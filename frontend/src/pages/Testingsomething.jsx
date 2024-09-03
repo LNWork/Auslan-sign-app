@@ -8,7 +8,7 @@ const Testingsomething = () => {
     const { transcript, resetTranscript, listening } = useSpeechRecognition();
 
     if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-        return <div>Your browser does not support speech recognition.</div>;
+        return <div>Your browser can't do speech recognition. Move to Google Chrome</div>;
     }
 
     const handleTextChange = (e) => {
@@ -53,6 +53,9 @@ const Testingsomething = () => {
             <div style={styles.lineBox}>
                 <div style={styles.line}></div>
             </div>
+            <div style={styles.whiteBox}>
+                <p>This is the box where I will put a video in </p>
+            </div>
         </div>
     );
 };
@@ -62,7 +65,7 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        marginTop: '40px', // Adjust this to position the first box slightly above the middle
+        marginTop: '40px', 
     },
     whiteBox: {
         width: '100%',
@@ -96,17 +99,15 @@ const styles = {
     lineBox: {
         width: '100%',
         maxWidth: '600px',
-        padding: '20px',
         textAlign: 'center',
-        position: 'relative',
+        marginBottom: '20px',
     },
     line: {
         width: '100%',
         height: '1px',
         backgroundColor: '#000',
-        position: 'absolute',
+        position: 'relative',
         top: '50%',
-        left: '0',
         transform: 'translateY(-50%)',
     },
 };
