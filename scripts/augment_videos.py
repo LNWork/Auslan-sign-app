@@ -1,7 +1,6 @@
 import cv2
 import os
 # This is the script for the gloss single word video augmentation. Let Kabilan know if this doesn't work properly
-# pip install gdown if we working with google drive files but that is for later
 
 #READ THIS probably won't work because i had each of the videos on it so I need to work around how to link it to the videos but it does augment 
 
