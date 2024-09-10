@@ -23,8 +23,8 @@ if not os.path.exists(output_folder):
 # List all video files in the input folder with .mp4 extension
 videos = [f for f in os.listdir(input_folder) if f.endswith('.mp4')]
 
-# Scaling factor for zoom by 20% feel free to change it
-scale_factor = 1.2
+# Scaling factor for zoom by 60% feel free to change it
+scale_factor = 1.6
 
 # Loop through each video in the input folder
 for video in videos:
@@ -82,6 +82,8 @@ for video in videos:
 
 print("BEES")
 
+
+#You can use fixed scales like angle = 15
 
         # Rotation:  rotating the image
         # angle = np.random.uniform(-30, 30)  # Random angle from -30 30
