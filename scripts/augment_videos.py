@@ -5,6 +5,7 @@ import os
 
 #READ THIS probably won't work because i had each of the videos on it so I need to work around how to link it to the videos but it does augment 
 
+# i will either try add a google drive link or we can discuss just running locally for now 
 
 #frame by frame breakdown extract frames, apply image aug to frame, reassemble, pray it works
 # if testing test with smaller size videos or you will be there forever  
