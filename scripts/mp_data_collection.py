@@ -1,58 +1,85 @@
 import cv2
 import mediapipe as mp
+import json
 
-mp_holistic = mp.solutions.holistic # Holistic model
-mp_drawing = mp.solutions.drawing_utils # Drawing utilities
+# Initialize MediaPipe Holistic and Drawing utilities
+mp_holistic = mp.solutions.holistic
+mp_drawing = mp.solutions.drawing_utils
 
-def mediapipe_detection(image, model):
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) # COLOR CONVERSION BGR 2 RGB
-    image.flags.writeable = False                  # Image is no longer writeable
-    results = model.process(image)                 # Make prediction
-    image.flags.writeable = True                   # Image is now writeable 
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR) # COLOR COVERSION RGB 2 BGR
-    return image, results
+# Function to convert landmarks to a list of dictionaries
+def extract_landmarks(landmarks):
+    return [{'x': lm.x, 'y': lm.y, 'z': lm.z, 'visibility': lm.visibility} for lm in landmarks.landmark]
 
+# Open the video file
+cap = cv2.VideoCapture('file path goes here')
 
-cap = cv2.VideoCapture(0)
-# Set mediapipe model 
-with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+# Initialize dictionary to store keypoints for each frame
+keypoints_data = []
+
+# Initialize Holistic
+with mp_holistic.Holistic(static_image_mode=False, 
+                          model_complexity=1, 
+                          smooth_landmarks=True, 
+                          min_detection_confidence=0.5, 
+                          min_tracking_confidence=0.5) as holistic:
+    frame_idx = 0
     while cap.isOpened():
-
-        # Read feed
         ret, frame = cap.read()
-
-        # Make detections
-        image, results = mediapipe_detection(frame, holistic)
-        print(results)
+        if not ret:
+            break
         
-        # Draw landmarks
-        draw_styled_landmarks(image, results)
+        # Convert the BGR frame to RGB for Mediapipe processing
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        # Show to screen
-        cv2.imshow('OpenCV Feed', image)
+        # Process the frame with the Holistic model
+        results = holistic.process(frame_rgb)
 
-        # Break gracefully
+        # Initialize a dictionary for the current frame's keypoints
+        frame_keypoints = {'frame': frame_idx}
+
+        # Extract pose landmarks
+        if results.pose_landmarks:
+            frame_keypoints['pose_landmarks'] = extract_landmarks(results.pose_landmarks)
+        
+        # Extract face landmarks
+        if results.face_landmarks:
+            frame_keypoints['face_landmarks'] = extract_landmarks(results.face_landmarks)
+
+        # Extract left hand landmarks
+        if results.left_hand_landmarks:
+            frame_keypoints['left_hand_landmarks'] = extract_landmarks(results.left_hand_landmarks)
+        
+        # Extract right hand landmarks
+        if results.right_hand_landmarks:
+            frame_keypoints['right_hand_landmarks'] = extract_landmarks(results.right_hand_landmarks)
+
+        # Append the frame data to keypoints_data
+        keypoints_data.append(frame_keypoints)
+
+        # Optionally draw landmarks on the frame (optional visualization)
+        if results.pose_landmarks:
+            mp_drawing.draw_landmarks(frame, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
+        if results.face_landmarks:
+            mp_drawing.draw_landmarks(frame, results.face_landmarks, mp_holistic.FACEMESH_TESSELATION)
+        if results.left_hand_landmarks:
+            mp_drawing.draw_landmarks(frame, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+        if results.right_hand_landmarks:
+            mp_drawing.draw_landmarks(frame, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+
+        # Show the frame (optional)
+        cv2.imshow('Holistic Model Output', frame)
+
+        # Exit with 'q'
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
-    cap.release()
-    cv2.destroyAllWindows()
 
-pose = []
-for res in results.pose_landmarks.landmark:
-    test = np.array([res.x, res.y, res.z, res.visibility])
-    pose.append(test)
+        # Increment frame index
+        frame_idx += 1
 
+# Save the keypoints data as a JSON file
+with open('keypoints_data.json', 'w') as f:
+    json.dump(keypoints_data, f, indent=4)
 
-pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(132)
-face = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten() if results.face_landmarks else np.zeros(1404)
-lh = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
-rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
-face = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten() if results.face_landmarks else np.zeros(1404)
-
-
-def extract_keypoints(results):
-    pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
-    face = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten() if results.face_landmarks else np.zeros(468*3)
-    lh = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
-    rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
-    return np.concatenate([pose, face, lh, rh])
+# Release video capture and close windows
+cap.release()
+cv2.destroyAllWindows()
