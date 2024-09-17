@@ -1,85 +1,76 @@
 import cv2
 import mediapipe as mp
 import json
+import os
+from glob import glob
 
-# Initialize MediaPipe Holistic and Drawing utilities
+# Initialize Model
 mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
 
-# Function to convert landmarks to a list of dictionaries
-def extract_landmarks(landmarks):
-    return [{'x': lm.x, 'y': lm.y, 'z': lm.z, 'visibility': lm.visibility} for lm in landmarks.landmark]
+# Directories for input output
+input_dir = 'data/New_Gloss_RGB_Data'  # Change this to your directory with videos
+output_dir = 'data/json_keypoints'        # Directory to save JSON files
 
-# Open the video file
-cap = cv2.VideoCapture('file path goes here')
+# Make sure directory is real
+os.makedirs(output_dir, exist_ok=True)
 
-# Initialize dictionary to store keypoints for each frame
-keypoints_data = []
+# List Video files
+video_files = glob(os.path.join(input_dir, '*.mp4'))  # Change extension if needed
 
-# Initialize Holistic
-with mp_holistic.Holistic(static_image_mode=False, 
-                          model_complexity=1, 
-                          smooth_landmarks=True, 
-                          min_detection_confidence=0.5, 
-                          min_tracking_confidence=0.5) as holistic:
-    frame_idx = 0
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
-        
-        # Convert the BGR frame to RGB for Mediapipe processing
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+# Process each video
+for video_file in video_files:
+    # Extract video name
+    video_name = os.path.splitext(os.path.basename(video_file))[0]
+    
+    # Open the video file
+    cap = cv2.VideoCapture(video_file)
+    
+    # Initialize dictionary to store keypoints for each frame
+    keypoints_data = []
 
-        # Process the frame with the Holistic model
-        results = holistic.process(frame_rgb)
+    # Initialize the Holistic model
+    with mp_holistic.Holistic(static_image_mode=False, 
+                              model_complexity=1, 
+                              smooth_landmarks=True, 
+                              min_detection_confidence=0.5, 
+                              min_tracking_confidence=0.5) as holistic:
+        frame_idx = 0
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
 
-        # Initialize a dictionary for the current frame's keypoints
-        frame_keypoints = {'frame': frame_idx}
+            # Convert the BGR frame to RGB for Mediapipe processing
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        # Extract pose landmarks
-        if results.pose_landmarks:
-            frame_keypoints['pose_landmarks'] = extract_landmarks(results.pose_landmarks)
-        
-        # Extract face landmarks
-        if results.face_landmarks:
-            frame_keypoints['face_landmarks'] = extract_landmarks(results.face_landmarks)
+            # Process the frame with the Holistic model
+            results = holistic.process(frame_rgb)
 
-        # Extract left hand landmarks
-        if results.left_hand_landmarks:
-            frame_keypoints['left_hand_landmarks'] = extract_landmarks(results.left_hand_landmarks)
-        
-        # Extract right hand landmarks
-        if results.right_hand_landmarks:
-            frame_keypoints['right_hand_landmarks'] = extract_landmarks(results.right_hand_landmarks)
+            # Initialize a dictionary for the current frame's keypoints
+            frame_keypoints = {'frame': frame_idx}
 
-        # Append the frame data to keypoints_data
-        keypoints_data.append(frame_keypoints)
+            # Extract pose landmarks
+            if results.pose_landmarks:
+                frame_keypoints['pose_landmarks'] = [{'x': lm.x, 'y': lm.y, 'z': lm.z, 'visibility': lm.visibility} 
+                                                     for lm in results.pose_landmarks.landmark]
+            # Extract left_hand landmarks
+            if results.left_hand_landmarks:
+                frame_keypoints['left_hand_landmarks'] = [{'x': lm.x, 'y': lm.y, 'z': lm.z, 'visibility': lm.visibility} 
+                                                     for lm in results.left_hand_landmarks.landmark]
+            # Extract right_hand landmarks
+            if results.right_hand_landmarks:
+                frame_keypoints['right_hand_landmarks'] = [{'x': lm.x, 'y': lm.y, 'z': lm.z, 'visibility': lm.visibility} 
+                                                     for lm in results.right_hand_landmarks.landmark]
 
-        # Optionally draw landmarks on the frame (optional visualization)
-        if results.pose_landmarks:
-            mp_drawing.draw_landmarks(frame, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
-        if results.face_landmarks:
-            mp_drawing.draw_landmarks(frame, results.face_landmarks, mp_holistic.FACEMESH_TESSELATION)
-        if results.left_hand_landmarks:
-            mp_drawing.draw_landmarks(frame, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-        if results.right_hand_landmarks:
-            mp_drawing.draw_landmarks(frame, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+            # keypoint data append, increment frame
+            keypoints_data.append(frame_keypoints)
+            frame_idx += 1
 
-        # Show the frame (optional)
-        cv2.imshow('Holistic Model Output', frame)
+    json_output_path = os.path.join(output_dir, f"{video_name}_keypoints.json")
+    with open(json_output_path, 'w') as f:
+        json.dump(keypoints_data, f, indent=4)
 
-        # Exit with 'q'
-        if cv2.waitKey(10) & 0xFF == ord('q'):
-            break
+    cap.release()
 
-        # Increment frame index
-        frame_idx += 1
-
-# Save the keypoints data as a JSON file
-with open('keypoints_data.json', 'w') as f:
-    json.dump(keypoints_data, f, indent=4)
-
-# Release video capture and close windows
-cap.release()
-cv2.destroyAllWindows()
+print(f"Collected Keypoints from {len(video_files)} Videos")
