@@ -1,9 +1,9 @@
 import cv2
 import json
 import os
-from pose_extraction import PoseExtractor
-from face_mesh_extraction import FaceMeshExtractor
-from hands_extraction import HandsExtractor
+from pose import PoseExtractor
+from face import FaceMeshExtractor
+from hands import HandsExtractor
 
 def extract_keypoints(video_path):
     pose_extractor = PoseExtractor()
