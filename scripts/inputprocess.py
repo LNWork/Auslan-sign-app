@@ -1,8 +1,8 @@
 import numpy as np
 
 # Parameters (adjust for real-time speed and accuracy)
-THRESHOLD = 0.05  # 5% change in keypoints
-WINDOW_SIZE = 5   # Number of frames with little to no movement to consider a pause
+THRESHOLD = 0.06  # 5% change in keypoints
+WINDOW_SIZE = 6   # Number of frames with little to no movement to consider a pause
 
 
 class RealTimeBoundaryDetector:
@@ -91,7 +91,7 @@ def main():
     real_time_detector = RealTimeBoundaryDetector()
 
     # Simulate a sequence of frames
-    frames = load_json_data('scripts/keypoints_data.json')
+    frames = load_json_data('scripts/combined_output.json')
 
     for frame in frames:
         real_time_detector.process_frame(frame)
