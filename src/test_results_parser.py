@@ -29,8 +29,8 @@ class ResultsParser:
         with open('parsed_result.json', 'w') as outfile:
             json.dump(result, outfile, indent=4)
 
-        # Uncomment below if you want to see the result printed out as well
-        # print(f"Best Word: {best_word}, Confidence: {best_confidence}")
+        
+        print(f"Best Word: {best_word}, Confidence: {best_confidence}")
 
 # Manual testing
 if __name__ == "__main__":
