@@ -1,8 +1,10 @@
 import numpy as np
 
 # Parameters (adjust for real-time speed and accuracy)
-THRESHOLD = 0.06  # 5% change in keypoints
-WINDOW_SIZE = 6   # Number of frames with little to no movement to consider a pause
+THRESHOLD = 0.05  # 5% change in keypoints
+VISIBILITY_THRESHOLD = 0.8  # Minimum visibility for a keypoint to be considered
+VISIBILITY_COUNT = 0.7  # Minimum number of keypoints with visibility above threshold
+WINDOW_SIZE = 5   # Number of frames with little to no movement to consider a pause
 
 
 class RealTimeBoundaryDetector:
@@ -17,7 +19,7 @@ class RealTimeBoundaryDetector:
 
     def extract_keypoints(self, landmarks):
         """Extract the keypoints (x, y, z) from the landmarks."""
-        return np.array([[landmark['x'], landmark['y'], landmark['z']] for landmark in landmarks])
+        return np.array([[landmark['x'], landmark['y'], landmark['z'], landmark['visibility']] for landmark in landmarks])
 
     def calculate_velocity(self, keypoints_current, keypoints_previous):
         """Calculate the velocity of keypoints between two frames."""
@@ -28,21 +30,25 @@ class RealTimeBoundaryDetector:
     def process_frame(self, frame):
         """Process a single frame of data in real-time."""
         pose_keypoints_current = self.extract_keypoints(
-            frame['pose_landmarks'])
+            frame.get('pose_landmarks', []))
 
-        # Handle empty left and right hand landmarks
+        if pose_keypoints_current.size == 0:
+            pose_keypoints_current = np.zeros(
+                (33, 4))
+
+            # Handle empty left and right hand landmarks
         left_hand_keypoints_current = self.extract_keypoints(
             frame.get('left_hand_landmarks', []))
         right_hand_keypoints_current = self.extract_keypoints(
             frame.get('right_hand_landmarks', []))
 
-        # If hand landmarks are empty, create dummy arrays with shape (21, 3)
+        # If hand landmarks are empty, create dummy arrays with shape (21, 4)
         if left_hand_keypoints_current.size == 0:
             left_hand_keypoints_current = np.zeros(
-                (21, 3))  # Assuming (x, y, z)
+                (21, 4))  # Assuming (x, y, z, visibility) for each keypoint
         if right_hand_keypoints_current.size == 0:
             right_hand_keypoints_current = np.zeros(
-                (21, 3))  # Same here for right hand
+                (21, 4))  # Same here for right hand
 
         # Combine all keypoints into one array
         keypoints_current = np.concatenate(
@@ -56,7 +62,7 @@ class RealTimeBoundaryDetector:
                 keypoints_current, self.previous_keypoints)
 
             # If velocity is below the threshold, increase pause count
-            if velocity < self.threshold:
+            if velocity < self.threshold and not self.visiblity_check(keypoints_current):
                 self.pause_count += 1
             else:
                 self.pause_count = 0  # Reset if significant movement detected
@@ -74,6 +80,17 @@ class RealTimeBoundaryDetector:
     def get_chunks(self):
         """Return chunks of frames between word boundaries."""
         return self.chunks
+
+    def visiblity_check(self, keypoints):
+        """Check if the visibility of keypoints is above a threshold."""
+        # print(len(keypoints[::3] > 0.5) > len(keypoints[::3]) * 0.7)
+        print((keypoints[..., 3] >= VISIBILITY_THRESHOLD).sum())
+        # print(len(keypoints[..., 3]) * VISIBILITY_COUNT)
+        if (((keypoints[..., 3] > VISIBILITY_THRESHOLD).sum()) >= len(keypoints[..., 3]) * VISIBILITY_COUNT):
+            # print("Visibility is above threshold")
+            return True
+        # print("Visibility is below threshold")
+        return False
 
     def reset(self):
         """Reset the state for the next real-time session."""
