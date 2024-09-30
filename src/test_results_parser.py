@@ -6,12 +6,8 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 genai_api_key = os.getenv("GOOGLE_API_KEY")
-
-os.environ["GOOGLE_API_KEY"] = genai_api_key
 genai.configure()
 class ResultsParser:
-    def __init__(self):
-        pass
 
     def parse_model_output(self, model_output):
         """
@@ -22,7 +18,7 @@ class ResultsParser:
             model_output (list of tuples): Output from the model, expected as a list of (word, confidence) tuples.
         """
         if not model_output:
-            # If there is no output, you could return or log an error
+            # To DO: Log error here.
             return {"error": "No output from model"}
 
         # Find the word with the highest confidence
@@ -33,13 +29,11 @@ class ResultsParser:
             model = genai.GenerativeModel("gemini-1.5-flash")
             response = model.generate_content("Convert these words into a correct English sentence:"+ best_phrase)
             response_dict = response.to_dict()
-            result = response_dict["candidates"][0]["content"]["parts"][0]["text"].strip('"').strip().replace("\n", "").replace("\"", "")
+            result = response_dict["candidates"][0]["content"]["parts"][0]["text"].strip('"').replace("\n", "").replace("\"", "")
             print(result)
         else:
-        #print(json.dumps(text))
             result = {
-                "word": best_phrase,
-                "confidence": best_confidence
+                best_phrase
             }
         return result
 
