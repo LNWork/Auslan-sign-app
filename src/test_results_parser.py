@@ -1,9 +1,17 @@
+import os
 import json
+import google.generativeai as genai
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+
+genai_api_key = os.getenv("GOOGLE_API_KEY")
+
+os.environ["GOOGLE_API_KEY"] = genai_api_key
+genai.configure()
 class ResultsParser:
     def __init__(self):
         pass
-
-
 
     def parse_model_output(self, model_output):
         """
@@ -18,16 +26,21 @@ class ResultsParser:
             return {"error": "No output from model"}
 
         # Find the word with the highest confidence
-        best_word, best_confidence = max(model_output, key=lambda item: item[1])
+        best_phrase, best_confidence = max(model_output, key=lambda item: item[1])
 
-        print(f"Best Word: {best_word}, Confidence: {best_confidence}")
-
-        # Prepare the result
-        result = {
-            "word": best_word,
-            "confidence": best_confidence
-        }
-
+        if len(best_phrase.split()) > 2:
+            print("contacting gemini")
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            response = model.generate_content("Convert these words into a correct English sentence:"+ best_phrase)
+            response_dict = response.to_dict()
+            result = response_dict["candidates"][0]["content"]["parts"][0]["text"].strip('"').strip().replace("\n", "").replace("\"", "")
+            print(result)
+        else:
+        #print(json.dumps(text))
+            result = {
+                "word": best_phrase,
+                "confidence": best_confidence
+            }
         return result
 
     def save_as_json(self, parsed_result, output_filename="parsed_result.json"):
@@ -45,13 +58,6 @@ def load_model_output(file_path):
 
 # Manual testing
 if __name__ == "__main__":
-    # Example manual input
-    # model_output = [
-    #     ["hello", 0.95],
-    #     ["hi", 0.75],
-    #     ["greetings", 0.60]
-    # ]
-
     # Create an instance of ResultsParser
     parser = ResultsParser()
 
@@ -66,3 +72,4 @@ if __name__ == "__main__":
     
     # Save the parsed result to a new JSON file
     parser.save_as_json(parsed_result)
+    
