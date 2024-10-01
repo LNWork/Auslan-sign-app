@@ -1,21 +1,23 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
+
 from markupsafe import escape
 
 app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return 'Index page'
+    return render_template('keypoints.html')
  
 @app.route('/api/keypoints', methods=['POST'])
-def recieve_landmarks():
-    data = request.json # Get the JSON data from request
-    # Save keypoints
-    # print("Recieved landmarks:", data) # to demo
+def receive_keypoints():
+    data = request.json  # Get the JSON data from the request
+    keypoints = data.get("poseLandmarks")  # Extract keypoints from the received data
 
-    #Respond with a success message
-    return jsonify({"message": "gotten keypoints"})
+    # You can process, store, or log the keypoints here
+    print("Received landmarks:", keypoints)  # Print keypoints for demonstration
 
+    # Respond with a success message
+    return jsonify({"message": "Landmarks received successfully!"})
 
 if __name__ == "__main__":
     app.run(debug=True)

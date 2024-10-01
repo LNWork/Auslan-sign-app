@@ -50,6 +50,7 @@
       // canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
     
       // Only overwrite missing pixels.
+
       canvasCtx.globalCompositeOperation = 'destination-atop';
       canvasCtx.drawImage(
           results.image, 0, 0, canvasElement.width, canvasElement.height);
@@ -74,14 +75,40 @@
     }
 
     function outputResults(results) {
+
+       // Prepare the data to send
+      const dataToSend = {
+          poseLandmarks: results.poseLandmarks,
+          leftHandLandmarks: results.leftHandLandmarks,
+          rightHandLandmarks: results.rightHandLandmarks,
+      };
+
+      // Send the data to the Flask backend
+      fetch('http://127.0.0.1:5000/api/keypoints', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(dataToSend), // Convert data to JSON
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log('Success:', data);
+          // You can also display the response message on the front end if desired
+      })
+      .catch((error) => {
+          console.error('Error:', error);
+      });
+
+      
       // Prepare text for output
       let outputText = '<strong>Landmark Coordinates:</strong><br>';
       
       // Check if pose landmarks exist
       if (results.poseLandmarks) {
-        results.poseLandmarks.forEach((landmark, index) => {
-          outputText += `Pose Landmark ${index}: (X: ${landmark.x.toFixed(3)}, Y: ${landmark.y.toFixed(3)}, Z: ${landmark.z.toFixed(3)})<br>`;
-        });
+          results.poseLandmarks.forEach((landmark, index) => {
+              outputText += `Pose Landmark ${index}: (X: ${landmark.x.toFixed(3)}, Y: ${landmark.y.toFixed(3)}, Z: ${landmark.z.toFixed(3)})<br>`;
+          });
       }
       
       // Check if left hand landmarks exist
