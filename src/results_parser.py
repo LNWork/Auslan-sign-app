@@ -1,52 +1,49 @@
+import os
 import json
+import google.generativeai as genai
+from dotenv import load_dotenv
+from flask import Flask, jsonify, request
 
+load_dotenv(override=True)
+
+genai_api_key = os.getenv("GOOGLE_API_KEY")
+genai.configure()
 class ResultsParser:
-    def __init__(self):
-        pass
 
     def parse_model_output(self, model_output):
         """
-        Parses the output from the sign language model and selects the word with the highest confidence.
+        Parses the output from the sign language model and saves the best word 
+        with the highest confidence to a JSON file.
         
         Args:
             model_output (list of tuples): Output from the model, expected as a list of (word, confidence) tuples.
-        
-        Returns:
-            json: Parsed result in JSON format.
         """
         if not model_output:
-            return json.dumps({"error": "No output from model"})
+            # To DO: Log error here.
+            return {"error": "No output from model"}
 
-        # Assuming the model output is a list of (word, confidence) tuples
-        # Example: [("hello", 0.95), ("hi", 0.75), ("greetings", 0.60)]
-        
         # Find the word with the highest confidence
-        best_word, best_confidence = max(model_output, key=lambda item: item[1])
+        best_phrase, best_confidence = max(model_output, key=lambda item: item[1])
 
-        # Format the output as JSON
-        result = {
-            "word": best_word,
-            "confidence": best_confidence
-        }
-        
-        return json.dumps(result)
+        if len(best_phrase.split()) > 2:
+            print("contacting gemini")
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            response = model.generate_content("Convert these words into a correct English sentence:"+ best_phrase)
+            response_dict = response.to_dict()
+            result = response_dict["candidates"][0]["content"]["parts"][0]["text"].strip('"').replace("\n", "").replace("\"", "")
+            print(result)
+        else:
+            result = {
+                best_phrase
+            }
+        return result
 
-# Example of how this would work with Flask
-from flask import Flask, jsonify, request
+    def save_as_json(self, parsed_result, output_filename="parsed_result.json"):
+        """
+        Save the parsed result as a JSON file.
+        """
+        with open(output_filename, 'w') as outfile:
+            json.dump(parsed_result, outfile, indent=4)
+            print(f"Saved parsed result to {output_filename}")
 
-app = Flask(__name__)
-parser = ResultsParser()
 
-@app.route('/parse', methods=['POST'])
-def parse():
-    # Get the model output from the POST request
-    model_output = request.json.get('model_output')
-
-    # Pass the model output to the results parser
-    parsed_result = parser.parse_model_output(model_output)
-    
-    # Return the parsed result as JSON
-    return jsonify(json.loads(parsed_result))
-
-if __name__ == "__main__":
-    app.run(debug=True)
