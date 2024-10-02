@@ -77,11 +77,14 @@
     function outputResults(results) {
 
        // Prepare the data to send
-      const dataToSend = {
-          poseLandmarks: results.poseLandmarks,
-          leftHandLandmarks: results.leftHandLandmarks,
-          rightHandLandmarks: results.rightHandLandmarks,
-      };
+       const dataToSend = {
+
+        keypoints: [
+          results.poseLandmarks,
+          results.leftHandLandmarks,
+          results.rightHandLandmarks,
+            ]
+          };
 
       // Send the data to the Flask backend
       fetch('http://127.0.0.1:5000/api/keypoints', {
@@ -94,13 +97,11 @@
       .then(response => response.json())
       .then(data => {
           console.log('Success:', data);
-          // You can also display the response message on the front end if desired
       })
       .catch((error) => {
           console.error('Error:', error);
       });
 
-      
       // Prepare text for output
       let outputText = '<strong>Landmark Coordinates:</strong><br>';
       

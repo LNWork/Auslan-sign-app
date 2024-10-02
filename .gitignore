@@ -2,3 +2,4 @@
 *.log
 docker-compose.override.yml
 .env
+.venv
