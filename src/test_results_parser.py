@@ -26,19 +26,19 @@ class ResultsParser:
             return {"error": "No output from model"}
 
         # Find the word with the highest confidence
-        best_phrase, best_confidence = max(model_output, key=lambda item: item[1])
+        best_model_phrase, best_confidence = max(model_output, key=lambda item: item[1])
 
-        if len(best_phrase.split()) > 2:
+        if len(best_model_phrase.split()) > 2:
             print("contacting gemini")
             model = genai.GenerativeModel("gemini-1.5-flash")
-            response = model.generate_content("Convert these words into a correct English sentence:"+ best_phrase)
+            response = model.generate_content("Convert these words into a correct English sentence:"+ best_model_phrase)
             response_dict = response.to_dict()
             result = response_dict["candidates"][0]["content"]["parts"][0]["text"].strip('"').strip().replace("\n", "").replace("\"", "")
             print(result)
         else:
         #print(json.dumps(text))
             result = {
-                "word": best_phrase,
+                "word": best_model_phrase,
                 "confidence": best_confidence
             }
         return result
