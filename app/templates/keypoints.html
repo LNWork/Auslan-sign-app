@@ -35,6 +35,30 @@
     const canvasCtx = canvasElement.getContext('2d');
     const resultsDiv = document.getElementById('results'); // Reference to results div
     
+    const emptyarray = [
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0}
+    ]
+
     function onResults(results) {
       canvasCtx.save();
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -78,15 +102,14 @@
 
        // Prepare the data to send
        const dataToSend = {
-
         keypoints: [
-          results.poseLandmarks,
-          results.leftHandLandmarks,
-          results.rightHandLandmarks,
-            ]
+          ...results.poseLandmarks || emptyarray,
+          ...results.leftHandLandmarks || emptyarray,
+          ...results.rightHandLandmarks || emptyarray
+        ]
           };
 
-      // Send the data to the Flask backend
+      // Send the data to the Flask backen
       fetch('http://127.0.0.1:5000/api/keypoints', {
           method: 'POST',
           headers: {

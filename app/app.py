@@ -8,7 +8,7 @@ app = Flask(__name__)
 def index():
     return render_template('keypoints.html')
 
-@app.route('/sign_to_text')
+@app.route('/text_to_sign')
 def run_text_to_sign():
     return render_template('text_to_sign.html')
  

@@ -18,6 +18,19 @@ os.makedirs(output_dir, exist_ok=True)
 # List Video files
 video_files = glob(os.path.join(input_dir, '*.mp4'))  # Change extension if needed
 
+# Fill non-present model arrays
+def fill_zeroes(num_lm):
+    return[{'x':0,'y':0,'z':0,"visibility":0} for point in range(num_lm)]
+
+# add function to complete missing keypoints
+def fill_keypoints(lms, total_lms):
+    if lms is None:
+        return fill_zeroes(total_lms)
+    keypoints = [{'x': lm.x, 'y': lm.y, 'z': lm.z, 'visibility': lm.visibility} for lm in lms.landmark]
+    while len(keypoints) < total_landmarks:
+        keypoints.append({'x': 0, 'y': 0, 'z': 0, 'visibility': 0})
+    return keypoints
+
 # Process each video
 for video_file in video_files:
     # Extract video name
@@ -50,23 +63,20 @@ for video_file in video_files:
             # Initialize a dictionary for the current frame's keypoints
             frame_keypoints = {'frame': frame_idx}
 
-            # Extract pose landmarks
-            if results.pose_landmarks:
-                frame_keypoints['pose_landmarks'] = [{'x': lm.x, 'y': lm.y, 'z': lm.z, 'visibility': lm.visibility} 
-                                                     for lm in results.pose_landmarks.landmark]
-            # Extract left_hand landmarks
-            if results.left_hand_landmarks:
-                frame_keypoints['left_hand_landmarks'] = [{'x': lm.x, 'y': lm.y, 'z': lm.z, 'visibility': lm.visibility} 
-                                                     for lm in results.left_hand_landmarks.landmark]
-            # Extract right_hand landmarks
-            if results.right_hand_landmarks:
-                frame_keypoints['right_hand_landmarks'] = [{'x': lm.x, 'y': lm.y, 'z': lm.z, 'visibility': lm.visibility} 
-                                                     for lm in results.right_hand_landmarks.landmark]
+            # Extract pose landmarks (ensure 33 keypoints)
+            frame_keypoints['pose_landmarks'] = complete_keypoints(results.pose_landmarks, 33)
 
-            # keypoint data append, increment frame
+            # Extract left hand landmarks (ensure 21 keypoints)
+            frame_keypoints['left_hand_landmarks'] = complete_keypoints(results.left_hand_landmarks, 21)
+
+            # Extract right hand landmarks (ensure 21 keypoints)
+            frame_keypoints['right_hand_landmarks'] = complete_keypoints(results.right_hand_landmarks, 21)
+
+            # Append keypoint data and increment frame index
             keypoints_data.append(frame_keypoints)
             frame_idx += 1
 
+    # Save keypoints to JSON file
     json_output_path = os.path.join(output_dir, f"{video_name}_keypoints.json")
     with open(json_output_path, 'w') as f:
         json.dump(keypoints_data, f, indent=4)
