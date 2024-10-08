@@ -1,18 +1,37 @@
 from pose_format import Pose
 from pose_format.pose_visualizer import PoseVisualizer
-#clone this https://github.com/sign-language-processing/pose/tree/master?tab=readme-ov-file
-# Load the .pose file
-data_buffer = open("C:\\Users\\kabil\\Downloads\\signvideo\\youth.pose", "rb").read()
-pose = Pose.read(data_buffer)
+import os
 
-# Create a visualizer object
-visualizer = PoseVisualizer(pose)
+# Folder containing .pose files
+folder_path = '/Users/albert/Downloads/Test'
 
-# Save the visualized poses as a video
-visualizer.save_video("C:\\Users\\kabil\\Downloads\\signvideo\\output_video.mp4", visualizer.draw())
+# Loop through all files in the folder
+for filename in os.listdir(folder_path):
+    file_path = os.path.join(folder_path, filename)
+    
+    # Process only .pose files
+    if os.path.isfile(file_path) and filename.endswith('.pose'):
+        # Read the pose file
+        with open(file_path, "rb") as f:
+            data_buffer = f.read()
+            pose = Pose.read(data_buffer)
 
-# Optionally, save the overlay on the original video
-visualizer.save_video("C:\\Users\\kabil\\Downloads\\signvideo\\output_overlay.mp4", visualizer.draw_on_video("C:\\Users\\kabil\\Downloads\\signvideo\\yummy.mp4"))
+        # Create a visualizer object
+        visualizer = PoseVisualizer(pose)
 
-# Optional: Save as GIF if using a Jupyter notebook or Google Colab
-# visualizer.save_gif("C:\\Users\\kabil\\Downloads\\signvideo\\output.gif", visualizer.draw())
+        # Generate output filenames based on input filename
+        output_video_path = os.path.join(folder_path, f"{os.path.splitext(filename)[0]}_output.mp4")
+        output_overlay_video_path = os.path.join(folder_path, f"{os.path.splitext(filename)[0]}_overlay_output.mp4")
+
+        # Save the visualized poses as a video
+        visualizer.save_video(output_video_path, visualizer.draw())
+
+        # Optionally, save the overlay on the original video if available
+        # Assuming the input video has the same name as the .pose file but with .mp4 extension
+        input_video_path = os.path.join(folder_path, f"{os.path.splitext(filename)[0]}.mp4")
+        if os.path.exists(input_video_path):
+            visualizer.save_video(output_overlay_video_path, visualizer.draw_on_video(input_video_path))
+        else:
+            print(f"No matching video found for {filename}, skipping overlay creation.")
+
+        print(f"Processed: {filename}")
