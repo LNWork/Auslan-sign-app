@@ -12,6 +12,10 @@ def process_pose_file(file_path):
             data_buffer = f.read()
             pose = Pose.read(data_buffer)
 
+        # Extract the title from the file name (or you can provide a custom title)
+        video_title = os.path.basename(file_path).split('.')[0]  # Extract filename without extension
+        print(video_title)
+
         # Create a visualizer object
         visualizer = PoseVisualizer(pose)
 
@@ -20,7 +24,8 @@ def process_pose_file(file_path):
         # output_overlay_video_path = os.path.splitext(file_path)[0] + "_overlay_output.mp4"
 
         # Save the visualized poses as a video
-        visualizer.save_video(output_video_path, visualizer.draw())
+        visualizer.save_video(output_video_path, visualizer.draw(title=video_title))
+
 
         # # Optionally, save the overlay on the original video if available
         # input_video_path = os.path.splitext(file_path)[0] + ".mp4"
