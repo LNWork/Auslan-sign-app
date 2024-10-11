@@ -3,6 +3,7 @@ from pose_format.pose_visualizer import PoseVisualizer
 import os
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
+from spoken_to_signed.gloss_to_pose import concatenate_poses  # Assuming concatenate_poses is from concatenate.py
 
 # Function to process each .pose file
 def process_pose_file(file_path):
@@ -16,9 +17,11 @@ def process_pose_file(file_path):
         video_title = os.path.basename(file_path).split('.')[0]  # Extract filename without extension
         print(video_title)
 
-        # Create a visualizer object
-        visualizer = PoseVisualizer(pose)
+        smoothed_pose = concatenate_poses(pose)
 
+        # Create a visualizer object
+        visualizer = PoseVisualizer(smoothed_pose)
+        
         # Generate output filenames based on input filename
         output_video_path = os.path.splitext(file_path)[0] + "_output.mp4"
         # output_overlay_video_path = os.path.splitext(file_path)[0] + "_overlay_output.mp4"
