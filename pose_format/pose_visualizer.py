@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 from .pose import Pose
 
+from typing import List
 
 class PoseVisualizer:
     """
@@ -167,9 +168,9 @@ class PoseVisualizer:
         # Adding the title to the bottom of the image
         if title:
             font = self.cv2.FONT_HERSHEY_SIMPLEX
-            font_scale = 1  # Adjust as necessary
+            font_scale = 4  # Adjust as necessary
             color = (255, 0, 0)  # Red text
-            thickness = 2  # Thickness of the text
+            thickness = 4  # Thickness of the text
             text_size = self.cv2.getTextSize(title, font, font_scale, thickness)[0]
             text_x = (img.shape[1] - text_size[0]) // 2  # Center the text horizontally
             text_y = img.shape[0] - 10  # Position the text slightly above the bottom edge
@@ -178,8 +179,7 @@ class PoseVisualizer:
         return img
 
 
-    def draw(self, background_color: Tuple[int, int, int] = (255, 255, 255), max_frames: int = None,
-             transparency: bool = False, title: str = ""):
+    def draw_frame_with_filename(self, frame_ranges: List[Tuple[int, int, str]], max_frames: int = None):
         """
         draws pose on plain background using the specified color - for a number of frames.
 
@@ -197,15 +197,38 @@ class PoseVisualizer:
             Frames with the pose data drawn on a custom background color.
         """
         # ...
-        if transparency:
-            background_color += (0,)
+        # if transparency:
+        #     background_color += (0,)
+        # int_frames = np.array(np.around(self.pose.body.data.data), dtype="int32")
+        # background = np.full(
+        #     (self.pose.header.dimensions.height, self.pose.header.dimensions.width, len(background_color)),
+        #     fill_value=background_color,
+        #     dtype="uint8")
+        # for frame, confidence in itertools.islice(zip(int_frames, self.pose.body.confidence), max_frames):
+        #     yield self._draw_frame(frame, confidence, img=background.copy(), transparency=transparency, title=title)
+        
         int_frames = np.array(np.around(self.pose.body.data.data), dtype="int32")
         background = np.full(
-            (self.pose.header.dimensions.height, self.pose.header.dimensions.width, len(background_color)),
-            fill_value=background_color,
-            dtype="uint8")
-        for frame, confidence in itertools.islice(zip(int_frames, self.pose.body.confidence), max_frames):
-            yield self._draw_frame(frame, confidence, img=background.copy(), transparency=transparency, title=title)
+        (self.pose.header.dimensions.height, self.pose.header.dimensions.width, 3),  # Assuming RGB
+        fill_value=(255, 255, 255),  # White background
+        dtype="uint8"
+    )
+
+        current_range_idx = 0
+        for frame_idx, (frame, confidence) in enumerate(zip(int_frames, self.pose.body.confidence)):
+            if max_frames is not None and frame_idx >= max_frames:
+                break
+            
+            # Determine which filename to use for this frame based on frame_ranges
+            if current_range_idx < len(frame_ranges):
+                start_frame, end_frame, filename = frame_ranges[current_range_idx]
+                if frame_idx > end_frame:
+                    current_range_idx += 1
+                    if current_range_idx < len(frame_ranges):
+                        start_frame, end_frame, filename = frame_ranges[current_range_idx]
+            
+            # Draw the frame with the correct filename overlay
+            yield self._draw_frame(frame, confidence, img=background.copy(), title=filename)
 
     def draw_on_video(self, background_video, max_frames: int = None, blur=False, title: str = ""):
         """

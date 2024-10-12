@@ -28,55 +28,63 @@ def trim_pose(pose, start=True, end=True):
     pose.body.confidence = pose.body.confidence[first_non_zero_index:last_non_zero_index]
     return pose
 
-# Singe pose processing, no concatenation
-def concatenate_poses(pose: Pose) -> Pose:
-    print('Reducing pose...')
-    pose = reduce_holistic(pose)
+# # Singe pose processing, no concatenation
+# def concatenate_poses(pose: Pose) -> Pose:
+#     print('Reducing pose...')
+#     pose = reduce_holistic(pose)
 
-    print('Normalizing pose...')
-    pose = normalize_pose(pose)
+#     print('Normalizing pose...')
+#     pose = normalize_pose(pose)
 
-    print('Trimming pose...')
-    pose = trim_pose(pose)
-
-    # Correct the wrists
-    print('Correcting wrists...')
-    pose = correct_wrists(pose)
-
-    # Scale the pose
-    print('Scaling pose...')
-    new_width = 500
-    shift = 1.25
-    shift_vec = np.full(shape=(pose.body.data.shape[-1]), fill_value=shift, dtype=np.float32)
-    pose.body.data = (pose.body.data + shift_vec) * new_width
-    pose.header.dimensions.height = pose.header.dimensions.width = int(new_width * shift * 2)
-
-    return pose
-
-# def concatenate_poses(poses: List[Pose]) -> tuple[Pose, List[tuple[int, int, str]]]:
-#     print('Reducing poses...')
-#     poses = [reduce_holistic(p) for p in poses]
-
-#     print('Normalizing poses...')
-#     poses = [normalize_pose(p) for p in poses]
-
-#     print('Trimming poses...')
-#     poses = [trim_pose(p, i > 0, i < len(poses) - 1) for i, p in enumerate(poses)]
-
-#     # Concatenate all poses
-#     print('Smooth concatenating poses...')
-#     concatenated_pose = smooth_concatenate_poses(poses)
+#     print('Trimming pose...')
+#     pose = trim_pose(pose)
 
 #     # Correct the wrists
 #     print('Correcting wrists...')
-#     concatenated_pose = correct_wrists(concatenated_pose)
+#     pose = correct_wrists(pose)
 
-#     # Scale the newly created pose
+#     # Scale the pose
 #     print('Scaling pose...')
 #     new_width = 500
 #     shift = 1.25
-#     shift_vec = np.full(shape=(concatenated_pose.body.data.shape[-1]), fill_value=shift, dtype=np.float32)
-#     concatenated_pose.body.data = (concatenated_pose.body.data + shift_vec) * new_width
-#     concatenated_pose.header.dimensions.height = concatenated_pose.header.dimensions.width = int(new_width * shift * 2)
+#     shift_vec = np.full(shape=(pose.body.data.shape[-1]), fill_value=shift, dtype=np.float32)
+#     pose.body.data = (pose.body.data + shift_vec) * new_width
+#     pose.header.dimensions.height = pose.header.dimensions.width = int(new_width * shift * 2)
 
-#     return concatenated_pose
+#     return pose
+
+def concatenate_poses(poses: List[Pose], filenames: List[str]) -> tuple[Pose, List[tuple[int, int, str]]]:
+    print('Reducing poses...')
+    poses = [reduce_holistic(p) for p in poses]
+
+    print('Normalizing poses...')
+    poses = [normalize_pose(p) for p in poses]
+
+    print('Trimming poses...')
+    poses = [trim_pose(p, i > 0, i < len(poses) - 1) for i, p in enumerate(poses)]
+
+    # Concatenate all poses
+    print('Smooth concatenating poses...')
+    concatenated_pose = smooth_concatenate_poses(poses)
+
+    # Correct the wrists
+    print('Correcting wrists...')
+    concatenated_pose = correct_wrists(concatenated_pose)
+
+    # Scale the newly created pose
+    print('Scaling pose...')
+    new_width = 500
+    shift = 1.25
+    shift_vec = np.full(shape=(concatenated_pose.body.data.shape[-1]), fill_value=shift, dtype=np.float32)
+    concatenated_pose.body.data = (concatenated_pose.body.data + shift_vec) * new_width
+    concatenated_pose.header.dimensions.height = concatenated_pose.header.dimensions.width = int(new_width * shift * 2)
+
+    # Collect frame range information for filenames
+    frame_ranges = []
+    current_frame = 0
+    for i, pose in enumerate(poses):
+        num_frames = len(pose.body.data)
+        frame_ranges.append((current_frame, current_frame + num_frames, filenames[i]))
+        current_frame += num_frames
+
+    return concatenated_pose, frame_ranges
