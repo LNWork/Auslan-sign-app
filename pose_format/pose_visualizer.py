@@ -170,10 +170,10 @@ class PoseVisualizer:
             font = self.cv2.FONT_HERSHEY_SIMPLEX
             font_scale = 4  # Adjust as necessary
             color = (255, 0, 0)  # Red text
-            thickness = 4  # Thickness of the text
+            thickness = 8  # Thickness of the text
             text_size = self.cv2.getTextSize(title, font, font_scale, thickness)[0]
             text_x = (img.shape[1] - text_size[0]) // 2  # Center the text horizontally
-            text_y = img.shape[0] - 10  # Position the text slightly above the bottom edge
+            text_y = img.shape[0] - 100  # Position the text slightly above the bottom edge
             self.cv2.putText(img, title, (text_x, text_y), font, font_scale, color, thickness, lineType=self.cv2.LINE_AA)
 
         return img
