@@ -2,36 +2,73 @@ import React, { useState } from 'react';
 import VideoInput from '../components/VideoInput';
 
 const TranslateApp = () => {
+  const [mode, setMode] = useState('videoToText'); // Toggle between 'videoToText' and 'textToVideo'
   const [sourceText, setSourceText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
+  const [animatedSignVideo, setAnimatedSignVideo] = useState(null); // Placeholder for the animated video output
 
-  // This is where your translation logic would go, such as calling an API
-  const handleTranslate = () => {
-    // Example translation logic (to be replaced with real translation logic/API)
-    setTranslatedText(`Translated Text: ${sourceText}`);
+  // This is where the translation logic will go
+  const handleSwap = () => {
+    setMode((prevMode) => (prevMode === 'videoToText' ? 'textToVideo' : 'videoToText'));
+  };
+
+  const handleTextToVideo = () => {
+    // Placeholder logic to convert text to an animated sign language video
+    setAnimatedSignVideo(`Animation for: ${sourceText}`); // For now, just display a placeholder
   };
 
   return (
     <div style={styles.container}>
-      <div style={styles.panel}>
-        <h2>Sign</h2>
-        {/* VideoInput component for video capture */}
-        <VideoInput />
-      </div>
+      {mode === 'videoToText' ? (
+        <>
+          {/* Video to Text Mode */}
+          <div style={styles.panel}>
+            <h2>Sign</h2>
+            <VideoInput />
+          </div>
 
-      <div style={styles.buttons}>
-        <button onClick={handleTranslate} style={styles.button}>Translate</button>
-      </div>
+          <div style={styles.buttons}>
+            <button onClick={handleSwap} style={styles.button}>Swap</button>
+          </div>
 
-      <div style={styles.panel}>
-        <h2>Text</h2>
-        <textarea
-          placeholder="Translation will appear here"
-          value={translatedText}
-          readOnly
-          style={styles.textarea}
-        />
-      </div>
+          <div style={styles.panel}>
+            <h2>Text</h2>
+            <textarea
+              placeholder="Translation will appear here"
+              value={translatedText}
+              readOnly
+              style={styles.textarea}
+            />
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Text to Video Mode */}
+          <div style={styles.panel}>
+            <h2>Text</h2>
+            <textarea
+              placeholder="Enter text to convert to sign language"
+              value={sourceText}
+              onChange={(e) => setSourceText(e.target.value)}
+              style={styles.textarea}
+            />
+          </div>
+
+          <div style={styles.buttons}>
+            <button onClick={handleSwap} style={styles.button}>Swap</button>
+            <button onClick={handleTextToVideo} style={styles.button}>Translate</button>
+          </div>
+
+          <div style={styles.panel}>
+            <h2>Sign Video</h2>
+            {animatedSignVideo ? (
+              <div style={styles.videoPlaceholder}>{animatedSignVideo}</div> // Placeholder for the sign language animation
+            ) : (
+              <div style={styles.videoPlaceholder}>Sign language animation will appear here</div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -50,15 +87,15 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    width: '50%', // Ensure each panel takes up equal space
-    height: '550px', // Taller height for both panels (adjust as needed)
+    width: '45%', // Ensure each panel takes up equal space
+    height: '400px', // Adjust height as needed
   },
   textarea: {
     width: '100%',
-    height: '100%', // Match height with the VideoInput panel
+    height: '100%', // Match height with the video panel
     padding: '10px',
     fontSize: '16px',
-    resize: 'none', // Prevent manual resizing of the textarea
+    resize: 'none',
     boxSizing: 'border-box', // Ensure padding is included within the size
   },
   buttons: {
@@ -72,6 +109,15 @@ const styles = {
     padding: '10px 20px',
     fontSize: '16px',
     cursor: 'pointer',
+  },
+  videoPlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#ddd',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: '16px',
   },
 };
 
