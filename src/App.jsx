@@ -1,6 +1,7 @@
 import React from 'react'
 import './App.css'
 import VideoInput from './components/VideoInput'
+import TranslateApp from './pages/Translate'
 
 const App = () => {
     return(
@@ -9,6 +10,7 @@ const App = () => {
                 Translate Auslan!
             </h1>
             <VideoInput />
+            <TranslateApp />
         </div>
     )
 }
