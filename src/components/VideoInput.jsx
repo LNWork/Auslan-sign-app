@@ -89,8 +89,8 @@ const VideoInput = () => {
         }
         canvasCtx.restore();
 
-        // Output Results to Page
-        outputResults(results, resultsDiv);
+        // Output Results to Page if desired
+        // outputResults(results, resultsDiv);
       });
 
       const camera = new window.Camera(videoElement, {
@@ -161,6 +161,7 @@ const VideoInput = () => {
     resultsDiv.innerHTML = outputText;
   };
 
+  // Component cleanup + Button to toggle camera
   return (
     <div className="container" style={{ position: 'relative', width: '1280px', height: '720px' }}>
       {error ? (
