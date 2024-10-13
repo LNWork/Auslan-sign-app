@@ -22,8 +22,8 @@ const TranslateApp = () => {
     setTranslatedText(`Translated (${targetLang}): ${sourceText}`);
   };
 
-  // Swap languages
-  const handleSwapLanguages = () => {
+  // Swap translation direction
+  const handleSwapTranslation = () => {
     setSourceLang(targetLang);
     setTargetLang(sourceLang);
   };
@@ -48,7 +48,7 @@ const TranslateApp = () => {
       </div>
 
       <div style={styles.buttons}>
-        <button onClick={handleSwapLanguages} style={styles.button}>Swap Languages</button>
+        <button onClick={handleSwapTranslation} style={styles.button}>Swap</button>
         <button onClick={handleTranslate} style={styles.button}>Translate</button>
       </div>
 
