@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import VideoInput from '../components/VideoInput';
 
 // Language options (for demo purposes, a small set of languages)
 const languages = [
@@ -30,7 +31,7 @@ const TranslateApp = () => {
   return (
     <div style={styles.container}>
       <div style={styles.panel}>
-        <h2>Source</h2>
+        <h2>Sign</h2>
         <select 
           value={sourceLang} 
           onChange={(e) => setSourceLang(e.target.value)} 
@@ -42,12 +43,8 @@ const TranslateApp = () => {
             </option>
           ))}
         </select>
-        <textarea
-          placeholder="Enter text"
-          value={sourceText}
-          onChange={(e) => setSourceText(e.target.value)}
-          style={styles.textarea}
-        />
+        {/* VideoInput component instead of textarea for video capture */}
+        <VideoInput />
       </div>
 
       <div style={styles.buttons}>
@@ -56,7 +53,7 @@ const TranslateApp = () => {
       </div>
 
       <div style={styles.panel}>
-        <h2>Target</h2>
+        <h2>Text</h2>
         <select 
           value={targetLang} 
           onChange={(e) => setTargetLang(e.target.value)} 

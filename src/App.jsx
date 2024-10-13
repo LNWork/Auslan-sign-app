@@ -9,7 +9,7 @@ const App = () => {
             <h1 className="text-3xl font-bold underline">
                 Translate Auslan!
             </h1>
-            <VideoInput />
+            {/* <VideoInput /> */}
             <TranslateApp />
         </div>
     )

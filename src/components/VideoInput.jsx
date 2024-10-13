@@ -20,7 +20,6 @@ const loadScript = (url) => {
 const VideoInput = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const resultsDivRef = useRef(null);
   const cameraRef = useRef(null); // Reference to the camera object
   const [isCameraOn, setIsCameraOn] = useState(false); // State to track if the camera is on
   const [error, setError] = useState(null); // State to handle errors
@@ -35,6 +34,13 @@ const VideoInput = () => {
     };
 
     loadMediaPipe();
+
+    // Cleanup on component unmount to stop video stream
+    return () => {
+      if (cameraRef.current) {
+        stopCamera();
+      }
+    };
   }, []);
 
   const startCamera = async () => {
@@ -42,7 +48,10 @@ const VideoInput = () => {
       const videoElement = videoRef.current;
       const canvasElement = canvasRef.current;
       const canvasCtx = canvasElement.getContext('2d');
-      const resultsDiv = resultsDivRef.current;
+
+      // Request camera feed
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      videoElement.srcObject = stream;
 
       const holistic = new window.Holistic({
         locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
@@ -61,10 +70,8 @@ const VideoInput = () => {
         // Clear and prepare canvas
         canvasCtx.save();
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        canvasCtx.globalCompositeOperation = 'destination-atop';
-        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-        canvasCtx.globalCompositeOperation = 'source-over';
-
+        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height); // Draw the video on the canvas
+        
         // Draw Pose and Hands Landmarks
         if (results.poseLandmarks) {
           window.drawConnectors(canvasCtx, results.poseLandmarks, window.POSE_CONNECTIONS, {
@@ -88,9 +95,6 @@ const VideoInput = () => {
           window.drawLandmarks(canvasCtx, results.rightHandLandmarks, { color: '#FF0000', lineWidth: 2 });
         }
         canvasCtx.restore();
-
-        // Output Results to Page if desired
-        // outputResults(results, resultsDiv);
       });
 
       const camera = new window.Camera(videoElement, {
@@ -118,8 +122,18 @@ const VideoInput = () => {
   const stopCamera = () => {
     if (cameraRef.current) {
       cameraRef.current.stop();
+      const stream = videoRef.current.srcObject;
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop()); // Stop the camera stream
+      }
+      videoRef.current.srcObject = null;
       cameraRef.current = null;
       setIsCameraOn(false);
+
+      // Clear the canvas when the camera is turned off
+      const canvasElement = canvasRef.current;
+      const canvasCtx = canvasElement.getContext('2d');
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height); // Clear the canvas
     }
   };
 
@@ -131,46 +145,19 @@ const VideoInput = () => {
     }
   };
 
-  const outputResults = (results, resultsDiv) => {
-    let outputText = '<strong>Landmark Coordinates:</strong><br>';
-
-    // Pose Landmarks
-    if (results.poseLandmarks) {
-      results.poseLandmarks.forEach((landmark, index) => {
-        outputText += `Pose Landmark ${index}: (X: ${landmark.x.toFixed(3)}, Y: ${landmark.y.toFixed(3)}, Z: ${landmark.z.toFixed(3)})<br>`;
-      });
-    }
-
-    // Left Hand Landmarks
-    if (results.leftHandLandmarks) {
-      outputText += '<br><strong>Left Hand Landmarks:</strong><br>';
-      results.leftHandLandmarks.forEach((landmark, index) => {
-        outputText += `Left Hand Landmark ${index}: (X: ${landmark.x.toFixed(3)}, Y: ${landmark.y.toFixed(3)}, Z: ${landmark.z.toFixed(3)})<br>`;
-      });
-    }
-
-    // Right Hand Landmarks
-    if (results.rightHandLandmarks) {
-      outputText += '<br><strong>Right Hand Landmarks:</strong><br>';
-      results.rightHandLandmarks.forEach((landmark, index) => {
-        outputText += `Right Hand Landmark ${index}: (X: ${landmark.x.toFixed(3)}, Y: ${landmark.y.toFixed(3)}, Z: ${landmark.z.toFixed(3)})<br>`;
-      });
-    }
-
-    // Update the resultsDiv with the generated outputText
-    resultsDiv.innerHTML = outputText;
-  };
-
-  // Component cleanup + Button to toggle camera
   return (
-    <div className="container" style={{ position: 'relative', width: '1280px', height: '720px' }}>
+    <div className="container" style={styles.container}>
       {error ? (
         <div style={{ color: 'red' }}>{error}</div>
       ) : (
         <>
+          {/* Hide the video element, it is only used to source the webcam feed */}
           <video ref={videoRef} className="input_video" style={{ display: 'none' }}></video>
-          <canvas ref={canvasRef} className="output_canvas" width="1280" height="720" />
-          <div className="results" ref={resultsDivRef} style={styles.results}></div>
+
+          {/* Only the canvas will be visible with the video feed and annotations */}
+          <canvas ref={canvasRef} className="output_canvas" width="1280" height="720" style={styles.canvas} />
+
+          <div className="results" style={styles.results}></div>
         </>
       )}
       <button onClick={toggleCamera} style={styles.button}>
@@ -181,6 +168,20 @@ const VideoInput = () => {
 };
 
 const styles = {
+  container: {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    padding: '10px',
+    boxSizing: 'border-box',
+  },
+  canvas: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    borderRadius: '10px',
+    boxSizing: 'border-box',
+  },
   results: {
     position: 'absolute',
     top: '10px',
@@ -189,7 +190,7 @@ const styles = {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: '10px',
     borderRadius: '5px',
-    zIndex: 10, // Ensures it appears above the video/canvas
+    zIndex: 10,
     fontFamily: 'Arial, sans-serif',
   },
   button: {
@@ -202,7 +203,7 @@ const styles = {
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
-    zIndex: 11, // Ensures the button appears above other elements
+    zIndex: 11,
   },
 };
 
