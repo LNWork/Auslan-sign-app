@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 // Import necessary MediaPipe scripts
 const cameraUtilsUrl = "https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js";
@@ -21,66 +21,88 @@ const VideoInput = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const resultsDivRef = useRef(null);
+  const [error, setError] = useState(null); // State to handle errors
   
   useEffect(() => {
     // Load all necessary MediaPipe scripts
     const loadMediaPipe = async () => {
-      await loadScript(cameraUtilsUrl);
-      await loadScript(controlUtilsUrl);
-      await loadScript(drawingUtilsUrl);
-      await loadScript(holisticUrl);
+      try {
+        await loadScript(cameraUtilsUrl);
+        await loadScript(controlUtilsUrl);
+        await loadScript(drawingUtilsUrl);
+        await loadScript(holisticUrl);
 
-      const videoElement = videoRef.current;
-      const canvasElement = canvasRef.current;
-      const canvasCtx = canvasElement.getContext('2d');
-      const resultsDiv = resultsDivRef.current;
-      
-      const holistic = new window.Holistic({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}` });
-      
-      holistic.setOptions({
-        modelComplexity: 1,
-        smoothLandmarks: true,
-        enableSegmentation: true,
-        smoothSegmentation: true,
-        minDetectionConfidence: 0.5,
-        minTrackingConfidence: 0.5
-      });
+        const videoElement = videoRef.current;
+        const canvasElement = canvasRef.current;
+        const canvasCtx = canvasElement.getContext('2d');
+        const resultsDiv = resultsDivRef.current;
 
-      holistic.onResults((results) => {
-        // Clear and prepare canvas
-        canvasCtx.save();
-        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        canvasCtx.globalCompositeOperation = 'destination-atop';
-        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-        canvasCtx.globalCompositeOperation = 'source-over';
+        const holistic = new window.Holistic({
+          locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
+        });
 
-        // Draw Pose and Hands Landmarks
-        if (results.poseLandmarks) {
-          window.drawConnectors(canvasCtx, results.poseLandmarks, window.POSE_CONNECTIONS, { color: '#00FF00', lineWidth: 4 });
-          window.drawLandmarks(canvasCtx, results.poseLandmarks, { color: '#FF0000', lineWidth: 2 });
+        holistic.setOptions({
+          modelComplexity: 1,
+          smoothLandmarks: true,
+          enableSegmentation: true,
+          smoothSegmentation: true,
+          minDetectionConfidence: 0.5,
+          minTrackingConfidence: 0.5,
+        });
+
+        holistic.onResults((results) => {
+          // Clear and prepare canvas
+          canvasCtx.save();
+          canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+          canvasCtx.globalCompositeOperation = 'destination-atop';
+          canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+          canvasCtx.globalCompositeOperation = 'source-over';
+
+          // Draw Pose and Hands Landmarks
+          if (results.poseLandmarks) {
+            window.drawConnectors(canvasCtx, results.poseLandmarks, window.POSE_CONNECTIONS, {
+              color: '#00FF00',
+              lineWidth: 4,
+            });
+            window.drawLandmarks(canvasCtx, results.poseLandmarks, { color: '#FF0000', lineWidth: 2 });
+          }
+          if (results.leftHandLandmarks) {
+            window.drawConnectors(canvasCtx, results.leftHandLandmarks, window.HAND_CONNECTIONS, {
+              color: '#CC0000',
+              lineWidth: 5,
+            });
+            window.drawLandmarks(canvasCtx, results.leftHandLandmarks, { color: '#00FF00', lineWidth: 2 });
+          }
+          if (results.rightHandLandmarks) {
+            window.drawConnectors(canvasCtx, results.rightHandLandmarks, window.HAND_CONNECTIONS, {
+              color: '#00CC00',
+              lineWidth: 5,
+            });
+            window.drawLandmarks(canvasCtx, results.rightHandLandmarks, { color: '#FF0000', lineWidth: 2 });
+          }
+          canvasCtx.restore();
+
+          // Output Results to Page
+          outputResults(results, resultsDiv);
+        });
+
+        const camera = new window.Camera(videoElement, {
+          onFrame: async () => {
+            await holistic.send({ image: videoElement });
+          },
+          width: 1280,
+          height: 720,
+        });
+        camera.start();
+      } catch (err) {
+        if (err.name === 'NotAllowedError') {
+          setError('Camera access was denied. Please allow camera permissions in your browser.');
+        } else if (err.name === 'NotFoundError') {
+          setError('No camera found. Please connect a camera to use this feature.');
+        } else {
+          setError(`Error accessing camera: ${err.message}`);
         }
-        if (results.leftHandLandmarks) {
-          window.drawConnectors(canvasCtx, results.leftHandLandmarks, window.HAND_CONNECTIONS, { color: '#CC0000', lineWidth: 5 });
-          window.drawLandmarks(canvasCtx, results.leftHandLandmarks, { color: '#00FF00', lineWidth: 2 });
-        }
-        if (results.rightHandLandmarks) {
-          window.drawConnectors(canvasCtx, results.rightHandLandmarks, window.HAND_CONNECTIONS, { color: '#00CC00', lineWidth: 5 });
-          window.drawLandmarks(canvasCtx, results.rightHandLandmarks, { color: '#FF0000', lineWidth: 2 });
-        }
-        canvasCtx.restore();
-
-        // Output Results to Page
-        outputResults(results, resultsDiv);
-      });
-
-      const camera = new window.Camera(videoElement, {
-        onFrame: async () => {
-          await holistic.send({ image: videoElement });
-        },
-        width: 1280,
-        height: 720,
-      });
-      camera.start();
+      }
     };
 
     loadMediaPipe();
@@ -124,9 +146,15 @@ const VideoInput = () => {
 
   return (
     <div className="container" style={{ position: 'relative', width: '1280px', height: '720px' }}>
-      <video ref={videoRef} className="input_video" style={{ display: 'none' }}></video>
-      <canvas ref={canvasRef} className="output_canvas" width="1280" height="720" />
-      <div className="results" ref={resultsDivRef} style={styles.results}></div>
+      {error ? (
+        <div style={{ color: 'red' }}>{error}</div>
+      ) : (
+        <>
+          <video ref={videoRef} className="input_video" style={{ display: 'none' }}></video>
+          <canvas ref={canvasRef} className="output_canvas" width="1280" height="720" />
+          <div className="results" ref={resultsDivRef} style={styles.results}></div>
+        </>
+      )}
     </div>
   );
 };
