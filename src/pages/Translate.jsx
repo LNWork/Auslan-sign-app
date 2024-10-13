@@ -7,8 +7,10 @@ const TranslateApp = () => {
   const [translatedText, setTranslatedText] = useState('');
   const [animatedSignVideo, setAnimatedSignVideo] = useState(null); // Placeholder for the animated video output
 
-  // This is where the translation logic will go
+  // This is where the translation logic will go (e.g., API call for video-to-text or text-to-video)
   const handleSwap = () => {
+    // Reset animatedSignVideo when switching modes
+    setAnimatedSignVideo(null);
     setMode((prevMode) => (prevMode === 'videoToText' ? 'textToVideo' : 'videoToText'));
   };
 
@@ -56,7 +58,7 @@ const TranslateApp = () => {
 
           <div style={styles.buttons}>
             <button onClick={handleSwap} style={styles.button}>Swap</button>
-            <button onClick={handleTextToVideo} style={styles.button}>Translate</button>
+            <button onClick={handleTextToVideo} style={styles.button}>Convert</button>
           </div>
 
           <div style={styles.panel}>
@@ -87,8 +89,10 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    justifyContent: 'center', // Center content vertically
     width: '45%', // Ensure each panel takes up equal space
-    height: '400px', // Adjust height as needed
+    height: '400px', // Consistent height for both modes (adjust as needed)
+    boxSizing: 'border-box',
   },
   textarea: {
     width: '100%',
@@ -112,12 +116,13 @@ const styles = {
   },
   videoPlaceholder: {
     width: '100%',
-    height: '100%',
+    height: '100%', // Match the height with textarea and video
     backgroundColor: '#ddd',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     fontSize: '16px',
+    boxSizing: 'border-box',
   },
 };
 
