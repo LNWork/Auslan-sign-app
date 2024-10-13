@@ -181,6 +181,37 @@ const VideoInput = () => {
   );
 };
 
+// Comment this out if you don't need to output the results to the page
+// const outputResults = (results, resultsDiv) => {
+//   let outputText = '<strong>Landmark Coordinates:</strong><br>';
+
+//   // Pose Landmarks
+//   if (results.poseLandmarks) {
+//     results.poseLandmarks.forEach((landmark, index) => {
+//       outputText += `Pose Landmark ${index}: (X: ${landmark.x.toFixed(3)}, Y: ${landmark.y.toFixed(3)}, Z: ${landmark.z.toFixed(3)})<br>`;
+//     });
+//   }
+
+//   // Left Hand Landmarks
+//   if (results.leftHandLandmarks) {
+//     outputText += '<br><strong>Left Hand Landmarks:</strong><br>';
+//     results.leftHandLandmarks.forEach((landmark, index) => {
+//       outputText += `Left Hand Landmark ${index}: (X: ${landmark.x.toFixed(3)}, Y: ${landmark.y.toFixed(3)}, Z: ${landmark.z.toFixed(3)})<br>`;
+//     });
+//   }
+
+//   // Right Hand Landmarks
+//   if (results.rightHandLandmarks) {
+//     outputText += '<br><strong>Right Hand Landmarks:</strong><br>';
+//     results.rightHandLandmarks.forEach((landmark, index) => {
+//       outputText += `Right Hand Landmark ${index}: (X: ${landmark.x.toFixed(3)}, Y: ${landmark.y.toFixed(3)}, Z: ${landmark.z.toFixed(3)})<br>`;
+//     });
+//   }
+
+//   // Update the resultsDiv with the generated outputText
+//   resultsDiv.innerHTML = outputText;
+// };
+
 const styles = {
   container: {
     position: 'relative',
