@@ -21,25 +21,41 @@ const VideoInput = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const cameraRef = useRef(null); // Reference to the camera object
+  const holisticRef = useRef(null); // Reference to the holistic object
   const [isCameraOn, setIsCameraOn] = useState(false); // State to track if the camera is on
   const [error, setError] = useState(null); // State to handle errors
   
   useEffect(() => {
-    // Load all necessary MediaPipe scripts
+    // Load MediaPipe scripts once and initialize the Holistic model
     const loadMediaPipe = async () => {
       await loadScript(cameraUtilsUrl);
       await loadScript(controlUtilsUrl);
       await loadScript(drawingUtilsUrl);
       await loadScript(holisticUrl);
+
+      // Initialize holistic once
+      const holistic = new window.Holistic({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
+      });
+
+      holistic.setOptions({
+        modelComplexity: 1,
+        smoothLandmarks: true,
+        enableSegmentation: true,
+        smoothSegmentation: true,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5,
+      });
+
+      // Store the holistic instance in a ref to reuse
+      holisticRef.current = holistic;
     };
 
     loadMediaPipe();
 
-    // Cleanup on component unmount to stop video stream
+    // Cleanup on component unmount to stop video stream and model
     return () => {
-      if (cameraRef.current) {
-        stopCamera();
-      }
+      stopCamera();
     };
   }, []);
 
@@ -53,18 +69,13 @@ const VideoInput = () => {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       videoElement.srcObject = stream;
 
-      const holistic = new window.Holistic({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
-      });
+      // If holistic model is initialized, use it
+      if (!holisticRef.current) {
+        console.error('Holistic model is not initialized');
+        return;
+      }
 
-      holistic.setOptions({
-        modelComplexity: 1,
-        smoothLandmarks: true,
-        enableSegmentation: true,
-        smoothSegmentation: true,
-        minDetectionConfidence: 0.5,
-        minTrackingConfidence: 0.5,
-      });
+      const holistic = holisticRef.current;
 
       holistic.onResults((results) => {
         // Clear and prepare canvas
@@ -97,16 +108,20 @@ const VideoInput = () => {
         canvasCtx.restore();
       });
 
-      const camera = new window.Camera(videoElement, {
-        onFrame: async () => {
-          await holistic.send({ image: videoElement });
-        },
-        width: 1280,
-        height: 720,
-      });
+      // Initialize camera only once
+      if (!cameraRef.current) {
+        const camera = new window.Camera(videoElement, {
+          onFrame: async () => {
+            await holistic.send({ image: videoElement });
+          },
+          width: 1280,
+          height: 720,
+        });
+        cameraRef.current = camera;
+      }
 
-      camera.start();
-      cameraRef.current = camera;
+      // Start the camera
+      cameraRef.current.start();
       setIsCameraOn(true);
     } catch (err) {
       if (err.name === 'NotAllowedError') {
@@ -127,7 +142,6 @@ const VideoInput = () => {
         stream.getTracks().forEach(track => track.stop()); // Stop the camera stream
       }
       videoRef.current.srcObject = null;
-      cameraRef.current = null;
       setIsCameraOn(false);
 
       // Clear the canvas when the camera is turned off
@@ -155,7 +169,7 @@ const VideoInput = () => {
           <video ref={videoRef} className="input_video" style={{ display: 'none' }}></video>
 
           {/* Only the canvas will be visible with the video feed and annotations */}
-          <canvas ref={canvasRef} className="output_canvas" width="1280" height="720" style={styles.canvas} />
+          <canvas ref={canvasRef} className="output_canvas" width="1920" height="1080" style={styles.canvas} />
 
           <div className="results" style={styles.results}></div>
         </>
@@ -172,8 +186,9 @@ const styles = {
     position: 'relative',
     width: '100%',
     height: '100%',
-    padding: '10px',
+    padding: '1px',
     boxSizing: 'border-box',
+    outline: '2px solid #007bff',
   },
   canvas: {
     width: '100%',

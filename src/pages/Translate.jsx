@@ -1,70 +1,30 @@
 import React, { useState } from 'react';
 import VideoInput from '../components/VideoInput';
 
-// Language options (for demo purposes, a small set of languages)
-const languages = [
-  { code: 'en', name: 'English' },
-  { code: 'es', name: 'Spanish' },
-  { code: 'fr', name: 'French' },
-  { code: 'de', name: 'German' },
-  { code: 'zh', name: 'Chinese' },
-];
-
 const TranslateApp = () => {
   const [sourceText, setSourceText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
-  const [sourceLang, setSourceLang] = useState('en');
-  const [targetLang, setTargetLang] = useState('es');
 
   // This is where your translation logic would go, such as calling an API
   const handleTranslate = () => {
     // Example translation logic (to be replaced with real translation logic/API)
-    setTranslatedText(`Translated (${targetLang}): ${sourceText}`);
-  };
-
-  // Swap translation direction
-  const handleSwapTranslation = () => {
-    setSourceLang(targetLang);
-    setTargetLang(sourceLang);
+    setTranslatedText(`Translated Text: ${sourceText}`);
   };
 
   return (
     <div style={styles.container}>
       <div style={styles.panel}>
         <h2>Sign</h2>
-        <select 
-          value={sourceLang} 
-          onChange={(e) => setSourceLang(e.target.value)} 
-          style={styles.dropdown}
-        >
-          {languages.map((lang) => (
-            <option key={lang.code} value={lang.code}>
-              {lang.name}
-            </option>
-          ))}
-        </select>
-        {/* VideoInput component instead of textarea for video capture */}
+        {/* VideoInput component for video capture */}
         <VideoInput />
       </div>
 
       <div style={styles.buttons}>
-        <button onClick={handleSwapTranslation} style={styles.button}>Swap</button>
         <button onClick={handleTranslate} style={styles.button}>Translate</button>
       </div>
 
       <div style={styles.panel}>
         <h2>Text</h2>
-        <select 
-          value={targetLang} 
-          onChange={(e) => setTargetLang(e.target.value)} 
-          style={styles.dropdown}
-        >
-          {languages.map((lang) => (
-            <option key={lang.code} value={lang.code}>
-              {lang.name}
-            </option>
-          ))}
-        </select>
         <textarea
           placeholder="Translation will appear here"
           value={translatedText}
@@ -83,27 +43,23 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between', // Add spacing between panels
     gap: '20px',
-    width: '80%',
+    width: '100%',
     margin: '0 auto',
   },
   panel: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    width: '45%', // Ensure each panel takes up equal space
-  },
-  dropdown: {
-    width: '100%',
-    padding: '10px',
-    marginBottom: '10px',
-    fontSize: '16px',
+    width: '50%', // Ensure each panel takes up equal space
+    height: '550px', // Taller height for both panels (adjust as needed)
   },
   textarea: {
     width: '100%',
-    height: '150px',
+    height: '100%', // Match height with the VideoInput panel
     padding: '10px',
     fontSize: '16px',
-    resize: 'none',
+    resize: 'none', // Prevent manual resizing of the textarea
+    boxSizing: 'border-box', // Ensure padding is included within the size
   },
   buttons: {
     display: 'flex',
