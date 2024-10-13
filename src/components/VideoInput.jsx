@@ -21,98 +21,115 @@ const VideoInput = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const resultsDivRef = useRef(null);
+  const cameraRef = useRef(null); // Reference to the camera object
+  const [isCameraOn, setIsCameraOn] = useState(false); // State to track if the camera is on
   const [error, setError] = useState(null); // State to handle errors
   
   useEffect(() => {
     // Load all necessary MediaPipe scripts
     const loadMediaPipe = async () => {
-      try {
-        await loadScript(cameraUtilsUrl);
-        await loadScript(controlUtilsUrl);
-        await loadScript(drawingUtilsUrl);
-        await loadScript(holisticUrl);
-
-        const videoElement = videoRef.current;
-        const canvasElement = canvasRef.current;
-        const canvasCtx = canvasElement.getContext('2d');
-        const resultsDiv = resultsDivRef.current;
-
-        const holistic = new window.Holistic({
-          locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
-        });
-
-        holistic.setOptions({
-          modelComplexity: 1,
-          smoothLandmarks: true,
-          enableSegmentation: true,
-          smoothSegmentation: true,
-          minDetectionConfidence: 0.5,
-          minTrackingConfidence: 0.5,
-        });
-
-        holistic.onResults((results) => {
-          // Clear and prepare canvas
-          canvasCtx.save();
-          canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-          canvasCtx.globalCompositeOperation = 'destination-atop';
-          canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-          canvasCtx.globalCompositeOperation = 'source-over';
-
-          // Draw Pose and Hands Landmarks
-          if (results.poseLandmarks) {
-            window.drawConnectors(canvasCtx, results.poseLandmarks, window.POSE_CONNECTIONS, {
-              color: '#00FF00',
-              lineWidth: 4,
-            });
-            window.drawLandmarks(canvasCtx, results.poseLandmarks, { color: '#FF0000', lineWidth: 2 });
-          }
-          if (results.leftHandLandmarks) {
-            window.drawConnectors(canvasCtx, results.leftHandLandmarks, window.HAND_CONNECTIONS, {
-              color: '#CC0000',
-              lineWidth: 5,
-            });
-            window.drawLandmarks(canvasCtx, results.leftHandLandmarks, { color: '#00FF00', lineWidth: 2 });
-          }
-          if (results.rightHandLandmarks) {
-            window.drawConnectors(canvasCtx, results.rightHandLandmarks, window.HAND_CONNECTIONS, {
-              color: '#00CC00',
-              lineWidth: 5,
-            });
-            window.drawLandmarks(canvasCtx, results.rightHandLandmarks, { color: '#FF0000', lineWidth: 2 });
-          }
-          canvasCtx.restore();
-
-          // Output Results to Page
-          outputResults(results, resultsDiv);
-        });
-
-        const camera = new window.Camera(videoElement, {
-          onFrame: async () => {
-            await holistic.send({ image: videoElement });
-          },
-          width: 1280,
-          height: 720,
-        });
-        camera.start();
-      } catch (err) {
-        if (err.name === 'NotAllowedError') {
-          setError('Camera access was denied. Please allow camera permissions in your browser.');
-        } else if (err.name === 'NotFoundError') {
-          setError('No camera found. Please connect a camera to use this feature.');
-        } else {
-          setError(`Error accessing camera: ${err.message}`);
-        }
-      }
+      await loadScript(cameraUtilsUrl);
+      await loadScript(controlUtilsUrl);
+      await loadScript(drawingUtilsUrl);
+      await loadScript(holisticUrl);
     };
 
     loadMediaPipe();
-
-    // Cleanup on component unmount
-    return () => {
-      const scripts = document.querySelectorAll('script[src*="mediapipe"]');
-      scripts.forEach((script) => script.remove());
-    };
   }, []);
+
+  const startCamera = async () => {
+    try {
+      const videoElement = videoRef.current;
+      const canvasElement = canvasRef.current;
+      const canvasCtx = canvasElement.getContext('2d');
+      const resultsDiv = resultsDivRef.current;
+
+      const holistic = new window.Holistic({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
+      });
+
+      holistic.setOptions({
+        modelComplexity: 1,
+        smoothLandmarks: true,
+        enableSegmentation: true,
+        smoothSegmentation: true,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5,
+      });
+
+      holistic.onResults((results) => {
+        // Clear and prepare canvas
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.globalCompositeOperation = 'destination-atop';
+        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.globalCompositeOperation = 'source-over';
+
+        // Draw Pose and Hands Landmarks
+        if (results.poseLandmarks) {
+          window.drawConnectors(canvasCtx, results.poseLandmarks, window.POSE_CONNECTIONS, {
+            color: '#00FF00',
+            lineWidth: 4,
+          });
+          window.drawLandmarks(canvasCtx, results.poseLandmarks, { color: '#FF0000', lineWidth: 2 });
+        }
+        if (results.leftHandLandmarks) {
+          window.drawConnectors(canvasCtx, results.leftHandLandmarks, window.HAND_CONNECTIONS, {
+            color: '#CC0000',
+            lineWidth: 5,
+          });
+          window.drawLandmarks(canvasCtx, results.leftHandLandmarks, { color: '#00FF00', lineWidth: 2 });
+        }
+        if (results.rightHandLandmarks) {
+          window.drawConnectors(canvasCtx, results.rightHandLandmarks, window.HAND_CONNECTIONS, {
+            color: '#00CC00',
+            lineWidth: 5,
+          });
+          window.drawLandmarks(canvasCtx, results.rightHandLandmarks, { color: '#FF0000', lineWidth: 2 });
+        }
+        canvasCtx.restore();
+
+        // Output Results to Page
+        outputResults(results, resultsDiv);
+      });
+
+      const camera = new window.Camera(videoElement, {
+        onFrame: async () => {
+          await holistic.send({ image: videoElement });
+        },
+        width: 1280,
+        height: 720,
+      });
+
+      camera.start();
+      cameraRef.current = camera;
+      setIsCameraOn(true);
+    } catch (err) {
+      if (err.name === 'NotAllowedError') {
+        setError('Camera access was denied. Please allow camera permissions in your browser.');
+      } else if (err.name === 'NotFoundError') {
+        setError('No camera found. Please connect a camera to use this feature.');
+      } else {
+        setError(`Error accessing camera: ${err.message}`);
+      }
+    }
+  };
+
+  const stopCamera = () => {
+    if (cameraRef.current) {
+      cameraRef.current.stop();
+      cameraRef.current = null;
+      setIsCameraOn(false);
+    }
+  };
+
+  const toggleCamera = () => {
+    if (isCameraOn) {
+      stopCamera();
+    } else {
+      startCamera();
+    }
+  };
 
   const outputResults = (results, resultsDiv) => {
     let outputText = '<strong>Landmark Coordinates:</strong><br>';
@@ -155,6 +172,9 @@ const VideoInput = () => {
           <div className="results" ref={resultsDivRef} style={styles.results}></div>
         </>
       )}
+      <button onClick={toggleCamera} style={styles.button}>
+        {isCameraOn ? 'Turn Camera Off' : 'Turn Camera On'}
+      </button>
     </div>
   );
 };
@@ -170,6 +190,18 @@ const styles = {
     borderRadius: '5px',
     zIndex: 10, // Ensures it appears above the video/canvas
     fontFamily: 'Arial, sans-serif',
+  },
+  button: {
+    position: 'absolute',
+    bottom: '20px',
+    left: '20px',
+    padding: '10px 20px',
+    backgroundColor: '#007bff',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    zIndex: 11, // Ensures the button appears above other elements
   },
 };
 
