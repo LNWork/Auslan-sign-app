@@ -33,9 +33,8 @@ class ResultsParser:
             result = response_dict["candidates"][0]["content"]["parts"][0]["text"].strip('"').replace("\n", "").replace("\"", "")
             print(result)
         else:
-            result = {
-                best_model_phrase
-            }
+            result = best_model_phrase
+            
         return result
 
     def save_as_json(self, parsed_result, output_filename="parsed_result.json"):
