@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify, render_template
 from results_parser import ResultsParser
+from results_parser import textAnimationTranslation
 import logging
 from markupsafe import escape
 
 app = Flask(__name__)
 
 results_parser = ResultsParser()
+text_animation_translation = textAnimationTranslation()
 
 # Set up logging
 logger = logging.getLogger()  # Create a logger
@@ -51,6 +53,19 @@ def model_output_parse():
     except Exception as e:
         logging.error(f'Error processing request: {e}')
         return jsonify({"error": "Internal Server Error. Check JSON Format"}), 500
+    
+@app.route('/t2s', methods=['POST'])
+def t2s_parse():
+    try:
+        t2s_input = request.get_json()
+        logging.info('Received request on /t2s: %s', t2s_input)
+        t2s_parse_phrase = t2s_input['t2s_input']
+        processed_t2s_phrase = text_animation_translation.parse_text_to_sign(t2s_parse_phrase)
+        logging.info('Text To Sign Processed Successfully! Message: %s', processed_t2s_phrase)  # Updated log message
+        return jsonify({"message": processed_t2s_phrase}), 200
+    except Exception as e:
+        logging.error(f'Error processing request: {e}')
+        return jsonify({"error": "Internal Server Error. Check JSON Format"}), 500 
 
 @app.route('/api/keypoints', methods=['POST'])
 def receive_keypoints():

@@ -48,6 +48,10 @@ class ResultsParser:
 class textAnimationTranslation:
 
     def parse_text_to_sign(self, t2s_input):
+
+        #if isinstance(t2s_input, list) and len(t2s_input) > 0:
+        #    t2s_input = t2s_input[0]
+
         if not t2s_input:
             # To DO: Log error here.
             return {"error": "Invalid input from user"}
@@ -57,15 +61,26 @@ class textAnimationTranslation:
             model = genai.GenerativeModel("gemini-1.5-flash")
             response = model.generate_content("Convert this phrase into an Auslan english Sentence (as text) Provide only the text no other explanation:"+ t2s_input)
             response2 = model.generate_content("Convert this phrase into a sign-language english Sentence (as text) Provide only the text no other explanation:"+ t2s_input)
-            result = response.to_dict
-            result2 = response2.to_dict
+            response_dict = response.to_dict()
+            response2_dict = response2.to_dict()
+            if response_dict["candidates"]:
+                result = response_dict["candidates"][0]["content"]["parts"][0]["text"].strip().replace("\n", "").replace("\"", "")
+            else:
+                result = "No valid response"
+            
+            # Safely accessing the text from the second response
+            if response2_dict["candidates"]:
+                result2 = response2_dict["candidates"][0]["content"]["parts"][0]["text"].strip().replace("\n", "").replace("\"", "")
+            else:
+                result2 = "No valid response"
             print(result)
             print(result2)
 
         else:
-            result = {t2s_input}
+            result = t2s_input
+            result2 = 'N/A'
 
-        return result
+        return result, result2
     
     def save_as_json(self, parsed_result, output_filename="parsed_input.json"):
         """
