@@ -163,4 +163,12 @@ cython_debug/
 
 # Folder with multiple json files
 /jsonStuff/
+/notebooks/json_keypoints/
 
+reduced_normalized_data.npz
+reduced_normalized_data2.npz
+reduced_normalized_data3.npz
+reduced_normalized_data4.npz
+reduced_normalized_data5.npz
+normalized_data.npz
+processed_data.npz
