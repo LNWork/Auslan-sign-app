@@ -58,7 +58,6 @@ def get_gloss_label(file_name, isosignsDF, singlewordDF):
     # Check if the file name starts with a digit to determine which DataFrame to use
     file_name = file_name.split("/")[-1]
     if 'video_64_147_1' in file_name or 'video_64_147_1_signer_keypoints' in file_name:
-        return 'right'
 
     if file_name[0].isdigit():
         # Extract Video_ID from the filename
@@ -216,5 +215,5 @@ if __name__ == '__main__':
     y_mapped_reduced = y_mapped[::4]   # Same for labels
 
     # Save the reduced dataset
-    np.savez_compressed('reduced_normalized_data2.npz',
+    np.savez_compressed('reduced_normalized_data4.npz',
                         xData=xData_reduced, yData=y_mapped_reduced)
