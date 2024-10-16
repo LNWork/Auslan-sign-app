@@ -59,6 +59,30 @@
       {'x':0,'y':0,'z':0,'visibility': 0}
     ]
 
+    const hand_emptyarray = [
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0},
+      {'x':0,'y':0,'z':0,'visibility': 0}
+    ]
+
     function onResults(results) {
       canvasCtx.save();
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -100,16 +124,23 @@
 
     function outputResults(results) {
 
+      const getLandmarkWithVisibility = (landmark) => (
+        {
+        x: landmark.x || 0,
+        y: landmark.y || 0,
+        z: landmark.z || 0,
+        visibility: landmark.visibility || 0 
+        });
+
        // Prepare the data to send
        const dataToSend = {
         keypoints: [
-          ...results.poseLandmarks || emptyarray,
-          ...results.leftHandLandmarks || emptyarray,
-          ...results.rightHandLandmarks || emptyarray
-        ]
-          };
+      ...(results.poseLandmarks || emptyarray).map(getLandmarkWithVisibility),
+      ...(results.leftHandLandmarks || hand_emptyarray).map(getLandmarkWithVisibility),
+      ...(results.rightHandLandmarks || hand_emptyarray).map(getLandmarkWithVisibility)
+          ]};
 
-      // Send the data to the Flask backen
+      // Send the data to the Flask backend
       fetch('http://127.0.0.1:5000/api/keypoints', {
           method: 'POST',
           headers: {

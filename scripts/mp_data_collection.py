@@ -9,14 +9,14 @@ mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
 
 # Directories for input output
-input_dir = 'data/New_Gloss_RGB_Data'  # Change this to your directory with videos
-output_dir = 'data/json_keypoints'        # Directory to save JSON files
+input_dir = 'data/practice_signs'  # Change this to your directory with videos
+output_dir = 'data/practice_signs_keypoints'        # Directory to save JSON files
 
 # Make sure directory is real
 os.makedirs(output_dir, exist_ok=True)
 
 # List Video files
-video_files = glob(os.path.join(input_dir, '*.mp4'))  # Change extension if needed
+video_files = glob(os.path.join(input_dir, '*.mov'))  # Change extension if needed
 
 # Fill non-present model arrays
 def fill_zeroes(num_lm):
@@ -27,7 +27,7 @@ def fill_keypoints(lms, total_lms):
     if lms is None:
         return fill_zeroes(total_lms)
     keypoints = [{'x': lm.x, 'y': lm.y, 'z': lm.z, 'visibility': lm.visibility} for lm in lms.landmark]
-    while len(keypoints) < total_landmarks:
+    while len(keypoints) < total_lms:
         keypoints.append({'x': 0, 'y': 0, 'z': 0, 'visibility': 0})
     return keypoints
 
@@ -64,13 +64,13 @@ for video_file in video_files:
             frame_keypoints = {'frame': frame_idx}
 
             # Extract pose landmarks (ensure 33 keypoints)
-            frame_keypoints['pose_landmarks'] = complete_keypoints(results.pose_landmarks, 33)
+            frame_keypoints['pose_landmarks'] = fill_keypoints(results.pose_landmarks, 33)
 
             # Extract left hand landmarks (ensure 21 keypoints)
-            frame_keypoints['left_hand_landmarks'] = complete_keypoints(results.left_hand_landmarks, 21)
+            frame_keypoints['left_hand_landmarks'] = fill_keypoints(results.left_hand_landmarks, 21)
 
             # Extract right hand landmarks (ensure 21 keypoints)
-            frame_keypoints['right_hand_landmarks'] = complete_keypoints(results.right_hand_landmarks, 21)
+            frame_keypoints['right_hand_landmarks'] = fill_keypoints(results.right_hand_landmarks, 21)
 
             # Append keypoint data and increment frame index
             keypoints_data.append(frame_keypoints)

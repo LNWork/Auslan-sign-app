@@ -3,3 +3,11 @@
 docker-compose.override.yml
 .env
 .venv
+data/New_Gloss_RGB_Data
+data/augmented_vid
+data/augmented_warp
+data/augmented_drop
+data/json_keypoints_drop
+data/json_keypoints_warp
+data/json_keypoints_shake
+
