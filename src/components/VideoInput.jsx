@@ -17,23 +17,21 @@ const loadScript = (url) => {
   });
 };
 
-const VideoInput = () => {
+const VideoInput = ({ onKeypointsChange }) => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const cameraRef = useRef(null); // Reference to the camera object
   const holisticRef = useRef(null); // Reference to the holistic object
   const [isCameraOn, setIsCameraOn] = useState(false); // State to track if the camera is on
   const [error, setError] = useState(null); // State to handle errors
-  
+
   useEffect(() => {
-    // Load MediaPipe scripts once and initialize the Holistic model
     const loadMediaPipe = async () => {
       await loadScript(cameraUtilsUrl);
       await loadScript(controlUtilsUrl);
       await loadScript(drawingUtilsUrl);
       await loadScript(holisticUrl);
 
-      // Initialize holistic once
       const holistic = new window.Holistic({
         locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
       });
@@ -47,15 +45,13 @@ const VideoInput = () => {
         minTrackingConfidence: 0.5,
       });
 
-      // Store the holistic instance in a ref to reuse
       holisticRef.current = holistic;
     };
 
     loadMediaPipe();
 
-    // Cleanup on component unmount to stop video stream and model
     return () => {
-      stopCamera();
+      stopCamera(); // Cleanup the camera on component unmount
     };
   }, []);
 
@@ -65,11 +61,9 @@ const VideoInput = () => {
       const canvasElement = canvasRef.current;
       const canvasCtx = canvasElement.getContext('2d');
 
-      // Request camera feed
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       videoElement.srcObject = stream;
 
-      // If holistic model is initialized, use it
       if (!holisticRef.current) {
         console.error('Holistic model is not initialized');
         return;
@@ -77,12 +71,13 @@ const VideoInput = () => {
 
       const holistic = holisticRef.current;
 
+      // Collect keypoints, draw on canvas, and pass keypoints to parent
       holistic.onResults((results) => {
-        // Clear and prepare canvas
+        // Clear the canvas and draw the video and landmarks
         canvasCtx.save();
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height); // Draw the video on the canvas
-        
+        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
         // Draw Pose and Hands Landmarks
         if (results.poseLandmarks) {
           window.drawConnectors(canvasCtx, results.poseLandmarks, window.POSE_CONNECTIONS, {
@@ -106,9 +101,19 @@ const VideoInput = () => {
           window.drawLandmarks(canvasCtx, results.rightHandLandmarks, { color: '#FF0000', lineWidth: 2 });
         }
         canvasCtx.restore();
+
+        // Send keypoints to parent component (Translate.jsx) via the onKeypointsChange prop
+        const keypoints = {
+          poseLandmarks: results.poseLandmarks || [],
+          leftHandLandmarks: results.leftHandLandmarks || [],
+          rightHandLandmarks: results.rightHandLandmarks || [],
+        };
+        if (onKeypointsChange) {
+          onKeypointsChange(keypoints);
+        }
       });
 
-      // Initialize camera only once
+      // Initialize the camera to start the feed
       if (!cameraRef.current) {
         const camera = new window.Camera(videoElement, {
           onFrame: async () => {
@@ -120,17 +125,10 @@ const VideoInput = () => {
         cameraRef.current = camera;
       }
 
-      // Start the camera
-      cameraRef.current.start();
-      setIsCameraOn(true);
+      cameraRef.current.start(); // Start the camera
+      setIsCameraOn(true); // Set camera state to 'on'
     } catch (err) {
-      if (err.name === 'NotAllowedError') {
-        setError('Camera access was denied. Please allow camera permissions in your browser.');
-      } else if (err.name === 'NotFoundError') {
-        setError('No camera found. Please connect a camera to use this feature.');
-      } else {
-        setError(`Error accessing camera: ${err.message}`);
-      }
+      handleCameraError(err);
     }
   };
 
@@ -139,15 +137,14 @@ const VideoInput = () => {
       cameraRef.current.stop();
       const stream = videoRef.current.srcObject;
       if (stream) {
-        stream.getTracks().forEach(track => track.stop()); // Stop the camera stream
+        stream.getTracks().forEach(track => track.stop());
       }
       videoRef.current.srcObject = null;
       setIsCameraOn(false);
 
-      // Clear the canvas when the camera is turned off
       const canvasElement = canvasRef.current;
       const canvasCtx = canvasElement.getContext('2d');
-      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height); // Clear the canvas
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height); // Clear the canvas when camera stops
     }
   };
 
@@ -156,6 +153,16 @@ const VideoInput = () => {
       stopCamera();
     } else {
       startCamera();
+    }
+  };
+
+  const handleCameraError = (err) => {
+    if (err.name === 'NotAllowedError') {
+      setError('Camera access was denied. Please allow camera permissions in your browser.');
+    } else if (err.name === 'NotFoundError') {
+      setError('No camera found. Please connect a camera to use this feature.');
+    } else {
+      setError(`Error accessing camera: ${err.message}`);
     }
   };
 
@@ -169,9 +176,7 @@ const VideoInput = () => {
           <video ref={videoRef} className="input_video" style={{ display: 'none' }}></video>
 
           {/* Only the canvas will be visible with the video feed and annotations */}
-          <canvas ref={canvasRef} className="output_canvas" width="1920" height="1080" style={styles.canvas} />
-
-          <div className="results" style={styles.results}></div>
+          <canvas ref={canvasRef} className="output_canvas" width="1280" height="720" style={styles.canvas} />
         </>
       )}
       <button onClick={toggleCamera} style={styles.button}>
@@ -180,37 +185,6 @@ const VideoInput = () => {
     </div>
   );
 };
-
-// Comment this out if you don't need to output the results to the page
-// const outputResults = (results, resultsDiv) => {
-//   let outputText = '<strong>Landmark Coordinates:</strong><br>';
-
-//   // Pose Landmarks
-//   if (results.poseLandmarks) {
-//     results.poseLandmarks.forEach((landmark, index) => {
-//       outputText += `Pose Landmark ${index}: (X: ${landmark.x.toFixed(3)}, Y: ${landmark.y.toFixed(3)}, Z: ${landmark.z.toFixed(3)})<br>`;
-//     });
-//   }
-
-//   // Left Hand Landmarks
-//   if (results.leftHandLandmarks) {
-//     outputText += '<br><strong>Left Hand Landmarks:</strong><br>';
-//     results.leftHandLandmarks.forEach((landmark, index) => {
-//       outputText += `Left Hand Landmark ${index}: (X: ${landmark.x.toFixed(3)}, Y: ${landmark.y.toFixed(3)}, Z: ${landmark.z.toFixed(3)})<br>`;
-//     });
-//   }
-
-//   // Right Hand Landmarks
-//   if (results.rightHandLandmarks) {
-//     outputText += '<br><strong>Right Hand Landmarks:</strong><br>';
-//     results.rightHandLandmarks.forEach((landmark, index) => {
-//       outputText += `Right Hand Landmark ${index}: (X: ${landmark.x.toFixed(3)}, Y: ${landmark.y.toFixed(3)}, Z: ${landmark.z.toFixed(3)})<br>`;
-//     });
-//   }
-
-//   // Update the resultsDiv with the generated outputText
-//   resultsDiv.innerHTML = outputText;
-// };
 
 const styles = {
   container: {
@@ -227,17 +201,6 @@ const styles = {
     objectFit: 'cover',
     borderRadius: '10px',
     boxSizing: 'border-box',
-  },
-  results: {
-    position: 'absolute',
-    top: '10px',
-    left: '10px',
-    color: 'white',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    padding: '10px',
-    borderRadius: '5px',
-    zIndex: 10,
-    fontFamily: 'Arial, sans-serif',
   },
   button: {
     position: 'absolute',
