@@ -17,7 +17,7 @@ const loadScript = (url) => {
   });
 };
 
-const VideoInput = ({ onKeypointsChange }) => {
+const VideoInput = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const cameraRef = useRef(null); // Reference to the camera object
@@ -71,7 +71,7 @@ const VideoInput = ({ onKeypointsChange }) => {
 
       const holistic = holisticRef.current;
 
-      // Collect keypoints, draw on canvas, and pass keypoints to parent
+      // Collect keypoints, draw on canvas, and send keypoints directly to the Flask backend
       holistic.onResults((results) => {
         // Clear the canvas and draw the video and landmarks
         canvasCtx.save();
@@ -102,15 +102,28 @@ const VideoInput = ({ onKeypointsChange }) => {
         }
         canvasCtx.restore();
 
-        // Send keypoints to parent component (Translate.jsx) via the onKeypointsChange prop
+        // Prepare keypoints to send to backend
         const keypoints = {
           poseLandmarks: results.poseLandmarks || [],
           leftHandLandmarks: results.leftHandLandmarks || [],
           rightHandLandmarks: results.rightHandLandmarks || [],
         };
-        if (onKeypointsChange) {
-          onKeypointsChange(keypoints);
-        }
+
+        // Send keypoints data to backend
+        fetch('http://127.0.0.1:5000/api/keypoints', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ keypoints }), // Convert data to JSON
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Data saved successfully:', data);
+        })
+        .catch((error) => {
+          console.error('Error saving data:', error);
+        });
       });
 
       // Initialize the camera to start the feed

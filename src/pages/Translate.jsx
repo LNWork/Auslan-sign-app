@@ -1,39 +1,13 @@
 import React, { useState } from 'react';
-import VideoInput from '../components/VideoInput'; // Ensure this path is correct based on your project structure
+import VideoInput from '../components/VideoInput';
 
-const Translate = () => {
+const TranslateApp = () => {
   const [mode, setMode] = useState('videoToText'); // Toggle between 'videoToText' and 'textToVideo'
   const [sourceText, setSourceText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
   const [animatedSignVideo, setAnimatedSignVideo] = useState(null); // Placeholder for the animated video output
-  const [keypoints, setKeypoints] = useState([]);
 
-  // Handle receiving keypoints from VideoInput component
-  const handleKeypointsChange = (newKeypoints) => {
-    setKeypoints((prevKeypoints) => [...prevKeypoints, newKeypoints]);
-
-    // Prepare data to send
-    const dataToSend = {
-      keypoints: newKeypoints,
-    };
-
-    // Send keypoints data to backend
-    fetch('http://127.0.0.1:5000/api/keypoints', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(dataToSend), // Convert data to JSON
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Data saved successfully:', data);
-    })
-    .catch((error) => {
-      console.error('Error saving data:', error);
-    });
-  };
-
+  // This is where the translation logic will go (e.g., API call for video-to-text or text-to-video)
   const handleSwap = () => {
     // Reset animatedSignVideo when switching modes
     setAnimatedSignVideo(null);
@@ -52,7 +26,7 @@ const Translate = () => {
           {/* Video to Text Mode */}
           <div style={styles.panel}>
             <h2>Sign</h2>
-            <VideoInput onKeypointsChange={handleKeypointsChange} />
+            <VideoInput />
           </div>
 
           <div style={styles.buttons}>
@@ -152,4 +126,4 @@ const styles = {
   },
 };
 
-export default Translate;
+export default TranslateApp;
