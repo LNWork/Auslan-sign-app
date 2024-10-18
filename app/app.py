@@ -3,8 +3,10 @@ from results_parser import ResultsParser
 from results_parser import textAnimationTranslation
 import logging
 from markupsafe import escape
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 results_parser = ResultsParser()
 text_animation_translation = textAnimationTranslation()

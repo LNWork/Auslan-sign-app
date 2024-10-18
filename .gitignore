@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+#Flask app cache
+results_parser.cpython-312.pyc
