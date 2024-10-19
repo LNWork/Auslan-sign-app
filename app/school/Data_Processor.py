@@ -5,5 +5,5 @@ class DataProcessor:
     def __init__(self):
         self.frame_number = 0
 
-    def add_frame(keypoints):
+    def add_frame(self,keypoints):
         pass

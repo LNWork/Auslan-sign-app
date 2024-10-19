@@ -10,6 +10,7 @@ import numpy as np
 
 app = Flask(__name__)
 CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 results_parser = ResultsParser()
 text_animation_translation = textAnimationTranslation()
@@ -55,7 +56,7 @@ def receive_keypoints():
     # You can process, store, or log the keypoints here
     print("Received landmarks:", data)  # Print keypoints for demonstration
 
-    # Sending data to the conntinator
+    # Sending data to the connectinator
     connectinator.process_frame(data)
 
     return jsonify({"message": "Keypoints received successfully!"})
