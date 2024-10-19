@@ -110,10 +110,11 @@ const VideoInput = () => {
         };
 
         // Send keypoints data to backend
-        fetch('http://127.0.0.1:5000/api/keypoints', {
+        fetch('http://127.0.0.1:8001/api/keypoints', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': 'http://127.0.0.1:8001/api/keypoints'
           },
           body: JSON.stringify({ keypoints }), // Convert data to JSON
         })
