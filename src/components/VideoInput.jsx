@@ -163,9 +163,9 @@ const VideoInput = () => {
 
         // Prepare keypoints to send to backend
         const keypoints = [];
-        keypoints.push(...(results.poseLandmarks || []));
-        keypoints.push(...(results.leftHandLandmarks || []));
-        keypoints.push(...(results.rightHandLandmarks || []));
+        keypoints.push(...(results.poseLandmarks || empty_pose));
+        keypoints.push(...(results.leftHandLandmarks || empty_hand));
+        keypoints.push(...(results.rightHandLandmarks || empty_hand));
 
         // Send keypoints data to backend
         fetch('http://127.0.0.1:8001/api/keypoints', {
