@@ -162,10 +162,11 @@ const VideoInput = () => {
         canvasCtx.restore();
 
         // Prepare keypoints to send to backend
-        const keypoints = [];
-        keypoints.push(...(results.poseLandmarks || empty_pose));
-        keypoints.push(...(results.leftHandLandmarks || empty_hand));
-        keypoints.push(...(results.rightHandLandmarks || empty_hand));
+        const keypoints = {
+          poseLandmarks: results.poseLandmarks || empty_pose,
+          leftHandLandmarks: results.leftHandLandmarks || empty_hand,
+          rightHandLandmarks: results.rightHandLandmarks || empty_hand,
+        }
 
         // Send keypoints data to backend
         fetch('http://127.0.0.1:8001/api/keypoints', {

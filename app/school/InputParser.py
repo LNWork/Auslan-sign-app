@@ -60,9 +60,9 @@ class InputParser:
 
     def combine_keypoints(self, frame):
         """Combine pose, left hand, and right hand keypoints into a single array."""
-        pose = self.extract_keypoints(frame['pose_landmarks'])
-        left_hand = self.extract_keypoints(frame['left_hand_landmarks'])
-        right_hand = self.extract_keypoints(frame['right_hand_landmarks'])
+        pose = self.extract_keypoints(frame['keypoints']['poseLandmarks'])
+        left_hand = self.extract_keypoints(frame['keypoints']['leftHandLandmarks'])
+        right_hand = self.extract_keypoints(frame['keypoints']['rightHandLandmarks'])
 
         combined = np.concatenate((pose, left_hand, right_hand), axis=0)
         # Normalize combined keypoints

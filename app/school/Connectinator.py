@@ -1,5 +1,5 @@
 from school.Model_Owner import Model
-from app.school.InputParser import InputParser
+from school.InputParser import InputParser
 
 
 class Connectinator:
