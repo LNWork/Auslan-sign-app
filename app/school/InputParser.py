@@ -64,7 +64,8 @@ class InputParser:
 
     def combine_keypoints(self, frame):
         """Combine pose, left hand, and right hand keypoints into a single array."""
-        combined = np.concatenate((frame['keypoints']), axis=0)
+        # combined = np.concatenate((frame['keypoints']), axis=0)
+        combined = frame['keypoints']
         # Normalize combined keypoints
         return self.normalize_keypoints(combined)
 
@@ -76,7 +77,7 @@ class InputParser:
 
     def process_frame(self, frame):
         """Process a single frame of keypoint data in real-time."""
-        keypoints_current = self.combine_keypoints(frame)
+        keypoints_current = self.normalize_keypoints(frame['keypoints'])
 
         handsDown = self.handsDown(
             keypoints_current[33:54], keypoints_current[54:75])
