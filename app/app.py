@@ -1,15 +1,16 @@
 from flask import Flask, request, jsonify, render_template
-from results_parser import ResultsParser
-from results_parser import textAnimationTranslation
+#from results_parser import ResultsParser
+#from school.GrammarParser import textAnimationTranslation
 import logging
 from markupsafe import escape
 from flask_cors import CORS
+from school.Connectinator import Connectinator
+import numpy as np
 
 app = Flask(__name__)
 CORS(app)
-
-results_parser = ResultsParser()
-text_animation_translation = textAnimationTranslation()
+model_path = 'frienddidit_cam1_200_extra.keras'
+connectinator = Connectinator(model_path)
 
 # Set up logging
 logger = logging.getLogger()  # Create a logger
@@ -34,6 +35,9 @@ logger.addHandler(console_handler)
 
 @app.route("/")
 def index():
+    #loaded_data = np.load('exported_data.npy')
+    #model_result = connectinator.predict_model(loaded_data)
+    #print(model_result) 
     return render_template('keypoints.html')
 
 @app.route('/sign_to_text')
@@ -46,8 +50,8 @@ def model_output_parse():
 
         model_output = request.get_json()
         logging.info('Received request on /model_output: %s', model_output)  # Updated log message
-        model_output_data = model_output['model_output']
-        processed_output = results_parser.parse_model_output(model_output_data)
+        #model_output_data = model_output['model_output']
+        processed_output = connectinator.parse_model_output(model_output)
     
         logging.info('Model Output Processed Successfully! Message: %s', processed_output)  # Updated log message
         return jsonify({"message": processed_output}), 200
@@ -61,16 +65,23 @@ def t2s_parse():
     try:
         t2s_input = request.get_json()
         logging.info('Received request on /t2s: %s', t2s_input)
-        t2s_parse_phrase = t2s_input['t2s_input']
-        processed_t2s_phrase = text_animation_translation.parse_text_to_sign(t2s_parse_phrase)
-        logging.info('Text To Sign Processed Successfully! Message: %s', processed_t2s_phrase)  # Updated log message
-        return jsonify({"message": processed_t2s_phrase}), 200
+        processed_t2s_phrase = connectinator.parse_text_to_sign(t2s_input)
+        #t2s_parse_phrase = t2s_input['t2s_input']
+        #processed_t2s_phrase = text_animation_translation.parse_text_to_sign(t2s_parse_phrase)
+        #logging.info('Text To Sign Processed Successfully! Message: %s', processed_t2s_phrase)  # Updated log message
+        return jsonify({"Translated_text": processed_t2s_phrase}), 200
     except Exception as e:
         logging.error(f'Error processing request: {e}')
         return jsonify({"error": "Internal Server Error. Check JSON Format"}), 500 
 
 @app.route('/api/keypoints', methods=['POST'])
 def receive_keypoints():
+
+    # You can process, store, or log the keypoints here
+    #print("Received landmarks:", data)  # Print keypoints for demonstration
+
+    # Sending data to the conntinator
+    #connectinator.process_frame(data)
     data = request.json  # Get the JSON data from the request
     logging.info("Received landmarks: %s", data)  # Log keypoints received
     return jsonify({"message": "Keypoints received successfully!"})
