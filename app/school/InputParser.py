@@ -160,10 +160,10 @@ class InputParser:
 
     def endPhrase(self):
         """End the current phrase and save the chunks to a file."""
+        self.endOfPhrase = True
         if self.current_chunk:
             self.save_chunk(self.current_chunk)
             self.current_chunk = []
-        self.endOfPhrase = True
         print("END OF PHRASE")
         self.callFunc()
 
