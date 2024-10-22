@@ -32,7 +32,7 @@ class InputParser:
 
     def normalize_keypoints(self, data):
         """Normalize the keypoints data."""
-        # data = np.array(data)  # Convert to NumPy array
+        data = np.array(data)  # Convert to NumPy array
         coords = data[..., :3]  # Extract x, y, z coordinates
         min_vals = np.min(coords, axis=0, keepdims=True)
         max_vals = np.max(coords, axis=0, keepdims=True)
@@ -66,10 +66,30 @@ class InputParser:
     def combine_keypoints(self, frame):
         """Combine pose, left hand, and right hand keypoints into a single array."""
         # combined = np.concatenate((frame['keypoints']), axis=0)
-        combined = self.extract_keypoints(frame['keypoints'])
+        full_data = []
+        for index, keypoints in enumerate(frame):
+            if keypoints != None:
+                full_data += keypoints
+                continue
+            
+            pose_number = 33 if index == 0 else 21
 
+            match index:
+                case 0:
+                    full_data += [{'x': 0, 'y': 0, 'z': 0, 'visibility': 0} for _ in range(pose_number)]
+                case 1 | 2:
+                    full_data += [{'x': 0, 'y': 0, 'z': 0, 'visibility': 0} for _ in range(pose_number)]
+                case _:
+                    print("if goes here u have stuffed up")
+            
+
+        #combined = self.extract_keypoints(full_data)
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        print(full_data)
+
+        extracted_data = self.extract_keypoints(full_data)
         # Normalize combined keypoints
-        return self.normalize_keypoints(combined)
+        return self.normalize_keypoints(extracted_data)
 
     def calculate_velocity(self, keypoints_current, keypoints_previous):
         """Calculate the velocity of keypoints between two frames."""
@@ -79,7 +99,7 @@ class InputParser:
 
     def process_frame(self, frame):
         """Process a single frame of keypoint data in real-time."""
-        keypoints_current = self.normalize_keypoints(frame['keypoints'])
+        keypoints_current = self.combine_keypoints(frame['keypoints'])
 
         handsDown = self.handsDown(
             keypoints_current[33:53], keypoints_current[54:74])
