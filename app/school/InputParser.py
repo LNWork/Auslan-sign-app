@@ -66,6 +66,7 @@ class InputParser:
     def combine_keypoints(self, frame):
         """Combine pose, left hand, and right hand keypoints into a single array."""
         # combined = np.concatenate((frame['keypoints']), axis=0)
+        # Checker for missing keypoint data
         full_data = []
         for index, keypoints in enumerate(frame):
             if keypoints != None:
@@ -85,8 +86,8 @@ class InputParser:
                     print("if goes here u have stuffed up")
 
         # combined = self.extract_keypoints(full_data)
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-        print(full_data)
+        #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        #print(full_data)
 
         extracted_data = self.extract_keypoints(full_data)
         # Normalize combined keypoints
@@ -101,18 +102,19 @@ class InputParser:
     def process_frame(self, frame):
         """Process a single frame of keypoint data in real-time."""
         keypoints_current = self.combine_keypoints(frame['keypoints'])
-
+        chunk_result = None
+        
         handsDown = self.handsDown(
             keypoints_current[33:53], keypoints_current[54:74])
         if handsDown:
             self.handsDownCounter += 1
-            print("HANDS DOWN for ", handsDownCounter)
+            print("HANDS DOWN for ", self.handsDownCounter)
             if self.handsDownCounter >= HANDS_DOWN_TIME:
                 print("HANDS DOWN FOR TOO LONG")
                 print("END OF PHRASE")
                 self.endPhrase()
         else:
-            handsDownCounter = 0
+            self.handsDownCounter = 0
 
             # Store combined and normalized keypoints in 'data'
         frame['data'] = keypoints_current.tolist()

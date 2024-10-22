@@ -4,6 +4,7 @@ import logging
 from school.results_parser import ResultsParser
 from school.results_parser import textAnimationTranslation
 import asyncio
+from time import time
 
 def create_logger():
     # Set up logging
@@ -65,6 +66,9 @@ class Connectinator:
         # Pass this then to a varable being used for the react front end.
         self.front_end_translation_variable = processed_output
 
+        with open('model_output.txt', 'a+') as f:
+            f.write(f"Time: {time()}, Phrase: {self.front_end_translation_variable}")
+
     # Return auslan grammer sentence
     def format_sign_text(self, input):
         processed_t2s_phrase = self.text_animation_translation.parse_text_to_sign(input)
@@ -80,9 +84,7 @@ class Connectinator:
 
         if full_chunk != None:
             # async predict the work and then add it to the self.full_phrase
-            
-            # TODO make predict async
-            predicted_result = await  self.predict_model(full_chunk)
+            predicted_result = await self.predict_model(full_chunk)
             self.full_phrase.append(predicted_result)
 
         

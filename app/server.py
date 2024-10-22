@@ -50,7 +50,7 @@ async def receive_keypoints():
     data = request.json  # Get the JSON data from the request
 
     # You can process, store, or log the keypoints here
-    print("Received landmarks:", data)  # Print keypoints for demonstration
+    #print("Received landmarks:", data)  # Print keypoints for demonstration
 
     # Sending data to the connectinator
     await connectinator.process_frame(data)
