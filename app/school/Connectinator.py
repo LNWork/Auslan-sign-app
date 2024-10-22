@@ -39,7 +39,7 @@ class Connectinator:
         self.model = Model(model_path)
 
         # Creating data processor class
-        self.inputProc = InputParser(connectinator=self)
+        self.inputProc = InputParser()
 
         # Create result parser
         self.results_parser = ResultsParser()

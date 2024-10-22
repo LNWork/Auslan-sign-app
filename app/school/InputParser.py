@@ -16,7 +16,7 @@ HANDS_DOWN_TIME = 30
 
 
 class InputParser:
-    def __init__(self, connectinator, threshold=THRESHOLD, window_size=WINDOW_SIZE, buffer_size=5):
+    def __init__(self, threshold=THRESHOLD, window_size=WINDOW_SIZE, buffer_size=5):
         self.threshold = threshold
         self.window_size = window_size
         self.buffer_size = buffer_size
@@ -29,7 +29,6 @@ class InputParser:
         self.chunk_counter = 0
         self.handsDownCounter = 0
         self.endOfPhrase = False
-        self.connectinator = connectinator
 
     def normalize_keypoints(self, data):
         """Normalize the keypoints data."""
