@@ -95,10 +95,6 @@ class InputParser:
         else:
             handsDownCounter = 0
 
-            # TODO: CHECK IF HANDS DOWN
-            # TODO: IF HANDS DOWN COUNTER REACHED, DEFINE END OF PHRASE
-            # TODO: END OF PHRASE SEND TO CONNECTINATOR
-
             # Store combined and normalized keypoints in 'data'
         frame['data'] = keypoints_current.tolist()
 
