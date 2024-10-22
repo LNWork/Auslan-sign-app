@@ -71,19 +71,20 @@ class InputParser:
             if keypoints != None:
                 full_data += keypoints
                 continue
-            
+
             pose_number = 33 if index == 0 else 21
 
             match index:
                 case 0:
-                    full_data += [{'x': 0, 'y': 0, 'z': 0, 'visibility': 0} for _ in range(pose_number)]
+                    full_data += [{'x': 0, 'y': 0, 'z': 0, 'visibility': 0}
+                                  for _ in range(pose_number)]
                 case 1 | 2:
-                    full_data += [{'x': 0, 'y': 0, 'z': 0, 'visibility': 0} for _ in range(pose_number)]
+                    full_data += [{'x': 0, 'y': 0, 'z': 0, 'visibility': 0}
+                                  for _ in range(pose_number)]
                 case _:
                     print("if goes here u have stuffed up")
-            
 
-        #combined = self.extract_keypoints(full_data)
+        # combined = self.extract_keypoints(full_data)
         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         print(full_data)
 
@@ -191,10 +192,9 @@ class InputParser:
     def handsDown(self, leftHand, rightHand):
         """Check if both hands are below a certain threshold."""
 
-        leftHandY = np.mean(
-            [landmark['y'] for landmark in leftHand])
-        rightHandY = np.mean(
-            [landmark['y'] for landmark in rightHand])
+        # Y is the second column in the keypoints (x, y, z, visibility)
+        leftHandY = np.mean(leftHand[:, 1])
+        rightHandY = np.mean(rightHand[:, 1])
         return leftHandY < HANDS_DOWN_THRESHOLD and rightHandY < HANDS_DOWN_THRESHOLD
 
     def callFunc(self):
