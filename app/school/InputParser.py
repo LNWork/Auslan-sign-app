@@ -32,7 +32,7 @@ class InputParser:
 
     def normalize_keypoints(self, data):
         """Normalize the keypoints data."""
-        data = np.array(data)  # Convert to NumPy array
+        # data = np.array(data)  # Convert to NumPy array
         coords = data[..., :3]  # Extract x, y, z coordinates
         min_vals = np.min(coords, axis=0, keepdims=True)
         max_vals = np.max(coords, axis=0, keepdims=True)
@@ -66,7 +66,7 @@ class InputParser:
     def combine_keypoints(self, frame):
         """Combine pose, left hand, and right hand keypoints into a single array."""
         # combined = np.concatenate((frame['keypoints']), axis=0)
-        combined = frame['keypoints']
+        combined = self.extract_keypoints(frame['keypoints'])
 
         # Normalize combined keypoints
         return self.normalize_keypoints(combined)
