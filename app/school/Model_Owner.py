@@ -4,6 +4,7 @@ from tensorflow.keras.models import *
 import json
 import numpy as np
 import tensorflow as tf
+import asyncio
 
 # Define a custom layer so that the model can load
 @tf.keras.utils.register_keras_serializable()
@@ -33,12 +34,12 @@ class Model:
         # Create model here
         self.model = load_model(filepath=model_path)
 
-    def query_model(self, keypoints):
+    async def query_model(self, keypoints):
         # Format keypoints so it fits the model
         formatted_keypoints = self.__format_input_keypoints(keypoints)
 
         # Query the model
-        result = self.__get_model_result(formatted_keypoints)
+        result = await self.__get_model_result(formatted_keypoints)
 
         # Parse results so it fits the formate needed
         final_result = self.__format_model_results(result)
@@ -54,23 +55,21 @@ class Model:
 
         return keypoints
 
-    def __get_model_result(self, keypoints):
+    async def __get_model_result(self, keypoints):
         # just query the model
-        return self.model.predict(keypoints)[0]
-
+        result = await asyncio.to_thread(self.model.predict, keypoints)
+        return result[0]
+    
     def __format_model_results(self, result):
         # Loop through resuklts and append the correct class to the probability
-
+        
         fomated_results = {"model_output": []}
         for i in range(len(result)):
-            #! REMOVE LATER BUT HERE CAUSE OF THE MISMATCH INDEX
-            if i > 606:
-                continue
-            
             # Adding the results
             str_index = str(i)
             fomated_results['model_output'].append([self.outputs[str_index], result[i]])
         
+        fomated_results['model_output'] = sorted(fomated_results['model_output'], key=lambda x: float(x[1]), reverse=True)[:10]
 
         return fomated_results
     ############################# Private helper functions needed for query model #############################

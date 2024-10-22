@@ -3,14 +3,23 @@ import json
 import google.generativeai as genai
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
+import asyncio
 
 load_dotenv(override=True)
 
 genai_api_key = os.getenv("GOOGLE_API_KEY")
 genai.configure()
 class ResultsParser:
+    # Only create model once
+    def __init__(self):
+        self.model = None  
 
-    def parse_model_output(self, model_output):
+    # Function for lazy loading for efficiently purposes 
+    async def _initialize_model(self):
+        if self.model is None:
+            self.model = genai.GenerativeModel("gemini-1.5-flash")
+
+    async def parse_model_output(self, model_output):
         """
         Parses the output from the sign language model and saves the best word 
         with the highest confidence to a JSON file.
@@ -27,8 +36,14 @@ class ResultsParser:
 
         if len(best_model_phrase.split()) > 2:
             print("contacting gemini")
-            model = genai.GenerativeModel("gemini-1.5-flash")
-            response = model.generate_content("Convert these words into a correct English sentence:"+ best_model_phrase)
+
+            # Creating model if it does not exist
+            await self._initialize_model()
+
+            # TODO change this to take in list of words and then to make it the best sentence from that
+            response = await self.model.generate_content("Convert these words into a correct English sentence:"+ best_model_phrase)
+            
+            # Getting results
             response_dict = response.to_dict()
             result = response_dict["candidates"][0]["content"]["parts"][0]["text"].strip('"').replace("\n", "").replace("\"", "")
             print(result)

@@ -3,7 +3,7 @@ from school.InputParser import InputParser
 import logging
 from school.results_parser import ResultsParser
 from school.results_parser import textAnimationTranslation
-
+import asyncio
 
 def create_logger():
     # Set up logging
@@ -32,6 +32,11 @@ def create_logger():
 
 class Connectinator:
     def __init__(self, model_path=''):
+        # Setting up the results list
+        self.full_phrase = AsyncResultsList(self)
+        self.end_phrase_flag = False
+        self.front_end_translation_variable = ''
+
         # Creating logger
         self.logger = create_logger()
 
@@ -51,46 +56,68 @@ class Connectinator:
         self.phraseFlag = False
 
     # Process the model output
-    def format_model_output(self, output):
+    async def format_model_output(self, output):
         processed_output = self.results_parser.parse_model_output(output)
 
-        return processed_output
+        # Update log file
+        self.logger.info('Model Output Processed Successfully! Message: %s', processed_output)  
+
+        # Pass this then to a varable being used for the react front end.
+        self.front_end_translation_variable = processed_output
 
     # Return auslan grammer sentence
     def format_sign_text(self, input):
-        processed_t2s_phrase = self.text_animation_translation.parse_text_to_sign(
-            input)
+        processed_t2s_phrase = self.text_animation_translation.parse_text_to_sign(input)
+
+        # Update log file
+        self.logger.info('Text To Sign Processed Successfully! Message: %s', processed_t2s_phrase)  
 
         return processed_t2s_phrase
 
     # Process frame
-    def process_frame(self, keypoints):
-        keyPointChunk, eof = self.inputProc.process_frame(keypoints)
-        if eof:
-            # TODO: DECIDE WHAT TO DO WITH END OF PRHASE
-            print("END OF PHRASE")
-        if keyPointChunk is not None:
-            return self.predict_model(keyPointChunk)
+    async def process_frame(self, keypoints):
+        full_chunk, self.end_phrase_flag = self.inputProc.process_frame(keypoints)
 
+        if full_chunk != None:
+            # async predict the work and then add it to the self.full_phrase
+            
+            # TODO make predict async
+            predicted_result = await  self.predict_model(full_chunk)
+            self.full_phrase.append(predicted_result)
+
+        
     # TODO: LISTENER FOR RECEIVE FROM SAVE CHUNK, SEND TO MODEL
 
-    def phraseListener(self, pred):
-        self.predictionList.append(pred)
-        if self.phraseFlag:
-            # define end of phrase
-            # send to magic
-            print("send to magic here")
-            self.predictionList = []
-            self.phraseFlag = False
-
     # Get model prediction
+    async def predict_model(self, keypoints):
+        return await self.model.query_model(keypoints)
 
-    def predict_model(self, keypoints):
-        predictions = self.model.query_model(keypoints)
-        self.phraseListener(predictions)
+    # TODO: LISTENER FOR RECEIVE OUTPUT FROM MODEL, ADD TO LIST, SEND TO RESULTS PARSER
 
-        return predictions
+# Custom list class so that it can access run async and check when stuff is added
+class AsyncResultsList(list):
+    def __init__(self, connectinator_instance: Connectinator, *args):
+        super().__init__(*args)
+        self.connectiantor = connectinator_instance
+        self.saved_results = None
 
-    # TODO: MODEL RESULTS ADDED TO LIST
-    # TODO: IF END OF PHRASE, SEND TO RESULTS PARSER IN LIST
-    # TODO: RESULTS PARSER UPDATE FRONT END TEXT FIELD
+
+    def append(self, item):
+        self.connectinator.logger.info(f"Word added with shape {item.shape}, dtype {item.dtype}")
+        super().append(item) 
+        
+        if self.connectiantor.end_phrase_flag == True:
+            asyncio.create_task(self.parse_results())
+    
+    # async call the connectinator.format_model_output on this list
+    async def parse_results(self):
+        # Reset list result 
+        self.saved_results = list(self)
+        self.clear()
+
+        # Reset the flag
+        self.connectiantor.end_phrase_flag = False
+
+        self.connectinator.logger.info("Parsing results asynchronously...")
+        await self.connectinator.format_model_output(self.saved_results) # change to pass saves results
+        

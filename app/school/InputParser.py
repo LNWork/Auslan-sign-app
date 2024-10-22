@@ -64,11 +64,7 @@ class InputParser:
 
     def combine_keypoints(self, frame):
         """Combine pose, left hand, and right hand keypoints into a single array."""
-        pose = self.extract_keypoints(frame['pose_landmarks'])
-        left_hand = self.extract_keypoints(frame['left_hand_landmarks'])
-        right_hand = self.extract_keypoints(frame['right_hand_landmarks'])
-
-        combined = np.concatenate((pose, left_hand, right_hand), axis=0)
+        combined = np.concatenate((frame['keypoints']), axis=0)
         # Normalize combined keypoints
         return self.normalize_keypoints(combined)
 
@@ -80,7 +76,7 @@ class InputParser:
 
     def process_frame(self, frame):
         """Process a single frame of keypoint data in real-time."""
-        keypoints_current = self.combine_keypoints(frame)\
+        keypoints_current = self.combine_keypoints(frame)
 
         handsDown = self.handsDown(
             frame['left_hand_landmarks'], frame['right_hand_landmarks'])
@@ -108,7 +104,7 @@ class InputParser:
 
             # Check if we detect a potential boundary or chunk size exceeds limit
             if self.pause_count >= self.window_size or len(self.current_chunk) >= MAX_CHUNK_LENGTH:
-                self.save_chunk(self.current_chunk)
+                chunk_result = self.save_chunk(self.current_chunk)
                 self.current_chunk = []  # Start a new chunk
                 self.pause_count = 0  # Reset pause counter
                 self.buffer = []  # Clear buffer
@@ -117,8 +113,11 @@ class InputParser:
 
         # Add the current frame to the chunk
         self.current_chunk.append(frame)
+
         # Update the previous frame's keypoints
         self.previous_keypoints = keypoints_current
+
+        return chunk_result, self.endOfPhrase
 
     def save_chunk(self, chunk):
         """Save the current chunk to a JSON file in the specified format, padding it to 145 frames."""
