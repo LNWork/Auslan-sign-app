@@ -32,6 +32,7 @@ class InputParser:
 
     def normalize_keypoints(self, data):
         """Normalize the keypoints data."""
+        data = np.array(data)  # Convert to NumPy array
         coords = data[..., :3]  # Extract x, y, z coordinates
         min_vals = np.min(coords, axis=0, keepdims=True)
         max_vals = np.max(coords, axis=0, keepdims=True)
@@ -66,6 +67,7 @@ class InputParser:
         """Combine pose, left hand, and right hand keypoints into a single array."""
         # combined = np.concatenate((frame['keypoints']), axis=0)
         combined = frame['keypoints']
+
         # Normalize combined keypoints
         return self.normalize_keypoints(combined)
 
@@ -80,11 +82,11 @@ class InputParser:
         keypoints_current = self.normalize_keypoints(frame['keypoints'])
 
         handsDown = self.handsDown(
-            keypoints_current[33:54], keypoints_current[54:75])
+            keypoints_current[33:53], keypoints_current[54:74])
         if handsDown:
-            handsDownCounter += 1
+            self.handsDownCounter += 1
             print("HANDS DOWN for ", handsDownCounter)
-            if handsDownCounter >= HANDS_DOWN_TIME:
+            if self.handsDownCounter >= HANDS_DOWN_TIME:
                 print("HANDS DOWN FOR TOO LONG")
                 print("END OF PHRASE")
                 self.endPhrase()
