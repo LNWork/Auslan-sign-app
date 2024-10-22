@@ -178,7 +178,7 @@ class InputParser:
 
     def callFunc(self):
         print("CALLING FUNCTION")
-        self.connectinator.phraseFlag = True
+        # self.connectinator.phraseFlag = True
         self.reset()
 
     def reset(self):
