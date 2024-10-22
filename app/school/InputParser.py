@@ -11,10 +11,12 @@ VISIBILITY_THRESHOLD = 0.7
 VISIBILITY_COUNT = 0.7
 WINDOW_SIZE = 30
 MAX_CHUNK_LENGTH = 145  # Maximum length of a chunk in frames
+HANDS_DOWN_THRESHOLD = 0.2
+HANDS_DOWN_TIME = 30
 
 
 class InputParser:
-    def __init__(self, threshold=THRESHOLD, window_size=WINDOW_SIZE, buffer_size=5):
+    def __init__(self, connectinator, threshold=THRESHOLD, window_size=WINDOW_SIZE, buffer_size=5):
         self.threshold = threshold
         self.window_size = window_size
         self.buffer_size = buffer_size
@@ -25,6 +27,9 @@ class InputParser:
         self.chunks = []
         self.buffer = []
         self.chunk_counter = 0
+        self.handsDownCounter = 0
+        self.endOfPhrase = False
+        self.connectinator = connectinator
 
     def normalize_keypoints(self, data):
         """Normalize the keypoints data."""
@@ -76,9 +81,25 @@ class InputParser:
 
     def process_frame(self, frame):
         """Process a single frame of keypoint data in real-time."""
-        keypoints_current = self.combine_keypoints(frame)
+        keypoints_current = self.combine_keypoints(frame)\
 
-        # Store combined and normalized keypoints in 'data'
+        handsDown = self.handsDown(
+            frame['left_hand_landmarks'], frame['right_hand_landmarks'])
+        if handsDown:
+            handsDownCounter += 1
+            print("HANDS DOWN for ", handsDownCounter)
+            if handsDownCounter >= HANDS_DOWN_TIME:
+                print("HANDS DOWN FOR TOO LONG")
+                print("END OF PHRASE")
+                self.endPhrase()
+        else:
+            handsDownCounter = 0
+
+            # TODO: CHECK IF HANDS DOWN
+            # TODO: IF HANDS DOWN COUNTER REACHED, DEFINE END OF PHRASE
+            # TODO: END OF PHRASE SEND TO CONNECTINATOR
+
+            # Store combined and normalized keypoints in 'data'
         frame['data'] = keypoints_current.tolist()
 
         if self.previous_keypoints is not None:
@@ -140,6 +161,29 @@ class InputParser:
             keypoints[..., 3] >= VISIBILITY_THRESHOLD).sum()
         total_keypoints = len(keypoints[..., 3])
         return visible_keypoints_count >= total_keypoints * VISIBILITY_COUNT
+
+    def endPhrase(self):
+        """End the current phrase and save the chunks to a file."""
+        if self.current_chunk:
+            self.save_chunk(self.current_chunk)
+            self.current_chunk = []
+        self.endOfPhrase = True
+        print("END OF PHRASE")
+        self.callFunc()
+
+    def handsDown(self, leftHand, rightHand):
+        """Check if both hands are below a certain threshold."""
+
+        leftHandY = np.mean(
+            [landmark['y'] for landmark in leftHand])
+        rightHandY = np.mean(
+            [landmark['y'] for landmark in rightHand])
+        return leftHandY < HANDS_DOWN_THRESHOLD and rightHandY < HANDS_DOWN_THRESHOLD
+
+    def callFunc(self):
+        print("CALLING FUNCTION")
+        self.connectinator.phraseFlag = True
+        self.endOfPhrase = False
 
     def reset(self):
         """Reset the state for the next real-time session."""

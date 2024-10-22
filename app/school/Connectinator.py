@@ -4,6 +4,7 @@ import logging
 from school.results_parser import ResultsParser
 from school.results_parser import textAnimationTranslation
 
+
 def create_logger():
     # Set up logging
     logger = logging.getLogger()  # Create a logger
@@ -28,6 +29,7 @@ def create_logger():
 
     return logger
 
+
 class Connectinator:
     def __init__(self, model_path=''):
         # Creating logger
@@ -37,13 +39,16 @@ class Connectinator:
         self.model = Model(model_path)
 
         # Creating data processor class
-        self.inputProc = InputParser()
+        self.inputProc = InputParser(connectinator=self)
 
         # Create result parser
         self.results_parser = ResultsParser()
 
         # Create text ani transltior
         self.text_animation_translation = textAnimationTranslation()
+
+        self.predictionList = []
+        self.phraseFlag = False
 
     # Process the model output
     def format_model_output(self, output):
@@ -53,21 +58,36 @@ class Connectinator:
 
     # Return auslan grammer sentence
     def format_sign_text(self, input):
-        processed_t2s_phrase = self.text_animation_translation.parse_text_to_sign(input)
+        processed_t2s_phrase = self.text_animation_translation.parse_text_to_sign(
+            input)
 
         return processed_t2s_phrase
-    
+
     # Process frame
     def process_frame(self, keypoints):
-        self.inputProc.process_frame(keypoints)
+        keyPointChunk = self.inputProc.process_frame(keypoints)
+        if keyPointChunk is not None:
+            return self.predict_model(keyPointChunk)
 
     # TODO: LISTENER FOR RECEIVE FROM SAVE CHUNK, SEND TO MODEL
 
+    def phraseListener(self, pred):
+        self.predictionList.append(pred)
+        if self.phraseFlag:
+            # define end of phrase
+            # send to magic
+            print("send to magic here")
+            self.predictionList = []
+            self.phraseFlag = False
+
     # Get model prediction
+
     def predict_model(self, keypoints):
-        return self.model.query_model(keypoints)
+        predictions = self.model.query_model(keypoints)
+        self.phraseListener(predictions)
 
-    # TODO: LISTENER FOR RECEIVE OUTPUT FROM MODEL, ADD TO LIST, SEND TO RESULTS PARSER
-    # TODO: RESET LIST WHEN CAMERA FINISHED
+        return predictions
 
-    # TODO: RESULTS PARSER ASYNC UPDATE FRONT END TEXT FIELD
+    # TODO: MODEL RESULTS ADDED TO LIST
+    # TODO: IF END OF PHRASE, SEND TO RESULTS PARSER IN LIST
+    # TODO: RESULTS PARSER UPDATE FRONT END TEXT FIELD
