@@ -49,7 +49,16 @@ class InputParser:
     def extract_keypoints(self, landmarks):
         """Extract the keypoints (x, y, z, visibility) from the landmarks."""
         try:
-            return np.array([[landmark['x'], landmark['y'], landmark['z'], landmark['visibility']] for landmark in landmarks])
+            return np.array([
+                [
+                    landmark.get('x', 0),  # Provide default x as 0 if missing
+                    landmark.get('y', 0),  # Provide default y as 0 if missing
+                    landmark.get('z', 0),  # Provide default z as 0 if missing
+                    # Default visibility as 0 if missing
+                    landmark.get('visibility', 0)
+                ] for landmark in landmarks
+            ])
+
         except KeyError as e:
             print(f"Missing key in landmark: {e}")
             return np.empty((0, 4))
@@ -86,8 +95,8 @@ class InputParser:
                     print("if goes here u have stuffed up")
 
         # combined = self.extract_keypoints(full_data)
-        #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-        #print(full_data)
+        # print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        # print(full_data)
 
         extracted_data = self.extract_keypoints(full_data)
         # Normalize combined keypoints
@@ -103,7 +112,7 @@ class InputParser:
         """Process a single frame of keypoint data in real-time."""
         keypoints_current = self.combine_keypoints(frame['keypoints'])
         chunk_result = None
-        
+
         handsDown = self.handsDown(
             keypoints_current[33:53], keypoints_current[54:74])
         if handsDown:
