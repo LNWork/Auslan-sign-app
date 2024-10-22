@@ -127,9 +127,9 @@ class InputParser:
 
     def save_chunk(self, chunk):
         """Save the current chunk to a JSON file in the specified format, padding it to 145 frames."""
-        os.makedirs('outputChunks',
-                    exist_ok=True)  # Ensure the output directory exists
-        filename = f"outputChunks/chunk_{self.chunk_counter}.json"
+        # os.makedirs('outputChunks',
+        #             exist_ok=True)  # Ensure the output directory exists
+        # filename = f"outputChunks/chunk_{self.chunk_counter}.json"
 
         # Pad the chunk to 145 frames if necessary
         padded_chunk = self.pad_chunk(chunk)
@@ -146,7 +146,7 @@ class InputParser:
 
         # TODO: SEND TO CONNECTINATOR
 
-        return chunk_data
+        return chunk_data, self.endOfPhrase
         # Save to the JSON file
         # with open(filename, 'w') as f:
         #     json.dump(chunk_data, f, indent=4)
@@ -183,7 +183,7 @@ class InputParser:
     def callFunc(self):
         print("CALLING FUNCTION")
         self.connectinator.phraseFlag = True
-        self.endOfPhrase = False
+        self.reset()
 
     def reset(self):
         """Reset the state for the next real-time session."""
@@ -193,3 +193,4 @@ class InputParser:
         self.chunks = []
         self.word_boundaries = []
         self.buffer = []
+        self.endOfPhrase = False

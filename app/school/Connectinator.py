@@ -65,7 +65,10 @@ class Connectinator:
 
     # Process frame
     def process_frame(self, keypoints):
-        keyPointChunk = self.inputProc.process_frame(keypoints)
+        keyPointChunk, eof = self.inputProc.process_frame(keypoints)
+        if eof:
+            # TODO: DECIDE WHAT TO DO WITH END OF PRHASE
+            print("END OF PHRASE")
         if keyPointChunk is not None:
             return self.predict_model(keyPointChunk)
 
