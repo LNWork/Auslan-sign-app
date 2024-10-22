@@ -79,7 +79,7 @@ class InputParser:
         keypoints_current = self.combine_keypoints(frame)
 
         handsDown = self.handsDown(
-            frame['left_hand_landmarks'], frame['right_hand_landmarks'])
+            keypoints_current[33:54], keypoints_current[54:75])
         if handsDown:
             handsDownCounter += 1
             print("HANDS DOWN for ", handsDownCounter)
