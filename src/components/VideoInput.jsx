@@ -1,64 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-// declare empty values for use in returns
-const empty_hand = [ {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-{'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0}]
-
-const empty_pose = [
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0},
-  {'x': 0.0, 'y': 0.0, 'z': 0.0, 'visibility': 0.0}
-]
 // Import necessary MediaPipe scripts
 const cameraUtilsUrl = "https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js";
 const controlUtilsUrl = "https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js";
@@ -162,10 +103,17 @@ const VideoInput = () => {
         canvasCtx.restore();
 
         // Prepare keypoints to send to backend
-        const keypoints = [];
-        keypoints.push(...(results.poseLandmarks || empty_pose));
-        keypoints.push(...(results.leftHandLandmarks || empty_hand));
-        keypoints.push(...(results.rightHandLandmarks || empty_hand));
+        const keypoints = [
+          results.poseLandmarks,
+          results.leftHandLandmarks ? results.leftHandLandmarks.map((landmark) => ({
+            ...landmark,
+            visibility: 0.0
+          })) : null,
+          results.rightHandLandmarks ? results.rightHandLandmarks.map((landmark) => ({
+            ...landmark,
+            visibility: 0.0
+          })) : null
+        ];
 
         // Send keypoints data to backend
         fetch('http://127.0.0.1:8001/api/keypoints', {
