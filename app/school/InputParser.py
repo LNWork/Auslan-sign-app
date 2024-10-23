@@ -48,20 +48,7 @@ class InputParser:
 
     def extract_keypoints(self, landmarks):
         """Extract the keypoints (x, y, z, visibility) from the landmarks."""
-        try:
-            return np.array([
-                [
-                    landmark.get('x', 0),  # Provide default x as 0 if missing
-                    landmark.get('y', 0),  # Provide default y as 0 if missing
-                    landmark.get('z', 0),  # Provide default z as 0 if missing
-                    # Default visibility as 0 if missing
-                    landmark.get('visibility', 0)
-                ] for landmark in landmarks
-            ])
-
-        except KeyError as e:
-            print(f"Missing key in landmark: {e}")
-            return np.empty((0, 4))
+        return np.array([[landmark['x'], landmark['y'], landmark['z'], landmark['visibility']] for landmark in landmarks])
 
     def pad_chunk(self, chunk, max_length=MAX_CHUNK_LENGTH):
         """Pads the chunk with the last frame to reach the max length of frames."""
