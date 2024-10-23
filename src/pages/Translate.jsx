@@ -1,7 +1,6 @@
-
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import VideoInput from '../components/VideoInput';
+import { storage, ref, getDownloadURL } from '../firebase';
 
 const TranslateApp = () => {
   const [mode, setMode] = useState('videoToText');
@@ -53,26 +52,13 @@ const TranslateApp = () => {
         setTranslatedText('No translation available.');
       }
 
-      // Send the translatedText to the Python script to get the video
-      const videoResponse = await fetch('http://127.0.0.1:5000/run-python-script', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ video_input: data.translatedText }),  // Sending the response
-      });
-
-      if (!videoResponse.ok) {
-        throw new Error(`Error fetching video: ${videoResponse.statusText}`);
-      }
-
-      const videoBlob = await videoResponse.blob(); // Get the video blob from the response
-      const videoUrl = URL.createObjectURL(videoBlob); // Create a URL for the video blob
-      setAnimatedSignVideo(videoUrl); // Set the video URL to the state
+      // Retrieve video from Firebase
+      const videoRef = ref(storage, 'videos/output_video.mp4');  // Path in Firebase Storage
+      const videoUrl = await getDownloadURL(videoRef);
+      setAnimatedSignVideo(videoUrl);  // Set the video URL to be displayed
 
     } catch (error) {
-      console.error('Error details:', error);
-      setTranslatedText(`Error: ${error.message}. Please check the API and input.`);
+      console.error('Error fetching video:', error);
     }
   };
 
@@ -81,16 +67,14 @@ const TranslateApp = () => {
       {mode === 'videoToText' ? (
         <>
           <div style={styles.panel}>
-            <h2>Sign</h2>
+            <h2>Video Input</h2>
             <VideoInput />
           </div>
-
           <div style={styles.buttons}>
             <button onClick={handleSwap} style={styles.button}>Swap</button>
           </div>
-
           <div style={styles.panel}>
-            <h2>Text</h2>
+            <h2>API Response</h2>
             <textarea
               placeholder="Translation will appear here"
               value={translatedText}
@@ -109,11 +93,11 @@ const TranslateApp = () => {
               onChange={(e) => setSourceText(e.target.value)}
               style={styles.textarea}
             />
-          </div>
-
           <div style={styles.buttons}>
             <button onClick={handleSwap} style={styles.button}>Swap</button>
             <button onClick={handleTextToVideo} style={styles.button}>Convert</button>
+          </div>
+
           </div>
 
           <div style={styles.panel}>
