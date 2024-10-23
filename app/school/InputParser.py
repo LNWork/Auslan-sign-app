@@ -121,7 +121,7 @@ class InputParser:
             if self.handsDownCounter >= HANDS_DOWN_TIME:
                 print("HANDS DOWN FOR TOO LONG")
                 print("END OF PHRASE")
-                chunk_result = self.endPhrase()
+                chunk_result, self.endOfPhrase = self.endPhrase()
         else:
             self.handsDownCounter = 0
 
@@ -194,12 +194,13 @@ class InputParser:
         """End the current phrase and save the chunks to a file."""
         self.endOfPhrase = True
         chunk_result = None
+        local_end_phrase = True
         if self.current_chunk:
             chunk_result = self.save_chunk(self.current_chunk)
             self.current_chunk = []
         print("END OF PHRASE")
         self.callFunc()
-        return chunk_result
+        return chunk_result, local_end_phrase
 
     def handsDown(self, leftHand, rightHand):
         """Check if both hands are below a certain threshold."""

@@ -84,6 +84,9 @@ class Connectinator:
     # Process frame
     async def process_frame(self, keypoints):
         full_chunk, self.end_phrase_flag = self.inputProc.process_frame(keypoints)
+        if self.end_phrase_flag == True:
+
+            print(f"ITS TRUEEE {self.end_phrase_flag}")
 
         if full_chunk is not None:
             print("AAAAAAAAa SENT TO THE MODEL")
@@ -120,7 +123,7 @@ class AsyncResultsList(list):
         super().append(item) 
         
         if self.connectinator.end_phrase_flag == True:
-            print("AHAHHAHAHAHAHAHHAHA")
+            print("AHAHHAHAHAHAHAHHAHA ")
             asyncio.create_task(self.parse_results())
     
     # async call the connectinator.format_model_output on this list
