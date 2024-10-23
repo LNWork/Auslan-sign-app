@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import VideoInput from '../components/VideoInput';
 
@@ -17,11 +15,12 @@ const TranslateApp = () => {
 
   // Function to convert text to video
   const handleTextToVideo = async () => {
-    const fixedSourceText = sourceText;
+    const fixedSourceText = sourceText.trim(); // Ensure there's no leading/trailing whitespace
     console.log('Sending Source Text:', fixedSourceText);
 
     try {
-      const response = await fetch('http://54.167.220.178:5000/t2s', {
+      // Send the text to the Flask endpoint
+      const response = await fetch('http://54.167.220.178:5000/api/text_to_animation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -29,46 +28,21 @@ const TranslateApp = () => {
         body: JSON.stringify({ t2s_input: fixedSourceText }),
       });
 
-      const responseText = await response.text();
-      console.log('Raw response:', responseText);
-
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      let data;
-      try {
-        data = JSON.parse(responseText);
-        console.log('Full response:', data);
-      } catch (parseError) {
-        console.error('Error parsing JSON:', parseError);
-        throw new Error('Invalid JSON response');
-      }
+      const data = await response.json();
+      console.log('API Response:', data);
 
-      if (data.translatedText) {
-        setTranslatedText(data.translatedText);
-      } else if (Array.isArray(data.queries) && data.queries.length > 0) {
-        setTranslatedText(data.queries.join(', '));
+      if (data.status === "success") {
+        setTranslatedText(data.message); // Assuming the response contains a success message
+        // Here you would also handle setting the video URL if the response contains it
+        // For instance, if the message contains a video URL, set it like this:
+        // setAnimatedSignVideo(data.videoUrl); // Adjust as needed based on your response structure
       } else {
         setTranslatedText('No translation available.');
       }
-
-      // Send the translatedText to the Python script to get the video
-      const videoResponse = await fetch('http://127.0.0.1:5000/run-python-script', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ video_input: data.translatedText }),  // Sending the response
-      });
-
-      if (!videoResponse.ok) {
-        throw new Error(`Error fetching video: ${videoResponse.statusText}`);
-      }
-
-      const videoBlob = await videoResponse.blob(); // Get the video blob from the response
-      const videoUrl = URL.createObjectURL(videoBlob); // Create a URL for the video blob
-      setAnimatedSignVideo(videoUrl); // Set the video URL to the state
 
     } catch (error) {
       console.error('Error details:', error);
