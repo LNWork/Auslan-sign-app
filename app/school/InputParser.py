@@ -8,10 +8,10 @@ import pandas as pd
 # Parameters (adjust for real-time speed and accuracy)
 THRESHOLD = 0.05
 VISIBILITY_THRESHOLD = 0.7
-VISIBILITY_COUNT = 0.7
+VISIBILITY_COUNT = 0.5
 WINDOW_SIZE = 30
 MAX_CHUNK_LENGTH = 145  # Maximum length of a chunk in frames
-HANDS_DOWN_THRESHOLD = 0.2
+HANDS_DOWN_THRESHOLD = 0.05
 HANDS_DOWN_TIME = 30
 
 
@@ -225,3 +225,4 @@ class InputParser:
         self.word_boundaries = []
         self.buffer = []
         self.endOfPhrase = False
+        self.handsDownCounter = 0
