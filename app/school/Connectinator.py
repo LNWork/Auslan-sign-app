@@ -5,6 +5,7 @@ from school.results_parser import ResultsParser
 from school.results_parser import textAnimationTranslation
 import asyncio
 from time import time
+import numpy as np
 
 def create_logger():
     # Set up logging
@@ -87,7 +88,10 @@ class Connectinator:
         if full_chunk != None:
             print("AAAAAAAAa SENT TO THE MODEL")
             # async predict the work and then add it to the self.full_phrase
-            predicted_result = await self.predict_model(full_chunk)
+            full_np_chunk = np.array(full_chunk)
+            print(type(full_np_chunk))
+
+            predicted_result = await self.predict_model(full_np_chunk)
             self.full_phrase.append(predicted_result)
 
         

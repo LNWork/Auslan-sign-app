@@ -31,13 +31,13 @@ async def model_test():
 
         return result
     
-    sally_test_data = np.load(r"D:\UNi\UTS\ino studio\full app\Auslan-sign-app\app\sally_shingata.npy")
+    sally_test_data = np.load(r"C:\Users\camch\Documents\GitHub\Auslan-sign-app\app\sally_shingata.npy")
     print(await get_model_result(sally_test_data, start_time))
-
-    # Fails
-    cubby_test_data = np.load(r"D:\UNi\UTS\ino studio\full app\Auslan-sign-app\app\cubbyhouse_shingata.npy")
-    print(await get_model_result(cubby_test_data, start_time))
     
+    # Fails
+    cubby_test_data = np.load(r"C:\Users\camch\Documents\GitHub\Auslan-sign-app\app\cubbyhouse_shingata.npy")
+    print(await get_model_result(cubby_test_data, start_time))
+    print(type(cubby_test_data))
     print("final time " + str(time() - start_time))
     return render_template('index.html')
 
