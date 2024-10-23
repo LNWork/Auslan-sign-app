@@ -35,6 +35,7 @@ class Model:
         self.model = load_model(filepath=model_path)
 
     async def query_model(self, keypoints):
+        print("IN QUERY")
         # Format keypoints so it fits the model
         formatted_keypoints = self.__format_input_keypoints(keypoints)
 
@@ -43,7 +44,7 @@ class Model:
 
         # Parse results so it fits the formate needed
         final_result = self.__format_model_results(result)
-
+        print("FORMATTE RESSULTS")
         return final_result
     
     ############################# Private helper functions needed for query model #############################
@@ -56,6 +57,7 @@ class Model:
         return keypoints
 
     async def __get_model_result(self, keypoints):
+        print("CALLINGTHE MODEEL")
         # just query the model
         result = await asyncio.to_thread(self.model.predict, keypoints)
         return result[0]

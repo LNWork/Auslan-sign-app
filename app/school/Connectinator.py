@@ -66,6 +66,8 @@ class Connectinator:
         # Pass this then to a varable being used for the react front end.
         self.front_end_translation_variable = processed_output
 
+        print("DONEEE")
+
         with open('model_output.txt', 'a+') as f:
             f.write(f"Time: {time()}, Phrase: {self.front_end_translation_variable}")
 
@@ -83,6 +85,7 @@ class Connectinator:
         full_chunk, self.end_phrase_flag = self.inputProc.process_frame(keypoints)
 
         if full_chunk != None:
+            print("AAAAAAAAa SENT TO THE MODEL")
             # async predict the work and then add it to the self.full_phrase
             predicted_result = await self.predict_model(full_chunk)
             self.full_phrase.append(predicted_result)
@@ -92,6 +95,7 @@ class Connectinator:
 
     # Get model prediction
     async def predict_model(self, keypoints):
+        print("SENT TO PREDICT")
         return await self.model.query_model(keypoints)
 
     # TODO: LISTENER FOR RECEIVE OUTPUT FROM MODEL, ADD TO LIST, SEND TO RESULTS PARSER
@@ -121,5 +125,6 @@ class AsyncResultsList(list):
         self.connectiantor.end_phrase_flag = False
 
         self.connectinator.logger.info("Parsing results asynchronously...")
+        print("FORMATTING RESULTS")
         await self.connectinator.format_model_output(self.saved_results) # change to pass saves results
         

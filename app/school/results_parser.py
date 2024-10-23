@@ -27,6 +27,7 @@ class ResultsParser:
         Args:
             model_output (list of tuples): Output from the model, expected as a list of (word, confidence) tuples.
         """
+        print("IN RESULTS")
         if not model_output:
             # To DO: Log error here.
             return {"error": "No output from model"}
@@ -40,6 +41,7 @@ class ResultsParser:
             # Creating model if it does not exist
             await self._initialize_model()
 
+            print("GETTING RESULT")
             # TODO change this to take in list of words and then to make it the best sentence from that
             response = await self.model.generate_content("Convert these words into a correct English sentence:"+ best_model_phrase)
             
@@ -49,7 +51,7 @@ class ResultsParser:
             print(result)
         else:
             result = best_model_phrase
-            
+        print("DONE")
         return result
 
     def save_as_json(self, parsed_result, output_filename="parsed_result.json"):

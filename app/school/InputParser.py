@@ -121,7 +121,7 @@ class InputParser:
             if self.handsDownCounter >= HANDS_DOWN_TIME:
                 print("HANDS DOWN FOR TOO LONG")
                 print("END OF PHRASE")
-                self.endPhrase()
+                chunk_result = self.endPhrase()
         else:
             self.handsDownCounter = 0
 
@@ -139,6 +139,7 @@ class InputParser:
 
             # Check if we detect a potential boundary or chunk size exceeds limit
             if self.pause_count >= self.window_size or len(self.current_chunk) >= MAX_CHUNK_LENGTH:
+                print("IF FOR SAVE")
                 chunk_result = self.save_chunk(self.current_chunk)
                 self.current_chunk = []  # Start a new chunk
                 self.pause_count = 0  # Reset pause counter
@@ -174,8 +175,8 @@ class InputParser:
             })
 
         # TODO: SEND TO CONNECTINATOR
-
-        return chunk_data, self.endOfPhrase
+        print("finsih save")
+        return chunk_data
         # Save to the JSON file
         # with open(filename, 'w') as f:
         #     json.dump(chunk_data, f, indent=4)
@@ -194,11 +195,13 @@ class InputParser:
     def endPhrase(self):
         """End the current phrase and save the chunks to a file."""
         self.endOfPhrase = True
+        chunk_result = None
         if self.current_chunk:
-            self.save_chunk(self.current_chunk)
+            chunk_result = self.save_chunk(self.current_chunk)
             self.current_chunk = []
         print("END OF PHRASE")
         self.callFunc()
+        return chunk_result
 
     def handsDown(self, leftHand, rightHand):
         """Check if both hands are below a certain threshold."""
