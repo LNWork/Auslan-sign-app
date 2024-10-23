@@ -1,62 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import VideoInput from '../components/VideoInput';
+import React, { useState } from 'react';
 import { storage, ref, getDownloadURL } from '../firebase';
 
 const TranslateApp = () => {
-  const [mode, setMode] = useState('videoToText');
   const [sourceText, setSourceText] = useState('');
-  const [translatedText, setTranslatedText] = useState('');
   const [animatedSignVideo, setAnimatedSignVideo] = useState(null);
 
-  // Function to swap between modes
-  const handleSwap = () => {
-    setAnimatedSignVideo(null);
-    setMode((prevMode) => (prevMode === 'videoToText' ? 'textToVideo' : 'videoToText'));
+  // Mock function to map user input to a specific video path in Firebase
+  const getVideoPathForText = (inputText) => {
+    // Example: Simple mock mapping for testing purposes
+    if (inputText.toLowerCase() === 'hello') {
+      return 'gs://auslan-194e5.appspot.com/hello.mp4';  // Replace with your actual video path in Firebase
+    } else if (inputText.toLowerCase() === 'thank you') {
+      return 'gs://auslan-194e5.appspot.com/thankyou.mp4';  // Replace with another video path
+    } else {
+      return 'gs://auslan-194e5.appspot.com/concatenated_output.mp4';  // Default video path
+    }
   };
 
-  // Function to convert text to video
+  // Function to fetch the video based on user input
   const handleTextToVideo = async () => {
-    const fixedSourceText = sourceText;
-    console.log('Sending Source Text:', fixedSourceText);
+    const videoPath = getVideoPathForText(sourceText); // Get the Firebase video path based on the input text
 
     try {
-      const response = await fetch('http://54.167.220.178:5000/t2s', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ t2s_input: fixedSourceText }),
-      });
-
-      const responseText = await response.text();
-      console.log('Raw response:', responseText);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
-      }
-
-      let data;
-      try {
-        data = JSON.parse(responseText);
-        console.log('Full response:', data);
-      } catch (parseError) {
-        console.error('Error parsing JSON:', parseError);
-        throw new Error('Invalid JSON response');
-      }
-
-      if (data.translatedText) {
-        setTranslatedText(data.translatedText);
-      } else if (Array.isArray(data.queries) && data.queries.length > 0) {
-        setTranslatedText(data.queries.join(', '));
-      } else {
-        setTranslatedText('No translation available.');
-      }
-
-      // Retrieve video from Firebase
-      const videoRef = ref(storage, 'videos/output_video.mp4');  // Path in Firebase Storage
-      const videoUrl = await getDownloadURL(videoRef);
-      setAnimatedSignVideo(videoUrl);  // Set the video URL to be displayed
-
+      const videoRef = ref(storage, videoPath); // Reference to the video in Firebase
+      const videoUrl = await getDownloadURL(videoRef); // Get the video URL from Firebase
+      setAnimatedSignVideo(videoUrl); // Set the video URL to display the video
     } catch (error) {
       console.error('Error fetching video:', error);
     }
@@ -64,64 +32,29 @@ const TranslateApp = () => {
 
   return (
     <div style={styles.container}>
-      {mode === 'videoToText' ? (
-        <>
-          <div style={styles.panel}>
-            <h2>Video Input</h2>
-            <VideoInput />
-          </div>
-          <div style={styles.buttons}>
-            <button onClick={handleSwap} style={styles.button}>Swap</button>
-          </div>
-          <div style={styles.panel}>
-            <h2>API Response</h2>
-            <textarea
-              placeholder="Translation will appear here"
-              value={translatedText}
-              readOnly
-              style={styles.textarea}
-            />
-          </div>
-        </>
-      ) : (
-        <>
-          <div style={styles.panel}>
-            <h2>Text</h2>
-            <textarea
-              placeholder="Enter text to convert to sign language"
-              value={sourceText}
-              onChange={(e) => setSourceText(e.target.value)}
-              style={styles.textarea}
-            />
-          <div style={styles.buttons}>
-            <button onClick={handleSwap} style={styles.button}>Swap</button>
-            <button onClick={handleTextToVideo} style={styles.button}>Convert</button>
-          </div>
+      <div style={styles.panel}>
+        <h2>Text</h2>
+        <textarea
+          placeholder="Enter text to convert to sign language"
+          value={sourceText}
+          onChange={(e) => setSourceText(e.target.value)}
+          style={styles.textarea}
+        />
+        <div style={styles.buttons}>
+          <button onClick={handleTextToVideo} style={styles.button}>Convert</button>
+        </div>
+      </div>
 
+      <div style={styles.panel}>
+        <h2>Sign Video</h2>
+        {animatedSignVideo ? (
+          <div style={styles.videoPlaceholder}>
+            <video src={animatedSignVideo} controls />
           </div>
-
-          <div style={styles.panel}>
-            <h2>Sign Video</h2>
-            {animatedSignVideo ? (
-              <div style={styles.videoPlaceholder}>
-                <video src={animatedSignVideo} controls />
-              </div>
-            ) : (
-              <div style={styles.videoPlaceholder}>Sign language animation will appear here</div>
-            )}
-          </div>
-
-          <div style={styles.panel}>
-            <h2>API Response</h2>
-            <textarea
-              placeholder="API response will appear here"
-              value={translatedText}
-              readOnly
-              style={styles.textarea}
-            />
-          </div>
-        </>
-      )}
+        ) : (
+          <div style={styles.videoPlaceholder}>Sign language animation will appear here</div>
+        )}
+      </div>
     </div>
   );
 };
@@ -147,15 +80,13 @@ const styles = {
   },
   textarea: {
     width: '100%',
-    height: '100%',
+    height: '200px',
     padding: '10px',
     fontSize: '16px',
     resize: 'none',
-    boxSizing: 'border-box',
   },
   buttons: {
     display: 'flex',
-    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     gap: '10px',
