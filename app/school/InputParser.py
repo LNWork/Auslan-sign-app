@@ -167,16 +167,14 @@ class InputParser:
         # Prepare the formatted data
         chunk_data = []
         for i, frame in enumerate(padded_chunk):
-            chunk_data.append({
-                # Reset the frame number to start from 0 for each chunk
-                "frame": i,
-                # The concatenated pose, left_hand, and right_hand keypoints
-                "data": frame['data']
-            })
+            chunk_data.append(frame['data'])
+        padded_np_arr = np.array(chunk_data)
 
+        final_chunk = padded_np_arr.reshape(145, 75, 4)
         # TODO: SEND TO CONNECTINATOR
         print("finsih save")
-        return chunk_data
+
+        return final_chunk
         # Save to the JSON file
         # with open(filename, 'w') as f:
         #     json.dump(chunk_data, f, indent=4)

@@ -5,7 +5,7 @@ from school.results_parser import ResultsParser
 from school.results_parser import textAnimationTranslation
 import asyncio
 from time import time
-import numpy as np
+import json
 
 def create_logger():
     # Set up logging
@@ -70,7 +70,7 @@ class Connectinator:
         print("DONEEE")
 
         with open('model_output.txt', 'a+') as f:
-            f.write(f"Time: {time()}, Phrase: {self.front_end_translation_variable}")
+            f.write(f"Time: {str(time())}, Phrase: {self.front_end_translation_variable}")
 
     # Return auslan grammer sentence
     def format_sign_text(self, input):
@@ -85,13 +85,16 @@ class Connectinator:
     async def process_frame(self, keypoints):
         full_chunk, self.end_phrase_flag = self.inputProc.process_frame(keypoints)
 
-        if full_chunk != None:
+        if full_chunk is not None:
             print("AAAAAAAAa SENT TO THE MODEL")
             # async predict the work and then add it to the self.full_phrase
-            full_np_chunk = np.array(full_chunk)
-            print(type(full_np_chunk))
 
-            predicted_result = await self.predict_model(full_np_chunk)
+            predicted_result = await self.predict_model(full_chunk)
+
+            with open('ball.txt', 'a+') as f:
+                f.write(f"time: {str(time())}, predict:")
+                f.write(json.dumps(str(predicted_result)))
+                f.write("\n\n")
             self.full_phrase.append(predicted_result)
 
         
@@ -108,15 +111,16 @@ class Connectinator:
 class AsyncResultsList(list):
     def __init__(self, connectinator_instance: Connectinator, *args):
         super().__init__(*args)
-        self.connectiantor = connectinator_instance
+        self.connectinator = connectinator_instance
         self.saved_results = None
 
 
     def append(self, item):
-        self.connectinator.logger.info(f"Word added with shape {item.shape}, dtype {item.dtype}")
+        self.connectinator.logger.info(f"Word added with shape {item['model_output']}")
         super().append(item) 
         
-        if self.connectiantor.end_phrase_flag == True:
+        if self.connectinator.end_phrase_flag == True:
+            print("AHAHHAHAHAHAHAHHAHA")
             asyncio.create_task(self.parse_results())
     
     # async call the connectinator.format_model_output on this list
@@ -126,7 +130,7 @@ class AsyncResultsList(list):
         self.clear()
 
         # Reset the flag
-        self.connectiantor.end_phrase_flag = False
+        self.connectinator.end_phrase_flag = False
 
         self.connectinator.logger.info("Parsing results asynchronously...")
         print("FORMATTING RESULTS")
