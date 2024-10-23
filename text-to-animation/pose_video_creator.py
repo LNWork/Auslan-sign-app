@@ -92,7 +92,7 @@ def concatenate_poses_and_save_temporarily(blob_names):
 
 # Check if a word has a corresponding pose file in Firebase
 def get_valid_blobs_from_sentence(sentence):
-    words = sentence.split()  # Split the sentence into words
+    words = [word.capitalize() for word in sentence.split()]  
     valid_blob_names = []
 
     bucket = storage.bucket()
@@ -105,6 +105,7 @@ def get_valid_blobs_from_sentence(sentence):
             print(f"Skipping word '{word}', no corresponding .pose file found.")
     
     return valid_blob_names
+
 
 def main():
     # Get user input from the terminal
