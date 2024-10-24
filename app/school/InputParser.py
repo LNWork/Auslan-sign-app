@@ -119,7 +119,8 @@ class InputParser:
             velocity = self.calculate_velocity(
                 keypoints_current, self.previous_keypoints)
 
-            if velocity < self.threshold and not self.visibility_check(keypoints_current):
+            if velocity < self.threshold:
+                print("velocity < threshold, velocity: ", velocity)
                 self.pause_count += 1
             else:
                 self.pause_count = 0

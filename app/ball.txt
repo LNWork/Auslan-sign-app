@@ -144,3 +144,5 @@ time: 1729662000.515784, predict:"{'model_output': [['doorbell', 0.22941023], ['
 
 time: 1729662986.596205, predict:"{'model_output': [['cubbyhouse', 0.19989035], ['swing', 0.1590455], ['mache', 0.047202516], ['bright', 0.042603444], ['bad', 0.04045111], ['press', 0.038212832], ['antenna', 0.028615285], ['thicker', 0.025024593], ['chat', 0.022165269], ['plastic', 0.021862581]]}"
 
+time: 1729738109.448735, predict:"{'model_output': [['antenna', 0.15915208], ['thirtyfive', 0.15898046], ['35', 0.12466665], ['hello', 0.08457404], ['bright', 0.06549922], ['wave', 0.06503377], ['cubbyhouse', 0.064088285], ['swing', 0.05652628], ['press', 0.04609658], ['measurement', 0.018158888]]}"
+

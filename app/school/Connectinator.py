@@ -7,6 +7,7 @@ import asyncio
 from time import time
 import json
 
+
 def create_logger():
     # Set up logging
     logger = logging.getLogger()  # Create a logger
@@ -62,7 +63,8 @@ class Connectinator:
         processed_output = self.results_parser.parse_model_output(output)
 
         # Update log file
-        self.logger.info('Model Output Processed Successfully! Message: %s', processed_output)  
+        self.logger.info(
+            'Model Output Processed Successfully! Message: %s', processed_output)
 
         # Pass this then to a varable being used for the react front end.
         self.front_end_translation_variable = processed_output
@@ -70,21 +72,25 @@ class Connectinator:
         print("DONEEE")
 
         with open('model_output.txt', 'a+') as f:
-            f.write(f"Time: {str(time())}, Phrase: {self.front_end_translation_variable}")
+            f.write(
+                f"Time: {str(time())}, Phrase: {self.front_end_translation_variable}")
 
     # Return auslan grammer sentence
     def format_sign_text(self, input):
-        processed_t2s_phrase = self.text_animation_translation.parse_text_to_sign(input)
+        processed_t2s_phrase = self.text_animation_translation.parse_text_to_sign(
+            input)
 
         # Update log file
-        self.logger.info('Text To Sign Processed Successfully! Message: %s', processed_t2s_phrase)  
+        self.logger.info(
+            'Text To Sign Processed Successfully! Message: %s', processed_t2s_phrase)
 
         return processed_t2s_phrase
 
     # Process frame
     async def process_frame(self, keypoints):
-        print(keypoints)
-        full_chunk, self.end_phrase_flag = self.inputProc.process_frame(keypoints)
+        # print(keypoints)
+        full_chunk, self.end_phrase_flag = self.inputProc.process_frame(
+            keypoints)
         if self.end_phrase_flag == True:
 
             print(f"ITS TRUEEE {self.end_phrase_flag}")
@@ -101,10 +107,10 @@ class Connectinator:
                 f.write("\n\n")
             self.full_phrase.append(predicted_result)
 
-        
     # TODO: LISTENER FOR RECEIVE FROM SAVE CHUNK, SEND TO MODEL
 
     # Get model prediction
+
     async def predict_model(self, keypoints):
         print("SENT TO PREDICT")
         return await self.model.query_model(keypoints)
@@ -112,24 +118,26 @@ class Connectinator:
     # TODO: LISTENER FOR RECEIVE OUTPUT FROM MODEL, ADD TO LIST, SEND TO RESULTS PARSER
 
 # Custom list class so that it can access run async and check when stuff is added
+
+
 class AsyncResultsList(list):
     def __init__(self, connectinator_instance: Connectinator, *args):
         super().__init__(*args)
         self.connectinator = connectinator_instance
         self.saved_results = None
 
-
     def append(self, item):
-        self.connectinator.logger.info(f"Word added with shape {item['model_output']}")
-        super().append(item) 
-        
+        self.connectinator.logger.info(
+            f"Word added with shape {item['model_output']}")
+        super().append(item)
+
         if self.connectinator.end_phrase_flag == True:
             print("AHAHHAHAHAHAHAHHAHA ")
             asyncio.create_task(self.parse_results())
-    
+
     # async call the connectinator.format_model_output on this list
     async def parse_results(self):
-        # Reset list result 
+        # Reset list result
         self.saved_results = list(self)
         self.clear()
 
@@ -138,5 +146,5 @@ class AsyncResultsList(list):
 
         self.connectinator.logger.info("Parsing results asynchronously...")
         print("FORMATTING RESULTS")
-        await self.connectinator.format_model_output(self.saved_results) # change to pass saves results
-        
+        # change to pass saves results
+        await self.connectinator.format_model_output(self.saved_results)
