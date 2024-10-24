@@ -51,7 +51,7 @@ def model_output_parse():
         model_output = request.get_json()
         logging.info('Received request on /model_output: %s', model_output)  # Updated log message
         #model_output_data = model_output['model_output']
-        processed_output = connectinator.parse_model_output(model_output)
+        processed_output = connectinator.format_model_output(model_output)
     
         logging.info('Model Output Processed Successfully! Message: %s', processed_output)  # Updated log message
         return jsonify({"message": processed_output}), 200
@@ -65,7 +65,7 @@ def t2s_parse():
     try:
         t2s_input = request.get_json()
         logging.info('Received request on /t2s: %s', t2s_input)
-        processed_t2s_phrase = connectinator.parse_text_to_sign(t2s_input)
+        processed_t2s_phrase = connectinator.format_sign_text(t2s_input['t2s_input'])
         #t2s_parse_phrase = t2s_input['t2s_input']
         #processed_t2s_phrase = text_animation_translation.parse_text_to_sign(t2s_parse_phrase)
         #logging.info('Text To Sign Processed Successfully! Message: %s', processed_t2s_phrase)  # Updated log message

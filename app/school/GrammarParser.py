@@ -22,7 +22,7 @@ class textAnimationTranslation:
         if len(t2s_input.split()) > 2:
             print("Contacting Gemini")
             model = genai.GenerativeModel("gemini-1.5-flash")
-            response = model.generate_content("Convert this phrase into an Auslan english Sentence (as text) Provide only the text no other explanation:"+ t2s_input)
+            response = model.generate_content("Convert this phrase into an Auslan english Sentence (as text) Provide only the text no other explanation:"+ t2s_input + "Use the following as an example, I am going to the park tomorrow translates to, tomorrow park me go")
             response2 = model.generate_content("Convert this phrase into a sign-language english Sentence (as text) Provide only the text no other explanation:"+ t2s_input)
             response_dict = response.to_dict()
             response2_dict = response2.to_dict()
@@ -43,7 +43,7 @@ class textAnimationTranslation:
             result = t2s_input
             result2 = 'N/A'
 
-        return result, result2
+        return result
     
     def save_as_json(self, parsed_result, output_filename="parsed_input.json"):
         """
