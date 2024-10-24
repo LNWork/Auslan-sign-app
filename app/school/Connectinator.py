@@ -83,7 +83,7 @@ class Connectinator:
 
     # Process frame
     async def process_frame(self, keypoints):
-        print(keypoints)
+        #print(keypoints)
         full_chunk, self.end_phrase_flag = self.inputProc.process_frame(keypoints)
         if self.end_phrase_flag == True:
 
