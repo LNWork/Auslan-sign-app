@@ -64,6 +64,8 @@ def process_pose_file(blob_name):
         return None
 
 # Concatenate poses and upload the video back to Firebase
+import subprocess
+
 def concatenate_poses_and_upload(blob_names, sentence):
     all_poses = []
     valid_filenames = []
@@ -93,28 +95,37 @@ def concatenate_poses_and_upload(blob_names, sentence):
 
         video_writer.release()
         temp_video.close()
-        
-        # Convert the video to a more compatible format
-        # (some video players may not support the default format)
-        outputPath = temp_video_path.replace('.mp4', '_converted.mp4')
-        # subprocess will run using the host computer
-        subprocess.run(['ffmpeg', '-i', temp_video_path, '-vcodec',
-                       'libx264', '-acodec', 'aac', outputPath])
 
-        # Upload the video to Firebase Storage in the 'output_videos/' folder with the sentence as the filename
+        # Convert the video to a more compatible format
+        output_path = temp_video_path.replace('.mp4', '_converted.mp4')
+        try:
+            # Capture output to check for errors
+            result = subprocess.run(['ffmpeg', '-i', temp_video_path, '-vcodec', 'libx264', '-acodec', 'aac', output_path], 
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+            if result.returncode != 0:
+                print(f"FFmpeg failed with the following error:\n{result.stderr}")
+                return  # Stop the function if FFmpeg failed
+            else:
+                print(f"Video successfully converted to: {output_path}")
+        except Exception as e:
+            print(f"Error during video conversion: {e}")
+            return  # Stop the function if an exception occurred
+
+        # Upload the converted video to Firebase Storage in the 'output_videos/' folder with the sentence as the filename
         bucket = storage.bucket()
-        blob = bucket.blob(f"output_videos/{sentence}.mp4")  # Updated path
-        blob.upload_from_filename(temp_video_path, content_type="video/mp4")
+        blob = bucket.blob(f"output_videos/{sentence}_converted.mp4")
+        blob.upload_from_filename(output_path, content_type="video/mp4")
 
         # Optionally make the file publicly accessible (if needed)
         blob.make_public()
         print(f"Video uploaded to Firebase at 'output_videos/{sentence}.mp4' and accessible at: {blob.public_url}")
 
-        # Remove the temporary file after uploading
+        # Remove the temporary files after uploading
         os.remove(temp_video_path)
+        os.remove(output_path)
     else:
         print("Not enough .pose files to concatenate")
-
 
 # Check if a word has a corresponding pose file in Firebase
 def get_valid_blobs_from_sentence(sentence):
