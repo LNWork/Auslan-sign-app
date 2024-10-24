@@ -22,7 +22,7 @@ class textAnimationTranslation:
         if len(t2s_input.split()) > 2:
             print("Contacting Gemini")
             model = genai.GenerativeModel("gemini-1.5-flash")
-            response = model.generate_content("Convert this phrase into an Auslan english Sentence (as text) Provide only the text no other explanation:"+ t2s_input + "Use the following as an example, I am going to the park tomorrow translates to, tomorrow park me go")
+            response = model.generate_content("Convert this phrase into an Auslan english Sentence (as text) Provide only the text no other explanation:"+ t2s_input + "Use the following structure: English: I (subject) am going (verb) to the shop tomorrow (object). Auslan: Tomorrow shop me go English: What (subject) is your (verb) dog's name (object)? Auslan: Dog name what?")
             response2 = model.generate_content("Convert this phrase into a sign-language english Sentence (as text) Provide only the text no other explanation:"+ t2s_input)
             response_dict = response.to_dict()
             response2_dict = response2.to_dict()
