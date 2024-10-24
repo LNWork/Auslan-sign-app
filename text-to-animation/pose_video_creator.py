@@ -46,7 +46,7 @@
 #         if not blob.exists():
 #             print(f"Blob {blob_name} does not exist.")
 #             return None
-        
+
 #         data_buffer = io.BytesIO()
 #         blob.download_to_file(data_buffer)
 #         data_buffer.seek(0)
@@ -83,7 +83,7 @@
 
 #         for frame in visualizer.draw_frame_with_filename([0]):  # Only one pose, so just draw the first frame
 #             video_writer.write(frame)
-        
+
 #         video_writer.release()
 #         temp_video.close()
 
@@ -103,7 +103,7 @@
 
 #         for frame in visualizer.draw_frame_with_filename(frame_ranges):
 #             video_writer.write(frame)
-        
+
 #         video_writer.release()
 #         temp_video.close()
 
@@ -113,18 +113,18 @@
 
 # # Check if a word has a corresponding pose file in Firebase
 # def get_valid_blobs_from_sentence(sentence):
-#     words = [word.capitalize() for word in sentence.split()]  
+#     words = [word.capitalize() for word in sentence.split()]
 #     valid_blob_names = []
 
 #     bucket = storage.bucket()
-    
+
 #     for word in words:
 #         blob = bucket.blob(f"{word}.pose")
 #         if blob.exists():
 #             valid_blob_names.append(word)
 #         else:
 #             print(f"Skipping word '{word}', no corresponding .pose file found.")
-    
+
 #     return valid_blob_names
 
 
@@ -153,9 +153,6 @@
 #     process_sentence(api_response_sentence)
 
 
-
-
-
 import os
 import tempfile
 import json
@@ -168,6 +165,10 @@ import cv2
 from concurrent.futures import ProcessPoolExecutor
 from spoken_to_signed.gloss_to_pose import concatenate_poses
 from dotenv import load_dotenv
+
+
+# Required for subprocess.run
+import subprocess
 
 # Load environment variables from the .env file
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', 'app', '.env'))
@@ -194,17 +195,21 @@ if None in firebase_credentials.values():
 
 # Initialize Firebase Admin SDK
 cred = credentials.Certificate(firebase_credentials)
-firebase_admin.initialize_app(cred, {'storageBucket': 'auslan-194e5.appspot.com'})
+firebase_admin.initialize_app(
+    cred, {'storageBucket': 'auslan-194e5.appspot.com'})
 
 # Process pose file from Firebase Storage
+
+
 def process_pose_file(blob_name):
     try:
         bucket = storage.bucket()
-        blob = bucket.blob(f"{blob_name}.pose")  # Assuming each word corresponds to a .pose file
+        # Assuming each word corresponds to a .pose file
+        blob = bucket.blob(f"{blob_name}.pose")
         if not blob.exists():
             print(f"Blob {blob_name} does not exist.")
             return None
-        
+
         data_buffer = io.BytesIO()
         blob.download_to_file(data_buffer)
         data_buffer.seek(0)
@@ -215,6 +220,8 @@ def process_pose_file(blob_name):
         return None
 
 # Concatenate poses and save video temporarily
+
+
 def concatenate_poses_and_save_temporarily(blob_names):
     all_poses = []
     valid_filenames = []
@@ -225,7 +232,8 @@ def concatenate_poses_and_save_temporarily(blob_names):
     for pose, blob_name in zip(results, blob_names):
         if pose:
             all_poses.append(pose)
-            valid_filenames.append(os.path.splitext(os.path.basename(blob_name))[0])
+            valid_filenames.append(os.path.splitext(
+                os.path.basename(blob_name))[0])
 
     if len(all_poses) == 1:
         # If there's only one pose, visualize and save it directly
@@ -235,20 +243,22 @@ def concatenate_poses_and_save_temporarily(blob_names):
         temp_video = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
         temp_video_path = temp_video.name
 
-        fourcc = cv2.VideoWriter_fourcc(*'H264')
+        fourcc = cv2.VideoWriter_fourcc(*'Hs263')
         video_writer = cv2.VideoWriter(temp_video_path, fourcc, all_poses[0].body.fps,
                                        (all_poses[0].header.dimensions.width, all_poses[0].header.dimensions.height))
 
-        for frame in visualizer.draw_frame_with_filename([0]):  # Only one pose, so just draw the first frame
+        # Only one pose, so just draw the first frame
+        for frame in visualizer.draw_frame_with_filename([0]):
             video_writer.write(frame)
-        
+
         video_writer.release()
         temp_video.close()
 
         return temp_video_path  # Return the path of the temporary file
 
     elif len(all_poses) > 1:
-        concatenated_pose, frame_ranges = concatenate_poses(all_poses, valid_filenames)
+        concatenated_pose, frame_ranges = concatenate_poses(
+            all_poses, valid_filenames)
         visualizer = PoseVisualizer(concatenated_pose)
 
         # Create a temporary file to store the video
@@ -261,28 +271,43 @@ def concatenate_poses_and_save_temporarily(blob_names):
 
         for frame in visualizer.draw_frame_with_filename(frame_ranges):
             video_writer.write(frame)
-        
+
         video_writer.release()
         temp_video.close()
 
-        return temp_video_path  # Return the path of the temporary file
+        # Convert the video to a more compatible format
+        # (some video players may not support the default format)
+        outputPath = temp_video_path.replace('.mp4', '_converted.mp4')
+        # subprocess will run using the host computer
+        subprocess.run(['ffmpeg', '-i', temp_video_path, '-vcodec',
+                       'libx264', '-acodec', 'aac', outputPath])
+
+        # Code will re-encode the video using some kinda magic
+        # this fixes encoding issues w chrome and chromium
+
+        # returns outputPath instead of temp_video_path
+
+        return outputPath  # Return the path of the temporary file
 
     return None
 
 # Check if a word has a corresponding pose file in Firebase
+
+
 def get_valid_blobs_from_sentence(sentence):
-    words = [word.capitalize() for word in sentence.split()]  
+    words = [word.capitalize() for word in sentence.split()]
     valid_blob_names = []
 
     bucket = storage.bucket()
-    
+
     for word in words:
         blob = bucket.blob(f"{word}.pose")
         if blob.exists():
             valid_blob_names.append(word)
         else:
-            print(f"Skipping word '{word}', no corresponding .pose file found.")
-    
+            print(
+                f"Skipping word '{word}', no corresponding .pose file found.")
+
     return valid_blob_names
 
 
