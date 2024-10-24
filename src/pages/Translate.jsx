@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const TranslateApp = () => {
   const [sourceText, setSourceText] = useState('');
@@ -22,7 +22,6 @@ const TranslateApp = () => {
     try {
       if (videoPath.startsWith('gs://')) {
         // Logic for Firebase videos would be here
-        // Keeping this for future use in case you switch back to Firebase
         console.error("Fetching from Firebase not implemented for this demo.");
       } else {
         // Local file path - directly set the video path
@@ -32,6 +31,25 @@ const TranslateApp = () => {
       console.error('Error fetching video:', error);
     }
   };
+
+  // Function to load and play/pause the video when it can play through
+  const loadVideos = () => {
+    const videoElements = document.querySelectorAll("video");
+    videoElements.forEach(video => {
+      video.load();
+      video.addEventListener("canplaythrough", function () {
+        this.play();
+        this.pause();
+      });
+    });
+  };
+
+  // Ensure the event handler is applied when the component mounts or video changes
+  useEffect(() => {
+    if (animatedSignVideo) {
+      loadVideos();
+    }
+  }, [animatedSignVideo]);
 
   return (
     <div style={styles.container}>
@@ -50,12 +68,12 @@ const TranslateApp = () => {
 
       <div style={styles.panel}>
         <h2>Sign Video</h2>
+        <video controls loop className='mt-5 w-full project-video' preload='auto'>
+          <source src={'src/test_video.mp4'} type='video/mp4' />
+          Your browser does not support the video tag.
+        </video>
         {animatedSignVideo ? (
           <div style={styles.videoPlaceholder}>
-            <video controls loop className='mt-5 w-full project-video' preload='metadata'>
-              <source src={animatedSignVideo} type='video/mp4'/>
-              Your browser does not support the video tag.
-            </video>
           </div>
         ) : (
           <div style={styles.videoPlaceholder}>Sign language animation will appear here</div>

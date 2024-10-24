@@ -235,7 +235,7 @@ def concatenate_poses_and_save_temporarily(blob_names):
         temp_video = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
         temp_video_path = temp_video.name
 
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        fourcc = cv2.VideoWriter_fourcc(*'H264')
         video_writer = cv2.VideoWriter(temp_video_path, fourcc, all_poses[0].body.fps,
                                        (all_poses[0].header.dimensions.width, all_poses[0].header.dimensions.height))
 
@@ -255,10 +255,10 @@ def concatenate_poses_and_save_temporarily(blob_names):
         temp_video = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
         temp_video_path = temp_video.name
 
-        fourcc = cv2.VideoWriter_fourcc(*'H264')
-        video_writer = cv2.VideoWriter(temp_video_path, fourcc, 15,  # Set the frame rate to 60 fps
-                                    (concatenated_pose.header.dimensions.width, 
-                                        concatenated_pose.header.dimensions.height))
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        video_writer = cv2.VideoWriter(temp_video_path, fourcc, concatenated_pose.body.fps,
+                                       (concatenated_pose.header.dimensions.width, concatenated_pose.header.dimensions.height))
+
         for frame in visualizer.draw_frame_with_filename(frame_ranges):
             video_writer.write(frame)
         
@@ -307,5 +307,5 @@ def process_sentence(sentence):
 
 if __name__ == "__main__":
     # Example usage: replace with actual API response
-    api_response_sentence = "france whale australia"
+    api_response_sentence = "france whale australia france whale australia france whale australia france whale australia france whale australia france whale australia france whale australia"
     process_sentence(api_response_sentence)
