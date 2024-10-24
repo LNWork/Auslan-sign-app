@@ -91,8 +91,9 @@ class Connectinator:
         # print(keypoints)
         full_chunk, self.end_phrase_flag = self.inputProc.process_frame(
             keypoints)
-        #print(keypoints)
-        full_chunk, self.end_phrase_flag = self.inputProc.process_frame(keypoints)
+        # print(keypoints)
+        full_chunk, self.end_phrase_flag = self.inputProc.process_frame(
+            keypoints)
         if self.end_phrase_flag == True:
             print("meow meow meow meow")
             asyncio.create_task(self.full_phrase.parse_results())
@@ -136,7 +137,7 @@ class AsyncResultsList(list):
     def append(self, item):
         print("adding worekds")
         self.connectinator.logger.info(
-            f"Word added with shape {item['model_output']}")
+            f"Word added with shape {item}")
         super().append(item)
 
     # async call the connectinator.format_model_output on this list
