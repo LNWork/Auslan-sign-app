@@ -72,4 +72,3 @@ if __name__ == "__main__":
     
     # Save the parsed result to a new JSON file
     parser.save_as_json(parsed_result)
-    
