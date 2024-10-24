@@ -2,28 +2,67 @@ import React, { useState } from 'react';
 import VideoInput from '../components/VideoInput';
 
 const TranslateApp = () => {
-  const [mode, setMode] = useState('videoToText'); // Toggle between 'videoToText' and 'textToVideo'
+  const [mode, setMode] = useState('videoToText');
   const [sourceText, setSourceText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
-  const [animatedSignVideo, setAnimatedSignVideo] = useState(null); // Placeholder for the animated video output
 
-  // This is where the translation logic will go (e.g., API call for video-to-text or text-to-video)
+  // Function to swap between modes
   const handleSwap = () => {
-    // Reset animatedSignVideo when switching modes
-    setAnimatedSignVideo(null);
+    setTranslatedText(''); // Clear the translated text on swap
     setMode((prevMode) => (prevMode === 'videoToText' ? 'textToVideo' : 'videoToText'));
   };
 
-  const handleTextToVideo = () => {
-    // Placeholder logic to convert text to an animated sign language video
-    setAnimatedSignVideo(`Animation for: ${sourceText}`); // For now, just display a placeholder
+  // Function to convert text to video
+  const handleTextToVideo = async () => {
+    const fixedSourceText = sourceText.trim(); // Ensure there's no leading/trailing whitespace
+    console.log('Sending Source Text:', fixedSourceText);
+
+    try {
+      const response = await fetch('http://3.106.229.4:5000/t2s', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ t2s_input: fixedSourceText }), // Send input as t2s_input
+      });
+
+      const responseText = await response.text();
+      console.log('Raw response:', responseText);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
+      }
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+        console.log('Full response:', data); // Log the full response for debugging
+      } catch (parseError) {
+        console.error('Error parsing JSON:', parseError);
+        throw new Error('Invalid JSON response');
+      }
+
+      // Check for translated text or queries
+      if (data.Translated_text) { // Use Translated_text (uppercase "T")
+        setTranslatedText(data.Translated_text); // Set translated text based on the backend response
+      } else if (data.translatedText) { // Check for translatedText as well
+        setTranslatedText(data.translatedText);
+      } else if (Array.isArray(data.queries) && data.queries.length > 0) {
+        setTranslatedText(data.queries.join(', '));
+      } else {
+        setTranslatedText('No translation available.'); // This is a fallback message
+      }
+
+    } catch (error) {
+      console.error('Error details:', error);
+      setTranslatedText(`Error: ${error.message}. Please check the API and input.`);
+    }
   };
 
   return (
     <div style={styles.container}>
       {mode === 'videoToText' ? (
         <>
-          {/* Video to Text Mode */}
           <div style={styles.panel}>
             <h2>Sign</h2>
             <VideoInput />
@@ -45,7 +84,6 @@ const TranslateApp = () => {
         </>
       ) : (
         <>
-          {/* Text to Video Mode */}
           <div style={styles.panel}>
             <h2>Text</h2>
             <textarea
@@ -62,12 +100,13 @@ const TranslateApp = () => {
           </div>
 
           <div style={styles.panel}>
-            <h2>Sign Video</h2>
-            {animatedSignVideo ? (
-              <div style={styles.videoPlaceholder}>{animatedSignVideo}</div> // Placeholder for the sign language animation
-            ) : (
-              <div style={styles.videoPlaceholder}>Sign language animation will appear here</div>
-            )}
+            <h2>API Response</h2>
+            <textarea
+              placeholder="API response will appear here"
+              value={translatedText}
+              readOnly
+              style={styles.textarea}
+            />
           </div>
         </>
       )}
@@ -78,9 +117,9 @@ const TranslateApp = () => {
 const styles = {
   container: {
     display: 'flex',
-    flexDirection: 'row', // Align panels side by side
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', // Add spacing between panels
+    justifyContent: 'space-between',
     gap: '20px',
     width: '100%',
     margin: '0 auto',
@@ -89,18 +128,18 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center', // Center content vertically
-    width: '45%', // Ensure each panel takes up equal space
-    height: '400px', // Consistent height for both modes (adjust as needed)
+    justifyContent: 'center',
+    width: '45%',
+    height: '400px',
     boxSizing: 'border-box',
   },
   textarea: {
     width: '100%',
-    height: '100%', // Match height with the video panel
+    height: '100%',
     padding: '10px',
     fontSize: '16px',
     resize: 'none',
-    boxSizing: 'border-box', // Ensure padding is included within the size
+    boxSizing: 'border-box',
   },
   buttons: {
     display: 'flex',
@@ -113,16 +152,6 @@ const styles = {
     padding: '10px 20px',
     fontSize: '16px',
     cursor: 'pointer',
-  },
-  videoPlaceholder: {
-    width: '100%',
-    height: '100%', // Match the height with textarea and video
-    backgroundColor: '#ddd',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontSize: '16px',
-    boxSizing: 'border-box',
   },
 };
 
