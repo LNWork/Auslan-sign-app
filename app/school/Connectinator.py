@@ -60,7 +60,7 @@ class Connectinator:
 
     # Process the model output
     async def format_model_output(self, output):
-        processed_output = self.results_parser.parse_model_output(output)
+        processed_output = await self.results_parser.parse_model_output(output)
 
         # Update log file
         self.logger.info(
@@ -73,7 +73,7 @@ class Connectinator:
 
         with open('model_output.txt', 'a+') as f:
             f.write(
-                f"Time: {str(time())}, Phrase: {self.front_end_translation_variable}")
+                f"\nTime: {str(time())}, Phrase: {self.front_end_translation_variable}")
 
     # Return auslan grammer sentence
     def format_sign_text(self, input):
@@ -94,11 +94,14 @@ class Connectinator:
         #print(keypoints)
         full_chunk, self.end_phrase_flag = self.inputProc.process_frame(keypoints)
         if self.end_phrase_flag == True:
+            print("meow meow meow meow")
+            asyncio.create_task(self.full_phrase.parse_results())
 
-            print(f"ITS TRUEEE {self.end_phrase_flag}")
+            print(f"End Phrase: {self.end_phrase_flag}")
 
         if full_chunk is not None:
             print("AAAAAAAAa SENT TO THE MODEL")
+
             # async predict the work and then add it to the self.full_phrase
 
             predicted_result = await self.predict_model(full_chunk)
@@ -107,8 +110,10 @@ class Connectinator:
                 f.write(f"time: {str(time())}, predict:")
                 f.write(json.dumps(str(predicted_result)))
                 f.write("\n\n")
+            print(self.end_phrase_flag)
+            print('EBFORE THE APPEND')
             self.full_phrase.append(predicted_result)
-
+            print("ADGERT APPEND")
     # TODO: LISTENER FOR RECEIVE FROM SAVE CHUNK, SEND TO MODEL
 
     # Get model prediction
@@ -125,28 +130,24 @@ class Connectinator:
 class AsyncResultsList(list):
     def __init__(self, connectinator_instance: Connectinator, *args):
         super().__init__(*args)
-        self.connectinator = connectinator_instance
         self.saved_results = None
+        self.connectinator = connectinator_instance
 
     def append(self, item):
+        print("adding worekds")
         self.connectinator.logger.info(
             f"Word added with shape {item['model_output']}")
         super().append(item)
 
-        if self.connectinator.end_phrase_flag == True:
-            print("AHAHHAHAHAHAHAHHAHA ")
-            asyncio.create_task(self.parse_results())
-
     # async call the connectinator.format_model_output on this list
+
     async def parse_results(self):
         # Reset list result
         self.saved_results = list(self)
         self.clear()
 
         # Reset the flag
-        self.connectinator.end_phrase_flag = False
-
         self.connectinator.logger.info("Parsing results asynchronously...")
         print("FORMATTING RESULTS")
         # change to pass saves results
-        await self.connectinator.format_model_output(self.saved_results)
+        await self.connectinator.format_model_output(self.saved_results['model_output'])

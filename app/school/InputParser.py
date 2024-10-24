@@ -9,9 +9,9 @@ import pandas as pd
 THRESHOLD = 0.05
 VISIBILITY_THRESHOLD = 0.7
 VISIBILITY_COUNT = 0.5
-WINDOW_SIZE = 30
+WINDOW_SIZE = 15
 MAX_CHUNK_LENGTH = 145  # Maximum length of a chunk in frames
-HANDS_DOWN_THRESHOLD = 0.05
+HANDS_DOWN_THRESHOLD = 0.02
 HANDS_DOWN_TIME = 30
 
 
@@ -93,13 +93,14 @@ class InputParser:
         """Calculate the velocity of keypoints between two frames."""
         velocities = np.linalg.norm(
             keypoints_current[:, :3] - keypoints_previous[:, :3], axis=1)
-        return np.mean(velocities)  # Return average velocity of all keypoints
+        # Return average velocity of all keypoints
+        return np.mean(velocities)
 
     def process_frame(self, frame):
         """Process a single frame of keypoint data in real-time."""
         keypoints_current = self.combine_keypoints(frame['keypoints'])
         chunk_result = None
-
+        locEOP = False
         handsDown = self.handsDown(
             keypoints_current[33:53], keypoints_current[54:74])
         if handsDown:
@@ -108,7 +109,8 @@ class InputParser:
             if self.handsDownCounter >= HANDS_DOWN_TIME:
                 print("HANDS DOWN FOR TOO LONG")
                 print("END OF PHRASE")
-                chunk_result, self.endOfPhrase = self.endPhrase()
+                chunk_result, locEOP = self.endPhrase()
+                return chunk_result, locEOP
         else:
             self.handsDownCounter = 0
 
@@ -118,6 +120,7 @@ class InputParser:
         if self.previous_keypoints is not None:
             velocity = self.calculate_velocity(
                 keypoints_current, self.previous_keypoints)
+            # print("VELOCITY: ", velocity)
 
             if velocity < self.threshold:
                 print("velocity < threshold, velocity: ", velocity)
@@ -127,8 +130,12 @@ class InputParser:
 
             # Check if we detect a potential boundary or chunk size exceeds limit
             if self.pause_count >= self.window_size or len(self.current_chunk) >= MAX_CHUNK_LENGTH:
+                if (self.pause_count >= self.window_size):
+                    print("PAUSE COUNT >= WINDOW SIZE")
+                else:
+                    print("CHUNK LENGTH EXCEEDED")
                 print("IF FOR SAVE")
-                chunk_result = self.save_chunk(self.current_chunk)
+                chunk_result, locEOP = self.save_chunk(self.current_chunk)
                 self.current_chunk = []  # Start a new chunk
                 self.pause_count = 0  # Reset pause counter
                 self.buffer = []  # Clear buffer
@@ -136,12 +143,13 @@ class InputParser:
                 self.buffer = []
 
         # Add the current frame to the chunk
-        self.current_chunk.append(frame)
+        if (self.handsDownCounter < 5):
+            self.current_chunk.append(frame)
+            self.previous_keypoints = keypoints_current
 
         # Update the previous frame's keypoints
-        self.previous_keypoints = keypoints_current
 
-        return chunk_result, self.endOfPhrase
+        return chunk_result, locEOP
 
     def save_chunk(self, chunk):
         """Save the current chunk to a JSON file in the specified format, padding it to 145 frames."""
@@ -162,7 +170,7 @@ class InputParser:
         # TODO: SEND TO CONNECTINATOR
         print("finsih save")
 
-        return final_chunk
+        return final_chunk, False
         # Save to the JSON file
         # with open(filename, 'w') as f:
         #     json.dump(chunk_data, f, indent=4)
@@ -180,15 +188,9 @@ class InputParser:
 
     def endPhrase(self):
         """End the current phrase and save the chunks to a file."""
-        self.endOfPhrase = True
-        chunk_result = None
-        local_end_phrase = True
-        if self.current_chunk:
-            chunk_result = self.save_chunk(self.current_chunk)
-            self.current_chunk = []
         print("END OF PHRASE")
         self.callFunc()
-        return chunk_result, local_end_phrase
+        return None, True
 
     def handsDown(self, leftHand, rightHand):
         """Check if both hands are below a certain threshold."""
@@ -196,6 +198,8 @@ class InputParser:
         # Y is the second column in the keypoints (x, y, z, visibility)
         leftHandY = np.mean(leftHand[:, 1])
         rightHandY = np.mean(rightHand[:, 1])
+        print("LEFT HAND Y: ", leftHandY)
+        print("RIGHT HAND Y: ", rightHandY)
         return leftHandY < HANDS_DOWN_THRESHOLD and rightHandY < HANDS_DOWN_THRESHOLD
 
     def callFunc(self):
@@ -211,5 +215,4 @@ class InputParser:
         self.chunks = []
         self.word_boundaries = []
         self.buffer = []
-        self.endOfPhrase = False
         self.handsDownCounter = 0
