@@ -33,8 +33,12 @@ class ResultsParser:
             return {"error": "No output from model"}
 
         # Find the word with the highest confidence
-        best_model_phrase, best_confidence = max(model_output, key=lambda item: item[1])
 
+        best_model_phrase = ""
+        for model_output_single in model_output:
+            best_phrase, best_confidence = max(model_output_single, key=lambda item: item[1])
+            best_model_phrase = ", ".join([best_model_phrase, best_phrase])
+            
         if len(best_model_phrase.split()) > 2:
             print("contacting gemini")
 
@@ -43,7 +47,7 @@ class ResultsParser:
 
             print("GETTING RESULT")
             # TODO change this to take in list of words and then to make it the best sentence from that
-            response = await self.model.generate_content("Convert these words into a correct English sentence:"+ best_model_phrase)
+            response = await self.model.generate_content("Convert these words into a correct English sentence: Each of the words are separated by a comma"+ best_model_phrase)
             
             # Getting results
             response_dict = response.to_dict()

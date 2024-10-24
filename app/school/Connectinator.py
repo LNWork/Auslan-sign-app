@@ -112,7 +112,7 @@ class Connectinator:
                 f.write("\n\n")
             print(self.end_phrase_flag)
             print('EBFORE THE APPEND')
-            self.full_phrase.append(predicted_result)
+            self.full_phrase.append(predicted_result['model_output'])
             print("ADGERT APPEND")
     # TODO: LISTENER FOR RECEIVE FROM SAVE CHUNK, SEND TO MODEL
 
@@ -150,4 +150,4 @@ class AsyncResultsList(list):
         self.connectinator.logger.info("Parsing results asynchronously...")
         print("FORMATTING RESULTS")
         # change to pass saves results
-        await self.connectinator.format_model_output(self.saved_results['model_output'])
+        await self.connectinator.format_model_output(self.saved_results)
