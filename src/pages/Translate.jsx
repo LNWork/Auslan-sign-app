@@ -19,6 +19,7 @@ const TranslateApp = () => {
     const fixedSourceText = sourceText.trim(); // Ensure there's no leading/trailing whitespace
     console.log('Sending Source Text:', fixedSourceText);
 
+    // 1. Fetch the grammar parsed text from the backend
     try {
       const response = await fetch('http://3.106.229.4:5000/t2s', {
         method: 'POST',
@@ -60,7 +61,7 @@ const TranslateApp = () => {
       setTranslatedText(`Error: ${error.message}. Please check the API and input.`);
     }
 
-    // Fetch the video based on the translated text
+    // 2. Fetch the video based on the translated text
     const videoPath = getVideoPathForText(sourceText); // Get the Firebase video path based on the input text
   
     try {
@@ -132,7 +133,7 @@ const TranslateApp = () => {
             {animatedSignVideo ? (
               <div style={styles.videoPlaceholder}>
                 <video
-                  src={'gs://auslan-194e5.appspot.com/test_video_FINAL.mp4'}
+                  src={animatedSignVideo}
                   controls
                   autoPlay
                   loop
