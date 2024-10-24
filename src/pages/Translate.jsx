@@ -131,7 +131,7 @@ const TranslateApp = () => {
           <div style={styles.panel}>
             <h2>Sign Video</h2>
             {animatedSignVideo ? (
-              <div style={styles.videoPlaceholder}>
+              <div style={styles.videoContainer}>
                 <video
                   src={animatedSignVideo}
                   controls
@@ -188,6 +188,28 @@ const styles = {
     padding: '10px 20px',
     fontSize: '16px',
     cursor: 'pointer',
+  },
+  videoContainer: {
+    width: '100%', // Or any desired percentage of the parent width
+    maxWidth: '800px', // Set a maximum width
+    height: 'auto', // Let the height adjust based on the aspect ratio
+    display: 'flex',
+    justifyContent: 'center', // Center the video horizontally
+    alignItems: 'center', // Center the video vertically
+    overflow: 'hidden', // Hide any overflow in case the video exceeds the container
+  },
+  video: {
+    width: '100%', // Video will take up the full width of the container
+    height: 'auto', // Maintain the aspect ratio by adjusting height automatically
+    objectFit: 'contain', // Ensure the video fits within the container without stretching
+  },
+  videoPlaceholder: {
+    width: '100%', // Full width placeholder
+    height: '400px', // Set a height for the placeholder
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ccc', // A background color for the placeholder
   },
 };
 
