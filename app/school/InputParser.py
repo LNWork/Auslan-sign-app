@@ -101,53 +101,52 @@ class InputParser:
         keypoints_current = self.combine_keypoints(frame['keypoints'])
         chunk_result = None
         locEOP = False
+
+        # Check if hands are down, and return None if detected
         handsDown = self.handsDown(
             keypoints_current[33:53], keypoints_current[54:74])
         if handsDown:
             self.handsDownCounter += 1
             print("HANDS DOWN for ", self.handsDownCounter)
             if self.handsDownCounter >= HANDS_DOWN_TIME:
-                print("HANDS DOWN FOR TOO LONG")
-                print("END OF PHRASE")
+                print("HANDS DOWN FOR TOO LONG - END OF PHRASE")
                 chunk_result, locEOP = self.endPhrase()
-                return chunk_result, locEOP
+                return chunk_result, locEOP  # Return immediately if hands are down
+            return None, False  # Return None if hands are detected down but not long enough
         else:
-            self.handsDownCounter = 0
+            self.handsDownCounter = 0  # Reset if hands are detected
 
-            # Store combined and normalized keypoints in 'data'
+        # Store combined and normalized keypoints in 'data'
         frame['data'] = keypoints_current.tolist()
 
         if self.previous_keypoints is not None:
+            # Calculate velocity between consecutive frames
             velocity = self.calculate_velocity(
                 keypoints_current, self.previous_keypoints)
-            # print("VELOCITY: ", velocity)
+            print(f"Calculated velocity: {velocity}")
 
+            # Detect if movement is under the threshold
             if velocity < self.threshold:
                 print("velocity < threshold, velocity: ", velocity)
                 self.pause_count += 1
             else:
-                self.pause_count = 0
+                self.pause_count = 0  # Reset pause count when movement occurs
 
             # Check if we detect a potential boundary or chunk size exceeds limit
             if self.pause_count >= self.window_size or len(self.current_chunk) >= MAX_CHUNK_LENGTH:
-                if (self.pause_count >= self.window_size):
-                    print("PAUSE COUNT >= WINDOW SIZE")
+                if self.pause_count >= self.window_size:
+                    print("Pause count >= window size, saving chunk")
                 else:
-                    print("CHUNK LENGTH EXCEEDED")
-                print("IF FOR SAVE")
+                    print("Chunk length exceeded, saving chunk")
                 chunk_result, locEOP = self.save_chunk(self.current_chunk)
-                self.current_chunk = []  # Start a new chunk
+                self.current_chunk = []  # Start a new chunk after saving the current one
                 self.pause_count = 0  # Reset pause counter
-                self.buffer = []  # Clear buffer
             else:
-                self.buffer = []
+                self.buffer = []  # Clear buffer if no boundary detected
 
         # Add the current frame to the chunk
-        if (self.handsDownCounter < 5):
-            self.current_chunk.append(frame)
-            self.previous_keypoints = keypoints_current
-
-        # Update the previous frame's keypoints
+        self.current_chunk.append(frame)
+        self.previous_keypoints = keypoints_current  # Update for the next frame
 
         return chunk_result, locEOP
 
@@ -198,8 +197,8 @@ class InputParser:
         # Y is the second column in the keypoints (x, y, z, visibility)
         leftHandY = np.mean(leftHand[:, 1])
         rightHandY = np.mean(rightHand[:, 1])
-        print("LEFT HAND Y: ", leftHandY)
-        print("RIGHT HAND Y: ", rightHandY)
+        # print("LEFT HAND Y: ", leftHandY)
+        # print("RIGHT HAND Y: ", rightHandY)
         return leftHandY < HANDS_DOWN_THRESHOLD and rightHandY < HANDS_DOWN_THRESHOLD
 
     def callFunc(self):
