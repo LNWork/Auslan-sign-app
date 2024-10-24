@@ -1,0 +1,24 @@
+
+Time: 1729786113.615883, Phrase: {'error': 'No output from model'}
+Time: 1729786114.2489269, Phrase: {'error': 'No output from model'}
+Time: 1729786114.91963, Phrase: {'error': 'No output from model'}
+Time: 1729786120.143549, Phrase: , hello
+Time: 1729786120.784396, Phrase: {'error': 'No output from model'}
+Time: 1729786121.4384708, Phrase: {'error': 'No output from model'}
+Time: 1729786122.0908601, Phrase: {'error': 'No output from model'}
+Time: 1729786226.156975, Phrase: {'error': 'No output from model'}
+Time: 1729786227.454279, Phrase: {'error': 'No output from model'}
+Time: 1729786235.634829, Phrase: {'error': 'No output from model'}
+Time: 1729786236.929593, Phrase: {'error': 'No output from model'}
+Time: 1729786264.56448, Phrase: {'error': 'No output from model'}
+Time: 1729786312.8296409, Phrase: {'error': 'No output from model'}
+Time: 1729786331.7766669, Phrase: , swing
+Time: 1729786425.221678, Phrase: {'error': 'No output from model'}
+Time: 1729786582.953562, Phrase: {'error': 'No output from model'}
+Time: 1729786584.5208251, Phrase: {'error': 'No output from model'}
+Time: 1729786586.2600582, Phrase: {'error': 'No output from model'}
+Time: 1729786605.232609, Phrase: {'error': 'No output from model'}
+Time: 1729786614.730361, Phrase: {'error': 'No output from model'}
+Time: 1729786616.523427, Phrase: {'error': 'No output from model'}
+Time: 1729786618.000468, Phrase: {'error': 'No output from model'}
+Time: 1729786657.703805, Phrase: {'error': 'No output from model'}

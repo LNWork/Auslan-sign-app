@@ -56,7 +56,7 @@ class Connectinator:
         self.text_animation_translation = textAnimationTranslation()
 
         self.predictionList = []
-        self.phraseFlag = False
+        self.prevFlag = False
 
     # Process the model output
     async def format_model_output(self, output):
@@ -92,9 +92,9 @@ class Connectinator:
         full_chunk, self.end_phrase_flag = self.inputProc.process_frame(
             keypoints)
         # print(keypoints)
-        full_chunk, self.end_phrase_flag = self.inputProc.process_frame(
-            keypoints)
-        if self.end_phrase_flag == True:
+        # full_chunk, self.end_phrase_flag = self.inputProc.process_frame(
+        #     keypoints)
+        if self.end_phrase_flag == True and self.prevFlag == False:
             print("meow meow meow meow")
             asyncio.create_task(self.full_phrase.parse_results())
 
@@ -115,6 +115,7 @@ class Connectinator:
             print('EBFORE THE APPEND')
             self.full_phrase.append(predicted_result['model_output'])
             print("ADGERT APPEND")
+            self.prevFlag = False
     # TODO: LISTENER FOR RECEIVE FROM SAVE CHUNK, SEND TO MODEL
 
     # Get model prediction
