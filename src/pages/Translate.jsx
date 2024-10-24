@@ -1,55 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { storage, ref, getDownloadURL } from '../firebase';
 
 const TranslateApp = () => {
   const [sourceText, setSourceText] = useState('');
   const [animatedSignVideo, setAnimatedSignVideo] = useState(null);
 
-  // Mock function to map user input to a specific video path
+  // Mock function to map user input to a specific video path in Firebase
   const getVideoPathForText = (inputText) => {
     // Example: Simple mock mapping for testing purposes
     if (inputText.toLowerCase() === 'hello') {
       return 'gs://auslan-194e5.appspot.com/hello.mp4';  // Replace with your actual video path in Firebase
     } else if (inputText.toLowerCase() === 'thank you') {
       return 'gs://auslan-194e5.appspot.com/thankyou.mp4';  // Replace with another video path
+    } else {
+      return 'gs://auslan-194e5.appspot.com/test_video_FINAL.mp4';  // Default video path
     }
-    return 'src/interval.mp4'
   };
 
-  // Function to handle video fetching or setting a local path
+  // Function to fetch the video based on user input
   const handleTextToVideo = async () => {
-    const videoPath = getVideoPathForText(sourceText); // Get the video path
+    const videoPath = getVideoPathForText(sourceText); // Get the Firebase video path based on the input text
 
     try {
-      if (videoPath.startsWith('gs://')) {
-        // Logic for Firebase videos would be here
-        console.error("Fetching from Firebase not implemented for this demo.");
-      } else {
-        // Local file path - directly set the video path
-        setAnimatedSignVideo(videoPath);
-      }
+      const videoRef = ref(storage, videoPath); // Reference to the video in Firebase
+      const videoUrl = await getDownloadURL(videoRef); // Get the video URL from Firebase
+      setAnimatedSignVideo(videoUrl); // Set the video URL to display the video
     } catch (error) {
       console.error('Error fetching video:', error);
     }
   };
-
-  // Function to load and play/pause the video when it can play through
-  const loadVideos = () => {
-    const videoElements = document.querySelectorAll("video");
-    videoElements.forEach(video => {
-      video.load();
-      video.addEventListener("canplaythrough", function () {
-        this.play();
-        this.pause();
-      });
-    });
-  };
-
-  // Ensure the event handler is applied when the component mounts or video changes
-  useEffect(() => {
-    if (animatedSignVideo) {
-      loadVideos();
-    }
-  }, [animatedSignVideo]);
 
   return (
     <div style={styles.container}>
@@ -68,12 +47,9 @@ const TranslateApp = () => {
 
       <div style={styles.panel}>
         <h2>Sign Video</h2>
-        <video controls loop className='mt-5 w-full project-video' preload='auto'>
-          <source src={'src/test_video.mp4'} type='video/mp4' />
-          Your browser does not support the video tag.
-        </video>
         {animatedSignVideo ? (
           <div style={styles.videoPlaceholder}>
+            <video src={animatedSignVideo} controls />
           </div>
         ) : (
           <div style={styles.videoPlaceholder}>Sign language animation will appear here</div>
