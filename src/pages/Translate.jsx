@@ -75,7 +75,7 @@ const TranslateApp = () => {
 
     // Mock function to map user input to a specific video path in Firebase
     const getVideoPathForText = (inputText) => {
-      return 'gs://auslan-194e5.appspot.com/test_video_FINAL.mp4';  // Default video path
+      return 'gs://auslan-194e5.appspot.com/france wales africa.mp4';  // Default video path
     };
 
   return (
@@ -118,15 +118,15 @@ const TranslateApp = () => {
             <button onClick={handleTextToVideo} style={styles.button}>Convert</button>
           </div>
 
-          <div style={styles.panel}>
-            <h2>API Response</h2>
+          {/* <div style={styles.panel}>
+            <h2>Auslan Sentence</h2>
             <textarea
-              placeholder="API response will appear here"
+              placeholder="Auslan sentence will appear here"
               value={translatedText}
               readOnly
               style={styles.textarea}
             />
-          </div>
+          </div> */}
 
           <div style={styles.panel}>
             <h2>Sign Video</h2>
@@ -165,15 +165,15 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '45%',
-    height: '400px',
+    width: '600px',
+    height: '600px',
     boxSizing: 'border-box',
   },
   textarea: {
-    width: '100%',
-    height: '100%',
+    width: '400px',
+    height: '400px',
     padding: '10px',
-    fontSize: '16px',
+    fontSize: '20px',
     resize: 'none',
     boxSizing: 'border-box',
   },
@@ -186,7 +186,7 @@ const styles = {
   },
   button: {
     padding: '10px 20px',
-    fontSize: '16px',
+    fontSize: '20px',
     cursor: 'pointer',
   },
   videoContainer: {
@@ -204,7 +204,7 @@ const styles = {
     objectFit: 'contain', // Ensure the video fits within the container without stretching
   },
   videoPlaceholder: {
-    width: '100%', // Full width placeholder
+    width: '400px', // Full width placeholder
     height: '400px', // Set a height for the placeholder
     display: 'flex',
     justifyContent: 'center',

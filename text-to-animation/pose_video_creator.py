@@ -45,7 +45,6 @@ firebase_admin.initialize_app(
 
 # Process pose file from Firebase Storage
 
-
 def process_pose_file(blob_name):
     try:
         bucket = storage.bucket()
@@ -64,10 +63,8 @@ def process_pose_file(blob_name):
         print(f"Error processing {blob_name}: {e}")
         return None
 
-# Concatenate poses and save video temporarily
-
-
-def concatenate_poses_and_save_temporarily(blob_names):
+# Concatenate poses and upload the video back to Firebase
+def concatenate_poses_and_upload(blob_names, sentence):
     all_poses = []
     valid_filenames = []
 
@@ -77,33 +74,10 @@ def concatenate_poses_and_save_temporarily(blob_names):
     for pose, blob_name in zip(results, blob_names):
         if pose:
             all_poses.append(pose)
-            valid_filenames.append(os.path.splitext(
-                os.path.basename(blob_name))[0])
+            valid_filenames.append(os.path.splitext(os.path.basename(blob_name))[0])
 
-    if len(all_poses) == 1:
-        # If there's only one pose, visualize and save it directly
-        visualizer = PoseVisualizer(all_poses[0])
-
-        # Create a temporary file to store the video
-        temp_video = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
-        temp_video_path = temp_video.name
-
-        fourcc = cv2.VideoWriter_fourcc(*'Hs263')
-        video_writer = cv2.VideoWriter(temp_video_path, fourcc, all_poses[0].body.fps,
-                                       (all_poses[0].header.dimensions.width, all_poses[0].header.dimensions.height))
-
-        # Only one pose, so just draw the first frame
-        for frame in visualizer.draw_frame_with_filename([0]):
-            video_writer.write(frame)
-
-        video_writer.release()
-        temp_video.close()
-
-        return temp_video_path  # Return the path of the temporary file
-
-    elif len(all_poses) > 1:
-        concatenated_pose, frame_ranges = concatenate_poses(
-            all_poses, valid_filenames)
+    if len(all_poses) > 1:
+        concatenated_pose, frame_ranges = concatenate_poses(all_poses, valid_filenames)
         visualizer = PoseVisualizer(concatenated_pose)
 
         # Create a temporary file to store the video
@@ -119,7 +93,7 @@ def concatenate_poses_and_save_temporarily(blob_names):
 
         video_writer.release()
         temp_video.close()
-
+        
         # Convert the video to a more compatible format
         # (some video players may not support the default format)
         outputPath = temp_video_path.replace('.mp4', '_converted.mp4')
@@ -127,18 +101,22 @@ def concatenate_poses_and_save_temporarily(blob_names):
         subprocess.run(['ffmpeg', '-i', temp_video_path, '-vcodec',
                        'libx264', '-acodec', 'aac', outputPath])
 
-        # Code will re-encode the video using some kinda magic
-        # this fixes encoding issues w chrome and chromium
+        # Upload the video to Firebase Storage in the 'output_videos/' folder with the sentence as the filename
+        bucket = storage.bucket()
+        blob = bucket.blob(f"output_videos/{sentence}.mp4")  # Updated path
+        blob.upload_from_filename(temp_video_path, content_type="video/mp4")
 
-        # returns outputPath instead of temp_video_path
+        # Optionally make the file publicly accessible (if needed)
+        blob.make_public()
+        print(f"Video uploaded to Firebase at 'output_videos/{sentence}.mp4' and accessible at: {blob.public_url}")
 
-        return outputPath  # Return the path of the temporary file
+        # Remove the temporary file after uploading
+        os.remove(temp_video_path)
+    else:
+        print("Not enough .pose files to concatenate")
 
-    return None
 
 # Check if a word has a corresponding pose file in Firebase
-
-
 def get_valid_blobs_from_sentence(sentence):
     words = [word.capitalize() for word in sentence.split()]
     valid_blob_names = []
@@ -165,7 +143,7 @@ def process_sentence(sentence):
         return None
 
     # Get the path to the temporary video file
-    temp_video_path = concatenate_poses_and_save_temporarily(valid_blob_names)
+    temp_video_path = concatenate_poses_and_upload(valid_blob_names, sentence)
 
     if temp_video_path:
         print(f"Video saved at {temp_video_path}")
@@ -177,5 +155,5 @@ def process_sentence(sentence):
 
 if __name__ == "__main__":
     # Example usage: replace with actual API response
-    api_response_sentence = "france australia france australia france australia france australia france australia france australia france australia"
+    api_response_sentence = "france wales africa"
     process_sentence(api_response_sentence)
