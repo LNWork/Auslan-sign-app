@@ -8,3 +8,6 @@ Time: 1729856813.9245691, Phrase: The correct sentence would be: **Hello, hello!
 Time: 1729856817.656234, Phrase: {'error': 'No output from model'}
 Time: 1729856819.182466, Phrase: {'error': 'No output from model'}
 Time: 1729856820.491366, Phrase: {'error': 'No output from model'}
+Time: 1729857525.475978, Phrase: Simple statement:
+Time: 1729857525.595593, Phrase: {'error': 'No output from model'}
+Time: 1729857526.6259358, Phrase: {'error': 'No output from model'}

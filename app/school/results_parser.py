@@ -6,6 +6,7 @@ import asyncio
 from flask import Flask, jsonify, request
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+import re
 
 load_dotenv(override=True)
 
@@ -45,37 +46,28 @@ class ResultsParser:
                 file.write(response)
             return response
 
-        # Define an async wrapper to call the synchronous generate_content method
-        async def generate_content_async(model, prompt):
-            # Run the synchronous call in an executor to avoid blocking
-            return await asyncio.get_event_loop().run_in_executor(
-                executor, lambda: model.generate_content(prompt)
-            )
-
         if len(best_model_phrase.split()) > 2:
             print("contacting gemini")
 
-            # Creating model if it does not exist
+            # Create model if it does not exist
             self._initialize_model()
 
             print("GETTING RESULT")
-            # # TODO change this to take in list of words and then to make it the best sentence from that
             response = self.model.generate_content(
                 "Convert these words into a correct English sentence: Each of the words are separated by a comma" + best_model_phrase)
 
-            # response = await asyncio.get_event_loop().run_in_executor(executor, fetch_and_write_content)
-
-            # Define your prompt
-            prompt = "Convert these words into a correct English sentence and each of the words are separated by a comma: " + best_model_phrase
-
-            # Call the async wrapper
-            # response = await generate_content_async(self.model, prompt)
-            print("got here")
-            print(response)
-            # Getting results
+            # Parse the response
             response_dict = response.to_dict()
-            result = response_dict["candidates"][0]["content"]["parts"][0]["text"].strip(
+            full_result = response_dict["candidates"][0]["content"]["parts"][0]["text"].strip(
                 '"').replace("\n", "").replace("\"", "")
+
+            # Extract only the text between ** symbols
+            match = re.search(r"\*\*(.*?)\*\*", full_result)
+            if match:
+                result = match.group(1)
+            else:
+                result = full_result  # Fallback if no ** found
+
             print(result)
 
         else:
