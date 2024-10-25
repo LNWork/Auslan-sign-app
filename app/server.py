@@ -70,7 +70,13 @@ def model_output_parse():
     except Exception as e:
         connectinator.logger.error(f'Error processing request: {e}')
         return jsonify({"error": "Internal Server Error. Check JSON Format"}), 500
-    
+
+@app.route('/get_sign_to_text', methods=["GET", "POST"])
+def get_sign_to_text():
+    translated_message = connectinator.front_end_translation_variable if connectinator.front_end_translation_variable != "" else "No transaltion yet"
+
+    return jsonify({"translation": translated_message}), 200
+
 @app.route('/t2s', methods=['POST'])
 def t2s_parse():
     try:

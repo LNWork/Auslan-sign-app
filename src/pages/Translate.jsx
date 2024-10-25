@@ -13,6 +13,33 @@ const TranslateApp = () => {
     setTranslatedText(''); // Clear the translated text on swap
     setMode((prevMode) => (prevMode === 'videoToText' ? 'textToVideo' : 'videoToText'));
   };
+  const get_sign_trans = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8001/get_sign_to_text', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+      const data = await response.json();
+      
+      // Output parsed sentence to console
+      console.log('Full response:', data);
+
+      // Set translated text or handle fallback
+      const translatedText = data.translation;
+      setTranslatedText(translatedText);
+
+    } catch (error) {
+      console.error('Error:', error);
+      setTranslatedText(`Error: ${error.message}. Please check the API and input.`);
+    }
+  }
+
+  setInterval(get_sign_trans(), 1000);
 
   // Function to convert text to video
   const handleTextToVideo = async () => {
