@@ -29,7 +29,8 @@ class ResultsParser:
         print("IN RESULTS")
         print(model_output)
         if len(model_output) == 0:
-            return {"error": "No output from model"}
+            # return {"error": "No output from model"}
+            return
 
         best_model_phrase = ""
         for model_output_single in model_output:
