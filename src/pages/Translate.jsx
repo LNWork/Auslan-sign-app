@@ -156,8 +156,8 @@ const styles = {
     boxSizing: 'border-box',
   },
   textarea: {
-    width: '400px',
-    height: '400px',
+    width: '600px',
+    height: '600px',
     padding: '10px',
     fontSize: '20px',
     resize: 'none',
