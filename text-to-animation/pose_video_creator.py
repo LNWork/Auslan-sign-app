@@ -11,13 +11,11 @@ from concurrent.futures import ProcessPoolExecutor
 from spoken_to_signed.gloss_to_pose import concatenate_poses
 from dotenv import load_dotenv
 
-
 # Required for subprocess.run
 import subprocess
 
 # Load environment variables from the .env file
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', 'app', '.env'))
-
 
 # Retrieve credentials from environment variables
 firebase_credentials = {
@@ -44,7 +42,6 @@ firebase_admin.initialize_app(
     cred, {'storageBucket': 'auslan-194e5.appspot.com'})
 
 # Process pose file from Firebase Storage
-
 def process_pose_file(blob_name):
     try:
         bucket = storage.bucket()
@@ -129,18 +126,22 @@ def concatenate_poses_and_upload(blob_names, sentence):
 
 # Check if a word has a corresponding pose file in Firebase
 def get_valid_blobs_from_sentence(sentence):
-    words = [word.capitalize() for word in sentence.split()]
+    words = sentence.split()  # Split the sentence into words
     valid_blob_names = []
 
     bucket = storage.bucket()
 
     for word in words:
-        blob = bucket.blob(f"{word}.pose")
-        if blob.exists():
-            valid_blob_names.append(word)
+        # Check both lowercase and capitalized versions of the word
+        lowercase_blob = bucket.blob(f"{word.lower()}.pose")
+        capitalized_blob = bucket.blob(f"{word.capitalize()}.pose")
+
+        if lowercase_blob.exists():
+            valid_blob_names.append(word.lower())  # Add lowercase if exists
+        elif capitalized_blob.exists():
+            valid_blob_names.append(word.capitalize())  # Add capitalized if exists
         else:
-            print(
-                f"Skipping word '{word}', no corresponding .pose file found.")
+            print(f"Skipping word '{word}', no corresponding .pose file found.")
 
     return valid_blob_names
 
@@ -166,5 +167,5 @@ def process_sentence(sentence):
 
 if __name__ == "__main__":
     # Example usage: replace with actual API response
-    api_response_sentence = "france wales africa"
+    api_response_sentence = "I hate him"
     process_sentence(api_response_sentence)

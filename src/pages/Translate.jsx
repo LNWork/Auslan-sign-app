@@ -32,6 +32,8 @@ const TranslateApp = () => {
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const data = await response.json();
+      
+      // Output parsed sentence to console
       console.log('Full response:', data);
 
       // Set translated text or handle fallback
@@ -43,7 +45,7 @@ const TranslateApp = () => {
       setTranslatedText(`Error: ${error.message}. Please check the API and input.`);
     }
 
-    // 2. Firebase - fetch the video based on the translated text
+    // 2. Firebase - fetch the sign language video based on the translated text
     try {
       const videoPath = getVideoPathForText(fixedSourceText);
       const videoRef = ref(storage, videoPath);
@@ -53,7 +55,6 @@ const TranslateApp = () => {
       console.error('Error fetching video:', error);
     }
   };
-
 
     // Mock function to map user input to a specific video path in Firebase
     const getVideoPathForText = (inputText) => {
