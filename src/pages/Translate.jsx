@@ -91,6 +91,7 @@ const TranslateApp = () => {
         }
     };
 
+
     // Mock function to map user input to a specific video path in Firebase
     const getVideoPathForText = (inputText) => {
         return "gs://auslan-194e5.appspot.com/output_videos/I absolutely enjoy basketball.mp4"; // Default video path
