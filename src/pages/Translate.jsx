@@ -13,65 +13,46 @@ const TranslateApp = () => {
     setTranslatedText(''); // Clear the translated text on swap
     setMode((prevMode) => (prevMode === 'videoToText' ? 'textToVideo' : 'videoToText'));
   };
-
+  
   // Function to convert text to video
   const handleTextToVideo = async () => {
-    const fixedSourceText = sourceText.trim(); // Ensure there's no leading/trailing whitespace
+    const fixedSourceText = sourceText.trim();
     console.log('Sending Source Text:', fixedSourceText);
 
-    // 1. Fetch the grammar parsed text from the backend
     try {
       const response = await fetch('http://3.106.229.4:5000/t2s', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ t2s_input: fixedSourceText }), // Send input as t2s_input
+        body: JSON.stringify({ t2s_input: fixedSourceText }),
       });
 
-      const responseText = await response.text();
-      console.log('Raw response:', responseText);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
-      }
+      const data = await response.json();
+      console.log('Full response:', data);
 
-      let data;
-      try {
-        data = JSON.parse(responseText);
-        console.log('Full response:', data); // Log the full response for debugging
-      } catch (parseError) {
-        console.error('Error parsing JSON:', parseError);
-        throw new Error('Invalid JSON response');
-      }
-
-      // Check for translated text or queries
-      if (data.Translated_text) { // Use Translated_text (uppercase "T")
-        setTranslatedText(data.Translated_text); // Set translated text based on the backend response
-      } else if (data.translatedText) { // Check for translatedText as well
-        setTranslatedText(data.translatedText);
-      } else if (Array.isArray(data.queries) && data.queries.length > 0) {
-        setTranslatedText(data.queries.join(', '));
-      } else {
-        setTranslatedText('No translation available.'); // This is a fallback message
-      }
+      // Set translated text or handle fallback
+      const translatedText = data.Translated_text || data.translatedText || (Array.isArray(data.queries) ? data.queries.join(', ') : 'No translation available.');
+      setTranslatedText(translatedText);
 
     } catch (error) {
-      console.error('Error details:', error);
+      console.error('Error:', error);
       setTranslatedText(`Error: ${error.message}. Please check the API and input.`);
     }
 
-    // 2. Fetch the video based on the translated text
-    const videoPath = getVideoPathForText(sourceText); // Get the Firebase video path based on the input text
-  
+    // Fetch the video based on the translated text
     try {
-      const videoRef = ref(storage, videoPath); // Reference to the video in Firebase
-      const videoUrl = await getDownloadURL(videoRef); // Get the video URL from Firebase
-      setAnimatedSignVideo(videoUrl); // Set the video URL to display the video
+      const videoPath = getVideoPathForText(fixedSourceText);
+      const videoRef = ref(storage, videoPath);
+      const videoUrl = await getDownloadURL(videoRef);
+      setAnimatedSignVideo(videoUrl);
     } catch (error) {
       console.error('Error fetching video:', error);
     }
   };
+
 
     // Mock function to map user input to a specific video path in Firebase
     const getVideoPathForText = (inputText) => {
