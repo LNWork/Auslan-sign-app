@@ -40,6 +40,8 @@ const TranslateApp = () => {
       const translatedText = data.Translated_text || data.translatedText || (Array.isArray(data.queries) ? data.queries.join(', ') : 'No translation available.');
       setTranslatedText(translatedText);
 
+      
+
     } catch (error) {
       console.error('Error:', error);
       setTranslatedText(`Error: ${error.message}. Please check the API and input.`);
@@ -58,7 +60,7 @@ const TranslateApp = () => {
 
     // Mock function to map user input to a specific video path in Firebase
     const getVideoPathForText = (inputText) => {
-      return 'gs://auslan-194e5.appspot.com/output_videos/france wales africa_converted.mp4';  // Default video path
+      return 'gs://auslan-194e5.appspot.com/output_videos/I hate him.mp4';  // Default video path
     };
 
   return (

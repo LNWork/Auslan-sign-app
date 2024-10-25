@@ -111,7 +111,7 @@ def concatenate_poses_and_upload(blob_names, sentence):
 
         # Upload the converted video to Firebase Storage in the 'output_videos/' folder with the sentence as the filename
         bucket = storage.bucket()
-        blob = bucket.blob(f"output_videos/{sentence}_converted.mp4")
+        blob = bucket.blob(f"output_videos/{sentence}.mp4")
         blob.upload_from_filename(output_path, content_type="video/mp4")
 
         # Optionally make the file publicly accessible (if needed)
