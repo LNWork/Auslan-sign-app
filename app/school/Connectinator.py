@@ -67,7 +67,8 @@ class Connectinator:
             'Model Output Processed Successfully! Message: %s', processed_output)
 
         # Pass this then to a varable being used for the react front end.
-        self.front_end_translation_variable = processed_output
+        if processed_output is not None:
+            self.front_end_translation_variable = processed_output
 
         print("DONEEE")
 
