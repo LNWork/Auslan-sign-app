@@ -34,8 +34,12 @@ const TranslateApp = () => {
     }
   }
 
-  setInterval(get_sign_trans(), 2000);
+  useEffect(() => {
 
+    const interval = setInterval(get_sign_trans, 2000);
+    return () => clearInterval(interval);
+  }, []);
+  
   // Function to convert text to video
   const handleTextToVideo = async () => {
     const fixedSourceText = sourceText.trim();
