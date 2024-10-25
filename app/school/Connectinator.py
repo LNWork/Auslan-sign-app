@@ -96,12 +96,16 @@ class Connectinator:
         #     keypoints)
         if self.end_phrase_flag == True and self.prevFlag == False:
             print("meow meow meow meow")
+            self.prevFlag = True
+            print(self.end_phrase_flag, self.prevFlag)
             asyncio.create_task(self.full_phrase.parse_results())
+            self.prevFlag = False
 
             print(f"End Phrase: {self.end_phrase_flag}")
 
         if full_chunk is not None:
             print("AAAAAAAAa SENT TO THE MODEL")
+            self.prevFlag = False
 
             # async predict the work and then add it to the self.full_phrase
 
@@ -111,11 +115,11 @@ class Connectinator:
                 f.write(f"time: {str(time())}, predict:")
                 f.write(json.dumps(str(predicted_result)))
                 f.write("\n\n")
-            print(self.end_phrase_flag)
+            print(self.end_phrase_flag, self.prevFlag)
             print('EBFORE THE APPEND')
             self.full_phrase.append(predicted_result['model_output'])
             print("ADGERT APPEND")
-            self.prevFlag = False
+
     # TODO: LISTENER FOR RECEIVE FROM SAVE CHUNK, SEND TO MODEL
 
     # Get model prediction
