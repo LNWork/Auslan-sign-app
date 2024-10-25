@@ -16,7 +16,7 @@ const TranslateApp = () => {
   const get_sign_trans = async () => {
     try {
       const response = await fetch('http://127.0.0.1:8001/get_sign_to_text', {
-        method: 'GET'
+        method: 'GET',
       });
 
       const data = await response.json();

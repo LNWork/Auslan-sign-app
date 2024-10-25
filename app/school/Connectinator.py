@@ -87,6 +87,9 @@ class Connectinator:
 
         return processed_t2s_phrase
 
+    def get_trnasltio(self):
+        return self.front_end_translation_variable
+
     # Process frame
     async def process_frame(self, keypoints):
         # print(keypoints)
