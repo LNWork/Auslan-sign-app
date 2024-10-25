@@ -59,8 +59,8 @@ class Connectinator:
         self.prevFlag = False
 
     # Process the model output
-    async def format_model_output(self, output):
-        processed_output = await self.results_parser.parse_model_output(output)
+    def format_model_output(self, output):
+        processed_output = self.results_parser.parse_model_output(output)
 
         # Update log file
         self.logger.info(
@@ -98,7 +98,7 @@ class Connectinator:
             print("meow meow meow meow")
             self.prevFlag = True
             print(self.end_phrase_flag, self.prevFlag)
-            asyncio.create_task(self.full_phrase.parse_results())
+            self.full_phrase.parse_results()
             self.prevFlag = False
 
             print(f"End Phrase: {self.end_phrase_flag}")
@@ -117,6 +117,8 @@ class Connectinator:
                 f.write("\n\n")
             print(self.end_phrase_flag, self.prevFlag)
             print('EBFORE THE APPEND')
+            print(predicted_result)
+            print(predicted_result['model_output'])
             self.full_phrase.append(predicted_result['model_output'])
             print("ADGERT APPEND")
 
@@ -147,13 +149,16 @@ class AsyncResultsList(list):
 
     # async call the connectinator.format_model_output on this list
 
-    async def parse_results(self):
+    def parse_results(self):
         # Reset list result
-        self.saved_results = list(self)
+        self.saved_results = [i for i in self]
         self.clear()
 
         # Reset the flag
         self.connectinator.logger.info("Parsing results asynchronously...")
         print("FORMATTING RESULTS")
+        print(self.saved_results)
+        print(self)
+        print(len(self.saved_results))
         # change to pass saves results
-        await self.connectinator.format_model_output(self.saved_results)
+        self.connectinator.format_model_output(self.saved_results)

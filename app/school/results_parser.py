@@ -2,98 +2,130 @@ import os
 import json
 import google.generativeai as genai
 from dotenv import load_dotenv
+import asyncio
 from flask import Flask, jsonify, request
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 load_dotenv(override=True)
 
 genai_api_key = os.getenv("GOOGLE_API_KEY")
 genai.configure()
+
+
 class ResultsParser:
     # Only create model once
     def __init__(self):
-        self.model = None  
+        self.model = None
 
-    # Function for lazy loading for efficiently purposes 
-    async def _initialize_model(self):
+    # Function for lazy loading for efficiency
+    def _initialize_model(self):
         if self.model is None:
             self.model = genai.GenerativeModel("gemini-1.5-flash")
 
-    async def parse_model_output(self, model_output):
-        """
-        Parses the output from the sign language model and saves the best word 
-        with the highest confidence to a JSON file.
-        
-        Args:
-            model_output (list of tuples): Output from the model, expected as a list of (word, confidence) tuples.
-        """
+    def parse_model_output(self, model_output):
+        executor = ThreadPoolExecutor()
         print("IN RESULTS")
-        if not model_output:
-            # To DO: Log error here.
+        print(model_output)
+        if len(model_output) == 0:
             return {"error": "No output from model"}
-
-        # Find the word with the highest confidence
 
         best_model_phrase = ""
         for model_output_single in model_output:
-            best_phrase, best_confidence = max(model_output_single, key=lambda item: item[1])
+            best_phrase, best_confidence = max(
+                model_output_single, key=lambda item: item[1])
             best_model_phrase = ", ".join([best_model_phrase, best_phrase])
-            
+
+        print(best_model_phrase)
+
+        def fetch_and_write_content():
+            response = self.model.generate_content(
+                "Convert these words into a correct English sentence: Each of the words are separated by a comma" + best_model_phrase)
+            with open("output.txt", "w") as file:
+                file.write(response)
+            return response
+
+        # Define an async wrapper to call the synchronous generate_content method
+        async def generate_content_async(model, prompt):
+            # Run the synchronous call in an executor to avoid blocking
+            return await asyncio.get_event_loop().run_in_executor(
+                executor, lambda: model.generate_content(prompt)
+            )
+
         if len(best_model_phrase.split()) > 2:
             print("contacting gemini")
 
             # Creating model if it does not exist
-            await self._initialize_model()
+            self._initialize_model()
 
             print("GETTING RESULT")
-            # TODO change this to take in list of words and then to make it the best sentence from that
-            response = await self.model.generate_content("Convert these words into a correct English sentence: Each of the words are separated by a comma"+ best_model_phrase)
-            
+            # # TODO change this to take in list of words and then to make it the best sentence from that
+            response = self.model.generate_content(
+                "Convert these words into a correct English sentence: Each of the words are separated by a comma" + best_model_phrase)
+
+            # response = await asyncio.get_event_loop().run_in_executor(executor, fetch_and_write_content)
+
+            # Define your prompt
+            prompt = "Convert these words into a correct English sentence and each of the words are separated by a comma: " + best_model_phrase
+
+            # Call the async wrapper
+            # response = await generate_content_async(self.model, prompt)
+            print("got here")
+            print(response)
             # Getting results
             response_dict = response.to_dict()
-            result = response_dict["candidates"][0]["content"]["parts"][0]["text"].strip('"').replace("\n", "").replace("\"", "")
+            result = response_dict["candidates"][0]["content"]["parts"][0]["text"].strip(
+                '"').replace("\n", "").replace("\"", "")
             print(result)
+
         else:
             result = best_model_phrase
         print("DONE")
         return result
 
     def save_as_json(self, parsed_result, output_filename="parsed_result.json"):
-        """
-        Save the parsed result as a JSON file.
-        """
         with open(output_filename, 'w') as outfile:
             json.dump(parsed_result, outfile, indent=4)
             print(f"Saved parsed result to {output_filename}")
 
+            # Define a function to perform the API call and file write operation
+
+
 class textAnimationTranslation:
 
     def parse_text_to_sign(self, t2s_input):
-
-        #if isinstance(t2s_input, list) and len(t2s_input) > 0:
-        #    t2s_input = t2s_input[0]
-
         if not t2s_input:
-            # To DO: Log error here.
             return {"error": "Invalid input from user"}
-        
+
         if len(t2s_input.split()) > 2:
             print("Contacting Gemini")
+
             model = genai.GenerativeModel("gemini-1.5-flash")
-            response = model.generate_content("Convert this phrase into an Auslan english Sentence (as text) Provide only the text no other explanation:"+ t2s_input)
-            response2 = model.generate_content("Convert this phrase into a sign-language english Sentence (as text) Provide only the text no other explanation:"+ t2s_input)
+
+            response = model.generate_content(
+                "Convert this phrase into an Auslan English sentence (as text) Provide only the text no other explanation: " + t2s_input
+            )
+            response2 = model.generate_content(
+                "Convert this phrase into a sign-language English sentence (as text) Provide only the text no other explanation: " + t2s_input
+            )
+
             response_dict = response.to_dict()
             response2_dict = response2.to_dict()
-            if response_dict["candidates"]:
-                result = response_dict["candidates"][0]["content"]["parts"][0]["text"].strip().replace("\n", "").replace("\"", "")
-            else:
-                result = "No valid response"
-            
-            # Safely accessing the text from the second response
-            if response2_dict["candidates"]:
-                result2 = response2_dict["candidates"][0]["content"]["parts"][0]["text"].strip().replace("\n", "").replace("\"", "")
-            else:
-                result2 = "No valid response"
+
+            result = (
+                response_dict["candidates"][0]["content"]["parts"][0]["text"].strip().replace(
+                    "\n", "").replace("\"", "")
+                if response_dict["candidates"]
+                else "No valid response"
+            )
+
+            result2 = (
+                response2_dict["candidates"][0]["content"]["parts"][0]["text"].strip().replace(
+                    "\n", "").replace("\"", "")
+                if response2_dict["candidates"]
+                else "No valid response"
+            )
+
             print(result)
             print(result2)
 
@@ -102,14 +134,8 @@ class textAnimationTranslation:
             result2 = 'N/A'
 
         return result, result2
-    
+
     def save_as_json(self, parsed_result, output_filename="parsed_input.json"):
-        """
-        Save the parsed input as a JSON file.
-        """
         with open(output_filename, 'w') as outfile:
             json.dump(parsed_result, outfile, indent=4)
             print(f"Saved parsed result to {output_filename}")
-
-
-
