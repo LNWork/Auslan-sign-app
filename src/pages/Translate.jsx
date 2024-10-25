@@ -190,8 +190,8 @@ const styles = {
     objectFit: 'contain', // Ensure the video fits within the container without stretching
   },
   videoPlaceholder: {
-    width: '400px', // Full width placeholder
-    height: '400px', // Set a height for the placeholder
+    width: '600px', // Full width placeholder
+    height: '600px', // Set a height for the placeholder
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
