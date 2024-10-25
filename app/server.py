@@ -73,8 +73,8 @@ def model_output_parse():
 
 @app.route('/get_sign_to_text', methods=["GET", "POST"])
 def get_sign_to_text():
-    translated_message = connectinator.front_end_translation_variable if connectinator.front_end_translation_variable != "" else "No translation yet"
-
+    translated_message = connectinator.front_end_translation_variable
+    
     return jsonify({"translation": translated_message}), 200
 
 @app.route('/t2s', methods=['POST'])

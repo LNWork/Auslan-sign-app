@@ -16,14 +16,8 @@ const TranslateApp = () => {
   const get_sign_trans = async () => {
     try {
       const response = await fetch('http://127.0.0.1:8001/get_sign_to_text', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': "*"
-        },
+        method: 'GET'
       });
-
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const data = await response.json();
       
@@ -40,7 +34,7 @@ const TranslateApp = () => {
     }
   }
 
-  setInterval(get_sign_trans(), 1000);
+  setInterval(get_sign_trans(), 2000);
 
   // Function to convert text to video
   const handleTextToVideo = async () => {
