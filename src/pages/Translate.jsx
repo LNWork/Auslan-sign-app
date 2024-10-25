@@ -13,12 +13,13 @@ const TranslateApp = () => {
     setTranslatedText(''); // Clear the translated text on swap
     setMode((prevMode) => (prevMode === 'videoToText' ? 'textToVideo' : 'videoToText'));
   };
-  
+
   // Function to convert text to video
   const handleTextToVideo = async () => {
     const fixedSourceText = sourceText.trim();
     console.log('Sending Source Text:', fixedSourceText);
 
+    // 1. API call to parse sentence to Auslan grammar
     try {
       const response = await fetch('http://3.106.229.4:5000/t2s', {
         method: 'POST',
@@ -42,7 +43,7 @@ const TranslateApp = () => {
       setTranslatedText(`Error: ${error.message}. Please check the API and input.`);
     }
 
-    // Fetch the video based on the translated text
+    // 2. Firebase - fetch the video based on the translated text
     try {
       const videoPath = getVideoPathForText(fixedSourceText);
       const videoRef = ref(storage, videoPath);
