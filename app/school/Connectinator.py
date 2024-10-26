@@ -1,4 +1,4 @@
-from school.Model_Owner import Model
+#from school.Model_Owner import Model
 from school.InputParser import InputParser
 import logging
 from school.results_parser import ResultsParser
