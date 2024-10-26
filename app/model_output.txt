@@ -1,0 +1,50 @@
+
+Time: 1729856054.3194308, Phrase: {'error': 'No output from model'}
+Time: 1729856070.0472372, Phrase: {'error': 'No output from model'}
+Time: 1729856071.036853, Phrase: {'error': 'No output from model'}
+Time: 1729856072.140312, Phrase: {'error': 'No output from model'}
+Time: 1729856073.149974, Phrase: {'error': 'No output from model'}
+Time: 1729856813.9245691, Phrase: The correct sentence would be: **Hello, hello! That's a bad cubbyhouse.** This sentence uses the words in a logical order and adds punctuation for clarity. 
+Time: 1729856817.656234, Phrase: {'error': 'No output from model'}
+Time: 1729856819.182466, Phrase: {'error': 'No output from model'}
+Time: 1729856820.491366, Phrase: {'error': 'No output from model'}
+Time: 1729857525.475978, Phrase: Simple statement:
+Time: 1729857525.595593, Phrase: {'error': 'No output from model'}
+Time: 1729857526.6259358, Phrase: {'error': 'No output from model'}
+Time: 1729860512.701243, Phrase: , hello
+Time: 1729860513.6838331, Phrase: , hello
+Time: 1729860514.694465, Phrase: , hello
+Time: 1729860515.687177, Phrase: , hello
+Time: 1729860516.693884, Phrase: , hello
+Time: 1729860530.478246, Phrase: The children shouted, 'Swing, swing, hello!' to the adults.
+Time: 1729860530.728222, Phrase: The children shouted, 'Swing, swing, hello!' to the adults.
+Time: 1729860531.722689, Phrase: The children shouted, 'Swing, swing, hello!' to the adults.
+Time: 1729860532.722971, Phrase: The children shouted, 'Swing, swing, hello!' to the adults.
+Time: 1729860533.847137, Phrase: The children shouted, 'Swing, swing, hello!' to the adults.
+Time: 1729860542.4766982, Phrase: The children shouted, 'Swing, swing, hello!' to the adults.
+Time: 1729860543.473384, Phrase: The children shouted, 'Swing, swing, hello!' to the adults.
+Time: 1729860544.476989, Phrase: The children shouted, 'Swing, swing, hello!' to the adults.
+Time: 1729860545.468928, Phrase: The children shouted, 'Swing, swing, hello!' to the adults.
+Time: 1729860546.477939, Phrase: The children shouted, 'Swing, swing, hello!' to the adults.
+Time: 1729860547.470492, Phrase: The children shouted, 'Swing, swing, hello!' to the adults.
+Time: 1729860548.530337, Phrase: The children shouted, 'Swing, swing, hello!' to the adults.
+Time: 1729860608.5093608, Phrase: , doorbell
+Time: 1729860619.812165, Phrase: Hello, hello, swing! 
+Time: 1729860620.417192, Phrase: Hello, hello, swing! 
+Time: 1729860621.418696, Phrase: Hello, hello, swing! 
+Time: 1729860622.431978, Phrase: Hello, hello, swing! 
+Time: 1729860623.415123, Phrase: Hello, hello, swing! 
+Time: 1729860631.222668, Phrase: Hello, hello, swing! 
+Time: 1729860632.222332, Phrase: Hello, hello, swing! 
+Time: 1729860633.220754, Phrase: Hello, hello, swing! 
+Time: 1729860634.229144, Phrase: Hello, hello, swing! 
+Time: 1729860635.23492, Phrase: Hello, hello, swing! 
+Time: 1729860636.2387881, Phrase: Hello, hello, swing! 
+Time: 1729860637.2315478, Phrase: Hello, hello, swing! 
+Time: 1729860638.246541, Phrase: Hello, hello, swing! 
+Time: 1729860649.33094, Phrase: Hello, swing. 
+Time: 1729860649.999404, Phrase: Hello, swing. 
+Time: 1729860651.009803, Phrase: Hello, swing. 
+Time: 1729860651.999351, Phrase: Hello, swing. 
+Time: 1729860653.121684, Phrase: Hello, swing. 
+Time: 1729860654.129937, Phrase: Hello, swing. 

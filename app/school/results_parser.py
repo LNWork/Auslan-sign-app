@@ -47,3 +47,17 @@ class ResultsParser:
 
 
 
+<<<<<<<< HEAD:app/school/results_parser.py
+========
+    # Path to the model_output.json file (adjust path as needed)
+    model_output_file = "src/model_output.json"
+    
+    # Load the model output from JSON file
+    model_output = load_model_output(model_output_file)
+
+    # Parse the results
+    parsed_result = parser.parse_model_output(model_output)
+    
+    # Save the parsed result to a new JSON file
+    parser.save_as_json(parsed_result)
+>>>>>>>> origin/Dev:src/test_results_parser.py

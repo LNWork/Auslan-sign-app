@@ -8,9 +8,11 @@ import pandas as pd
 # Parameters (adjust for real-time speed and accuracy)
 THRESHOLD = 0.05
 VISIBILITY_THRESHOLD = 0.7
-VISIBILITY_COUNT = 0.7
-WINDOW_SIZE = 30
+VISIBILITY_COUNT = 0.5
+WINDOW_SIZE = 15
 MAX_CHUNK_LENGTH = 145  # Maximum length of a chunk in frames
+HANDS_DOWN_THRESHOLD = 0.02
+HANDS_DOWN_TIME = 30
 
 
 class InputParser:
@@ -25,9 +27,12 @@ class InputParser:
         self.chunks = []
         self.buffer = []
         self.chunk_counter = 0
+        self.handsDownCounter = 0
+        self.endOfPhrase = False
 
     def normalize_keypoints(self, data):
         """Normalize the keypoints data."""
+        data = np.array(data)  # Convert to NumPy array
         coords = data[..., :3]  # Extract x, y, z coordinates
         min_vals = np.min(coords, axis=0, keepdims=True)
         max_vals = np.max(coords, axis=0, keepdims=True)
@@ -43,11 +48,7 @@ class InputParser:
 
     def extract_keypoints(self, landmarks):
         """Extract the keypoints (x, y, z, visibility) from the landmarks."""
-        try:
-            return np.array([[landmark['x'], landmark['y'], landmark['z'], landmark['visibility']] for landmark in landmarks])
-        except KeyError as e:
-            print(f"Missing key in landmark: {e}")
-            return np.empty((0, 4))
+        return np.array([[landmark['x'], landmark['y'], landmark['z'], landmark['visibility']] for landmark in landmarks])
 
     def pad_chunk(self, chunk, max_length=MAX_CHUNK_LENGTH):
         """Pads the chunk with the last frame to reach the max length of frames."""
@@ -60,55 +61,100 @@ class InputParser:
 
     def combine_keypoints(self, frame):
         """Combine pose, left hand, and right hand keypoints into a single array."""
-        pose = self.extract_keypoints(frame['pose_landmarks'])
-        left_hand = self.extract_keypoints(frame['left_hand_landmarks'])
-        right_hand = self.extract_keypoints(frame['right_hand_landmarks'])
+        # combined = np.concatenate((frame['keypoints']), axis=0)
+        # Checker for missing keypoint data
+        full_data = []
+        for index, keypoints in enumerate(frame):
+            if keypoints != None:
+                full_data += keypoints
+                continue
 
-        combined = np.concatenate((pose, left_hand, right_hand), axis=0)
+            pose_number = 33 if index == 0 else 21
+
+            match index:
+                case 0:
+                    full_data += [{'x': 0, 'y': 0, 'z': 0, 'visibility': 0}
+                                  for _ in range(pose_number)]
+                case 1 | 2:
+                    full_data += [{'x': 0, 'y': 0, 'z': 0, 'visibility': 0}
+                                  for _ in range(pose_number)]
+                case _:
+                    print("if goes here u have stuffed up")
+
+        # combined = self.extract_keypoints(full_data)
+        # print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        # print(full_data)
+
+        extracted_data = self.extract_keypoints(full_data)
         # Normalize combined keypoints
-        return self.normalize_keypoints(combined)
+        return self.normalize_keypoints(extracted_data)
 
     def calculate_velocity(self, keypoints_current, keypoints_previous):
         """Calculate the velocity of keypoints between two frames."""
         velocities = np.linalg.norm(
             keypoints_current[:, :3] - keypoints_previous[:, :3], axis=1)
-        return np.mean(velocities)  # Return average velocity of all keypoints
+        # Return average velocity of all keypoints
+        return np.mean(velocities)
 
     def process_frame(self, frame):
         """Process a single frame of keypoint data in real-time."""
-        keypoints_current = self.combine_keypoints(frame)
+        keypoints_current = self.combine_keypoints(frame['keypoints'])
+        chunk_result = None
+        locEOP = False
+
+        # Check if hands are down, and return None if detected
+        handsDown = self.handsDown(
+            keypoints_current[33:53], keypoints_current[54:74])
+        if handsDown:
+            self.handsDownCounter += 1
+            print("HANDS DOWN for ", self.handsDownCounter)
+            if self.handsDownCounter >= HANDS_DOWN_TIME:
+                print("HANDS DOWN FOR TOO LONG - END OF PHRASE")
+                chunk_result, locEOP = self.endPhrase()
+                return chunk_result, locEOP  # Return immediately if hands are down
+            return None, False  # Return None if hands are detected down but not long enough
+        else:
+            self.handsDownCounter = 0  # Reset if hands are detected
 
         # Store combined and normalized keypoints in 'data'
         frame['data'] = keypoints_current.tolist()
 
         if self.previous_keypoints is not None:
+            # Calculate velocity between consecutive frames
             velocity = self.calculate_velocity(
                 keypoints_current, self.previous_keypoints)
+            print(f"Calculated velocity: {velocity}")
 
-            if velocity < self.threshold and not self.visibility_check(keypoints_current):
+            # Detect if movement is under the threshold
+            if velocity < self.threshold:
+                print("velocity < threshold, velocity: ", velocity)
                 self.pause_count += 1
             else:
-                self.pause_count = 0
+                self.pause_count = 0  # Reset pause count when movement occurs
 
             # Check if we detect a potential boundary or chunk size exceeds limit
             if self.pause_count >= self.window_size or len(self.current_chunk) >= MAX_CHUNK_LENGTH:
-                self.save_chunk(self.current_chunk)
-                self.current_chunk = []  # Start a new chunk
+                if self.pause_count >= self.window_size:
+                    print("Pause count >= window size, saving chunk")
+                else:
+                    print("Chunk length exceeded, saving chunk")
+                chunk_result, locEOP = self.save_chunk(self.current_chunk)
+                self.current_chunk = []  # Start a new chunk after saving the current one
                 self.pause_count = 0  # Reset pause counter
-                self.buffer = []  # Clear buffer
             else:
-                self.buffer = []
+                self.buffer = []  # Clear buffer if no boundary detected
 
         # Add the current frame to the chunk
         self.current_chunk.append(frame)
-        # Update the previous frame's keypoints
-        self.previous_keypoints = keypoints_current
+        self.previous_keypoints = keypoints_current  # Update for the next frame
+
+        return chunk_result, locEOP
 
     def save_chunk(self, chunk):
         """Save the current chunk to a JSON file in the specified format, padding it to 145 frames."""
-        os.makedirs('outputChunks',
-                    exist_ok=True)  # Ensure the output directory exists
-        filename = f"outputChunks/chunk_{self.chunk_counter}.json"
+        # os.makedirs('outputChunks',
+        #             exist_ok=True)  # Ensure the output directory exists
+        # filename = f"outputChunks/chunk_{self.chunk_counter}.json"
 
         # Pad the chunk to 145 frames if necessary
         padded_chunk = self.pad_chunk(chunk)
@@ -116,16 +162,14 @@ class InputParser:
         # Prepare the formatted data
         chunk_data = []
         for i, frame in enumerate(padded_chunk):
-            chunk_data.append({
-                # Reset the frame number to start from 0 for each chunk
-                "frame": i,
-                # The concatenated pose, left_hand, and right_hand keypoints
-                "data": frame['data']
-            })
+            chunk_data.append(frame['data'])
+        padded_np_arr = np.array(chunk_data)
 
+        final_chunk = padded_np_arr.reshape(145, 75, 4)
         # TODO: SEND TO CONNECTINATOR
+        print("finsih save")
 
-        return chunk_data
+        return final_chunk, False
         # Save to the JSON file
         # with open(filename, 'w') as f:
         #     json.dump(chunk_data, f, indent=4)
@@ -141,6 +185,27 @@ class InputParser:
         total_keypoints = len(keypoints[..., 3])
         return visible_keypoints_count >= total_keypoints * VISIBILITY_COUNT
 
+    def endPhrase(self):
+        """End the current phrase and save the chunks to a file."""
+        print("END OF PHRASE")
+        self.callFunc()
+        return None, True
+
+    def handsDown(self, leftHand, rightHand):
+        """Check if both hands are below a certain threshold."""
+
+        # Y is the second column in the keypoints (x, y, z, visibility)
+        leftHandY = np.mean(leftHand[:, 1])
+        rightHandY = np.mean(rightHand[:, 1])
+        # print("LEFT HAND Y: ", leftHandY)
+        # print("RIGHT HAND Y: ", rightHandY)
+        return leftHandY < HANDS_DOWN_THRESHOLD and rightHandY < HANDS_DOWN_THRESHOLD
+
+    def callFunc(self):
+        print("CALLING FUNCTION")
+        # self.connectinator.phraseFlag = True
+        self.reset()
+
     def reset(self):
         """Reset the state for the next real-time session."""
         self.pause_count = 0
@@ -149,3 +214,4 @@ class InputParser:
         self.chunks = []
         self.word_boundaries = []
         self.buffer = []
+        self.handsDownCounter = 0
