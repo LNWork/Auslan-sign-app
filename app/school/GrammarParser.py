@@ -18,33 +18,33 @@ class textAnimationTranslation:
         if not t2s_input:
             # To DO: Log error here.
             return {"error": "Invalid input from user"}
-        
+
         if len(t2s_input.split()) > 2:
             print("Contacting Gemini")
             model = genai.GenerativeModel("gemini-1.5-flash")
-            response = model.generate_content("Convert this phrase into an Auslan english Sentence (as text) Provide only the text no other explanation:"+ t2s_input + "Use the following structure: English: I (subject) am going (verb) to the shop tomorrow (object). Auslan: Tomorrow shop me go English: What (subject) is your (verb) dog's name (object)? Auslan: Dog name what?")
-            response2 = model.generate_content("Convert this phrase into a sign-language english Sentence (as text) Provide only the text no other explanation:"+ t2s_input)
+            response = model.generate_content("Convert the following phrase into an Auslan English sentence (as text with no other output):"+ t2s_input)
+            #response2 = t2s_input
             response_dict = response.to_dict()
-            response2_dict = response2.to_dict()
+            #response2_dict = t2s_input
             if response_dict["candidates"]:
                 result = response_dict["candidates"][0]["content"]["parts"][0]["text"].strip().replace("\n", "").replace("\"", "")
             else:
                 result = "No valid response"
-            
+
             # Safely accessing the text from the second response
-            if response2_dict["candidates"]:
-                result2 = response2_dict["candidates"][0]["content"]["parts"][0]["text"].strip().replace("\n", "").replace("\"", "")
-            else:
-                result2 = "No valid response"
+            #if response2_dict["candidates"]:
+            #    result2 = response2_dict["candidates"][0]["content"]["parts"][0]["text"].strip().replace("\n", "").replace("\"", "")
+            #else:
+            #    result2 = "No valid response"
             print(result)
-            print(result2)
+            #print(result2)
 
         else:
             result = t2s_input
-            result2 = 'N/A'
+            #result2 = 'N/A'
 
         return result
-    
+
     def save_as_json(self, parsed_result, output_filename="parsed_input.json"):
         """
         Save the parsed input as a JSON file.
@@ -52,3 +52,4 @@ class textAnimationTranslation:
         with open(output_filename, 'w') as outfile:
             json.dump(parsed_result, outfile, indent=4)
             print(f"Saved parsed result to {output_filename}")
+

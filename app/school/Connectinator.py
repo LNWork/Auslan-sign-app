@@ -3,9 +3,12 @@ from school.InputParser import InputParser
 import logging
 from school.results_parser import ResultsParser
 from school.GrammarParser import textAnimationTranslation
+import sys
+import os
 import asyncio
 from time import time
 import json
+from text_to_animation.pose_video_creator import process_sentence
 
 def create_logger():
     # Set up logging
@@ -73,13 +76,16 @@ class Connectinator:
             f.write(f"Time: {str(time())}, Phrase: {self.front_end_translation_variable}")
 
     # Return auslan grammer sentence
-    def format_sign_text(self, input):
+    async def format_sign_text(self, input):
         processed_t2s_phrase = self.text_animation_translation.parse_text_to_sign(input)
 
-        # Update log file
-        self.logger.info('Text To Sign Processed Successfully! Message: %s', processed_t2s_phrase)  
+    # Log the processed message
+        self.logger.info('Text To Sign Processed Successfully! Message: %s', processed_t2s_phrase)
 
-        return processed_t2s_phrase
+    # Call process_sentence with the processed phrase
+        process_sentence(processed_t2s_phrase)
+        done = {"Translated_text": "Successfully sent to firebase"}
+        return done
 
     # Process frame
     async def process_frame(self, keypoints):

@@ -1,0 +1,1 @@
+"Translated_text"
