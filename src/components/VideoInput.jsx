@@ -152,14 +152,12 @@ const VideoInput = () => {
     }
   };
 
-  const stopCamera = () => {
-    if (cameraRef.current) {
-      cameraRef.current.stop();
-      const stream = videoRef.current.srcObject;
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-      videoRef.current.srcObject = null;
+  function stopCamera() {
+    if (videoRef.current && videoRef.current.srcObject) {
+      let stream = videoRef.current.srcObject;
+      let tracks = stream.getTracks();
+  
+      tracks.forEach(track => track.stop()); // Stop all tracks to turn off the camera
       setIsCameraOn(false);
       const canvasElement = canvasRef.current;
       const canvasCtx = canvasElement.getContext('2d');
