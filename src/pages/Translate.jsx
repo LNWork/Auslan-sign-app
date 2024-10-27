@@ -169,7 +169,7 @@ const TranslateApp = () => {
                                     loop
                                     style={styles.video}
                                     onLoadedMetadata={(e) =>
-                                        (e.target.playbackRate = 2.0)
+                                        (e.target.playbackRate = 1.0)
                                     }
                                 />
                             </div>

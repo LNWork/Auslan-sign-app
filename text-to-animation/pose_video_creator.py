@@ -84,7 +84,7 @@ def concatenate_poses_and_upload(blob_names, sentence):
         temp_video_path = temp_video.name
 
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        video_writer = cv2.VideoWriter(temp_video_path, fourcc, concatenated_pose.body.fps,
+        video_writer = cv2.VideoWriter(temp_video_path, fourcc, concatenated_pose.body.fps * 2,
                                        (concatenated_pose.header.dimensions.width, concatenated_pose.header.dimensions.height))
 
         for frame in visualizer.draw_frame_with_filename(frame_ranges):
