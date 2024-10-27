@@ -1,8 +1,22 @@
+/* App.css */
+html, body {
+  height: 100%;
+  margin: 0; /* Remove default margins */
+  padding: 0; /* Remove default padding */
+  background-color: #1a1a1a; /* Darker shade of gray */
+  color: white; /* Set default text color to white */
+  overflow-x: hidden; /* Prevent horizontal scroll due to overflow */
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100vw; /* Ensure full viewport width */
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo {

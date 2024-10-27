@@ -97,6 +97,8 @@ const TranslateApp = () => {
         return "gs://auslan-194e5.appspot.com/output_videos/I absolutely enjoy basketball.mp4"; // Default video path
     };
 
+    // React code for UI rendering
+
     return (
         <div style={styles.container}>
             {mode === "videoToText" ? (
@@ -147,14 +149,14 @@ const TranslateApp = () => {
                     </div>
 
                     {/* <div style={styles.panel}>
-            <h2>Auslan Sentence</h2>
-            <textarea
-              placeholder="Auslan sentence will appear here"
-              value={translatedText}
-              readOnly
-              style={styles.textarea}
-            />
-          </div> */}
+                      <h2>Auslan Sentence</h2>
+                      <textarea
+                        placeholder="Auslan sentence will appear here"
+                        value={translatedText}
+                        readOnly
+                        style={styles.textarea}
+                      />
+                    </div> */}
 
                     <div style={styles.panel}>
                         <h2>Sign Video</h2>
@@ -188,13 +190,14 @@ const styles = {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
+        justifyContent: "center",
         gap: "20px",
         width: "100%",
         margin: "0 auto",
     },
     panel: {
         display: "flex",
+        flex: "1",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
@@ -203,8 +206,8 @@ const styles = {
         boxSizing: "border-box",
     },
     textarea: {
-        width: "600px",
-        height: "600px",
+        width: "530px",
+        height: "540px",
         padding: "10px",
         fontSize: "20px",
         resize: "none",
@@ -237,8 +240,8 @@ const styles = {
         objectFit: "contain", // Ensure the video fits within the container without stretching
     },
     videoPlaceholder: {
-        width: "600px", // Full width placeholder
-        height: "600px", // Set a height for the placeholder
+        width: "530px", // Full width placeholder
+        height: "540px", // Set a height for the placeholder
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
