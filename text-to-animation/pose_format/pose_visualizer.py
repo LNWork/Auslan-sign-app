@@ -169,7 +169,7 @@ class PoseVisualizer:
         if title:
             font = self.cv2.FONT_HERSHEY_SIMPLEX
             font_scale = 4  # Adjust as necessary
-            color = (255, 0, 0)  # Red text
+            color = (255, 255, 0)  # Red text
             thickness = 8  # Thickness of the text
             text_size = self.cv2.getTextSize(title, font, font_scale, thickness)[0]
             text_x = (img.shape[1] - text_size[0]) // 2  # Center the text horizontally
