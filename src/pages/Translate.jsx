@@ -204,20 +204,26 @@ const styles = {
         width: "600px",
         height: "600px",
         boxSizing: "border-box",
+        padding: "20px",
     },
     textarea: {
-        width: "530px",
-        height: "540px",
-        padding: "10px",
-        fontSize: "20px",
-        resize: "none",
-        boxSizing: "border-box",
-    },
+      width: "530px",
+      height: "540px",
+      padding: "10px",
+      fontSize: "20px",
+      resize: "none",
+      boxSizing: "border-box",
+      backgroundColor: "#333333", // Gray background color
+      color: "#ffffff", // White text color for contrast
+      border: "1px solid #555555", // Optional: darker gray border for a subtle outline
+      borderRadius: "8px", // Optional: rounded corners for a softer look
+  },
     buttons: {
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
+        color: "white",
         gap: "10px",
     },
     button: {
@@ -234,6 +240,9 @@ const styles = {
         justifyContent: "center", // Center the video horizontally
         alignItems: "center", // Center the video vertically
         overflow: "hidden", // Hide any overflow in case the video exceeds the container
+        borderRadius: "8px", // Optional: rounded corners for a softer look
+        color: "#ffffff", // White text color for contrast
+        backgroundColor: "#333333", // Gray background color
     },
     video: {
         width: "100%", // Video will take up the full width of the container
