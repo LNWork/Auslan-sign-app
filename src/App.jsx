@@ -6,8 +6,9 @@ import TranslateApp from './pages/Translate'
 const App = () => {
     return(
         <div style={styles.page}>
-            <h1 className="text-3xl font-bold underline" style={styles.gradientText}>
-                AuslanLive
+            <h1 className="text-3xl font-bold underline">
+                <span style={styles.gradientText}>AuslanLive</span>
+                {/* <span style={styles.whiteText}>Live</span> */}
             </h1>
             <TranslateApp />
         </div>
@@ -24,7 +25,7 @@ const styles = {
         justifyContent: 'center',
     },
     gradientText: {
-        background: 'linear-gradient(90deg, #4a00e0, #8e2de2, #007bff)', // Bold blue and violet gradient
+        background: 'linear-gradient(90deg, #0033cc, #007bff, #66ccff, #ffffff)', // Bold blue to light blue to white gradient
         WebkitBackgroundClip: 'text',
         color: 'transparent',
         fontWeight: 'bold',

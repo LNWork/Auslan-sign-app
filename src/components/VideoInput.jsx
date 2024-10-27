@@ -215,7 +215,7 @@ const styles = {
     boxSizing: 'border-box',
     outline: '2px solid #007bff',
     borderRadius: '8px',
-    backgroundColor:'333333',
+    backgroundColor:'#333333',
   },
   canvas: {
     width: '100%',
