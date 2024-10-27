@@ -175,7 +175,7 @@ const TranslateApp = () => {
                             </div>
                         ) : (
                             <div style={styles.videoPlaceholder}>
-                                Sign language animation will appear here
+                                Please type in a sentence and click convert!
                             </div>
                         )}
                     </div>
@@ -213,10 +213,10 @@ const styles = {
       fontSize: "20px",
       resize: "none",
       boxSizing: "border-box",
-      backgroundColor: "#333333", // Gray background color
-      color: "#ffffff", // White text color for contrast
-      border: "1px solid #555555", // Optional: darker gray border for a subtle outline
-      borderRadius: "8px", // Optional: rounded corners for a softer look
+      backgroundColor: "#333333", 
+      color: "#ffffff", 
+      border: "1px solid #555555", 
+      borderRadius: "8px",
   },
     buttons: {
         display: "flex",
@@ -227,27 +227,30 @@ const styles = {
         gap: "10px",
     },
     button: {
-        padding: "10px 20px",
-        fontSize: "20px",
-        backgroundColor: "#007bff",
-        cursor: "pointer",
-    },
+      padding: "10px 20px",
+      fontSize: "20px",
+      backgroundColor: "#007bff", // Existing button background color
+      color: "#ffffff", // White text color
+      cursor: "pointer",
+      border: "none", // Optional: removes default border for a cleaner look
+      borderRadius: "5px", // Optional: adds rounded corners
+  },
     videoContainer: {
-        width: "100%", // Or any desired percentage of the parent width
-        maxWidth: "800px", // Set a maximum width
-        height: "auto", // Let the height adjust based on the aspect ratio
+        width: "100%", 
+        maxWidth: "800px", 
+        height: "auto", 
         display: "flex",
-        justifyContent: "center", // Center the video horizontally
-        alignItems: "center", // Center the video vertically
-        overflow: "hidden", // Hide any overflow in case the video exceeds the container
-        borderRadius: "8px", // Optional: rounded corners for a softer look
-        color: "#ffffff", // White text color for contrast
-        backgroundColor: "#333333", // Gray background color
+        justifyContent: "center",
+        alignItems: "center", 
+        overflow: "hidden", 
+        borderRadius: "8px", 
+        color: "#ffffff", 
+        backgroundColor: "#333333", 
     },
     video: {
-        width: "100%", // Video will take up the full width of the container
-        height: "auto", // Maintain the aspect ratio by adjusting height automatically
-        objectFit: "contain", // Ensure the video fits within the container without stretching
+        width: "100%", 
+        height: "auto", 
+        objectFit: "contain", 
     },
     videoPlaceholder: {
         width: "530px", // Full width placeholder
@@ -255,7 +258,9 @@ const styles = {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#ccc", // A background color for the placeholder
+        backgroundColor: "#333333", // A background color for the placeholder
+        color: "darkgray", // White text color for contrast
+        borderRadius: "8px"
     },
 };
 
