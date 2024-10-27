@@ -161,12 +161,13 @@ const VideoInput = () => {
       }
       videoRef.current.srcObject = null;
       setIsCameraOn(false);
-
       const canvasElement = canvasRef.current;
       const canvasCtx = canvasElement.getContext('2d');
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height); // Clear the canvas when camera stops
+  
+      videoRef.current.srcObject = null; // Set srcObject to null after stopping tracks
     }
-  };
+  }
 
   const toggleCamera = () => {
     if (isCameraOn) {
