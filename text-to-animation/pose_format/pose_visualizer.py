@@ -210,7 +210,7 @@ class PoseVisualizer:
         int_frames = np.array(np.around(self.pose.body.data.data), dtype="int32")
         background = np.full(
         (self.pose.header.dimensions.height, self.pose.header.dimensions.width, 3),  # Assuming RGB
-        fill_value=(255, 255, 255),  # White background
+        fill_value=(50, 50, 50),  # Dark grey background
         dtype="uint8"
     )
 
