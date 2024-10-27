@@ -148,16 +148,6 @@ const TranslateApp = () => {
                         </button>
                     </div>
 
-                    {/* <div style={styles.panel}>
-                      <h2>Auslan Sentence</h2>
-                      <textarea
-                        placeholder="Auslan sentence will appear here"
-                        value={translatedText}
-                        readOnly
-                        style={styles.textarea}
-                      />
-                    </div> */}
-
                     <div style={styles.panel}>
                         <h2>Sign Video</h2>
                         {animatedSignVideo ? (

@@ -17,7 +17,7 @@ const loadScript = (url) => {
   });
 };
 
-const VideoInput = () => {
+const VideoInput = React.forwardRef((props, ref) => { // Use React.forwardRef
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const cameraRef = useRef(null); // Reference to the camera object
@@ -71,7 +71,6 @@ const VideoInput = () => {
 
       const holistic = holisticRef.current;
 
-      // Collect keypoints, draw on canvas, and send keypoints directly to the Flask backend
       holistic.onResults((results) => {
         // Clear the canvas and draw the video and landmarks
         canvasCtx.save();
@@ -133,7 +132,6 @@ const VideoInput = () => {
         });
       });
 
-      // Initialize the camera to start the feed
       if (!cameraRef.current) {
         const camera = new window.Camera(videoElement, {
           onFrame: async () => {
@@ -145,27 +143,33 @@ const VideoInput = () => {
         cameraRef.current = camera;
       }
 
-      cameraRef.current.start(); // Start the camera
-      setIsCameraOn(true); // Set camera state to 'on'
+      cameraRef.current.start();
+      setIsCameraOn(true);
     } catch (err) {
       handleCameraError(err);
     }
   };
 
-  function stopCamera() {
+  const stopCamera = () => {
     if (videoRef.current && videoRef.current.srcObject) {
       let stream = videoRef.current.srcObject;
       let tracks = stream.getTracks();
-  
+
       tracks.forEach(track => track.stop()); // Stop all tracks to turn off the camera
       setIsCameraOn(false);
+
+      // Clear the canvas
       const canvasElement = canvasRef.current;
       const canvasCtx = canvasElement.getContext('2d');
-      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height); // Clear the canvas when camera stops
-  
-      videoRef.current.srcObject = null; // Set srcObject to null after stopping tracks
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+      videoRef.current.srcObject = null;
     }
-  }
+  };
+
+  React.useImperativeHandle(ref, () => ({
+    stopCamera,
+  }));
 
   const toggleCamera = () => {
     if (isCameraOn) {
@@ -191,10 +195,7 @@ const VideoInput = () => {
         <div style={{ color: 'red' }}>{error}</div>
       ) : (
         <>
-          {/* Hide the video element, it is only used to source the webcam feed */}
           <video ref={videoRef} className="input_video" style={{ display: 'none' }}></video>
-
-          {/* Only the canvas will be visible with the video feed and annotations */}
           <canvas ref={canvasRef} className="output_canvas" width="1280" height="720" style={styles.canvas} />
         </>
       )}
@@ -203,7 +204,7 @@ const VideoInput = () => {
       </button>
     </div>
   );
-};
+});
 
 const styles = {
   container: {
