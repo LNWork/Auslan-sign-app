@@ -1,5 +1,5 @@
 #from school.Model_Owner import Model
-from school.InputParser import InputParser
+#from school.InputParser import InputParser
 import logging
 from school.results_parser import ResultsParser
 from school.GrammarParser import textAnimationTranslation
@@ -49,7 +49,7 @@ class Connectinator:
         #self.model = Model(model_path)
 
         # Creating data processor class
-        self.inputProc = InputParser()
+        #self.inputProc = InputParser()
 
         # Create result parser
         self.results_parser = ResultsParser()
