@@ -167,5 +167,5 @@ def process_sentence(sentence):
 
 if __name__ == "__main__":
     # Example usage: replace with actual API response
-    api_response_sentence = "I absolutely enjoy basketball"
+    api_response_sentence = "I do himself make first new greatest little hers last day their"
     process_sentence(api_response_sentence)

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import VideoInput from "../components/VideoInput";
 import { storage, ref, getDownloadURL } from "../firebase";
 
@@ -7,10 +7,16 @@ const TranslateApp = () => {
     const [sourceText, setSourceText] = useState("");
     const [translatedText, setTranslatedText] = useState("");
     const [animatedSignVideo, setAnimatedSignVideo] = useState(null);
+    const videoInputRef = useRef(null); // Define videoInputRef here
 
     // Function to swap between modes
     const handleSwap = () => {
         setTranslatedText(""); // Clear the translated text on swap
+
+        if (mode === "videoToText" && videoInputRef.current) {
+          videoInputRef.current.stopCamera(); // Stop the camera when switching to textToVideo
+        }
+        
         setMode((prevMode) =>
             prevMode === "videoToText" ? "textToVideo" : "videoToText"
         );
@@ -94,7 +100,11 @@ const TranslateApp = () => {
 
     // Mock function to map user input to a specific video path in Firebase
     const getVideoPathForText = (inputText) => {
-        return "gs://auslan-194e5.appspot.com/output_videos/I absolutely enjoy basketball.mp4"; // Default video path
+        // Example mapping logic
+        const firebaseURL = "gs://auslan-194e5.appspot.com/output_videos/";
+        const fileType = ".mp4";
+
+        return "gs://auslan-194e5.appspot.com/output_videos/I do himself make first new greatest little hers last day their.mp4"; // Default video path
     };
 
     // React code for UI rendering
@@ -239,7 +249,7 @@ const styles = {
     },
     video: {
         width: "100%", 
-        height: "auto", 
+        height: "100%", 
         objectFit: "contain", 
     },
     videoPlaceholder: {
