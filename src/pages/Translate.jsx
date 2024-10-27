@@ -190,7 +190,7 @@ const styles = {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "space-around",
         gap: "20px",
         width: "100%",
         margin: "0 auto",
@@ -223,6 +223,7 @@ const styles = {
     button: {
         padding: "10px 20px",
         fontSize: "20px",
+        backgroundColor: "#007bff",
         cursor: "pointer",
     },
     videoContainer: {
