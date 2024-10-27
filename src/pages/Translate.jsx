@@ -144,7 +144,7 @@ const TranslateApp = () => {
                             onClick={handleTextToVideo}
                             style={styles.button}
                         >
-                            Convert
+                            Translate
                         </button>
                     </div>
 
