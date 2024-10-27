@@ -104,7 +104,8 @@ const TranslateApp = () => {
         const firebaseURL = "gs://auslan-194e5.appspot.com/output_videos/";
         const fileType = ".mp4";
 
-        return "gs://auslan-194e5.appspot.com/output_videos/I do himself make first new greatest little hers last day their.mp4"; // Default video path
+        return firebaseURL + inputText + fileType;
+        // return "gs://auslan-194e5.appspot.com/output_videos/I do himself make first new greatest little hers last day their.mp4"; // Default video path
     };
 
     // React code for UI rendering
