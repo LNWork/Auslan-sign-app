@@ -3,8 +3,8 @@ import tempfile
 import json
 import firebase_admin
 from firebase_admin import credentials, storage
-from pose_format import Pose
-from pose_format.pose_visualizer import PoseVisualizer
+from school.text_to_animation.pose_format.pose import Pose
+from school.text_to_animation.pose_format.pose_visualizer import PoseVisualizer
 import io
 import cv2
 from concurrent.futures import ProcessPoolExecutor
