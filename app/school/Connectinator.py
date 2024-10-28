@@ -78,17 +78,19 @@ class Connectinator:
 
     # Return auslan grammer sentence
     def format_sign_text(self, input):
-        processed_t2s_phrase = self.text_animation_translation.parse_text_to_sign(
-            input)
+        processed_t2s_phrase_one, processed_t2s_phrase_two  = self.text_animation_translation.parse_text_to_sign(input)
 
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        print(processed_t2s_phrase_one, processed_t2s_phrase_two)
+        
         # Create video from the processed sentence
-        process_sentence(processed_t2s_phrase)
+        process_sentence(processed_t2s_phrase_one)
 
         # Update log file
         self.logger.info(
-            'Text To Sign Processed Successfully! Message: %s', processed_t2s_phrase)
+            'Text To Sign Processed Successfully! Message: %s', processed_t2s_phrase_one)
         
-        return processed_t2s_phrase
+        return processed_t2s_phrase_one
 
     def get_trnasltio(self):
         return self.front_end_translation_variable
