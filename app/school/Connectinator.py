@@ -6,6 +6,7 @@ from school.results_parser import textAnimationTranslation
 import asyncio
 from time import time
 import json
+from text_to_animation.pose_video_creator import process_sentence
 
 
 def create_logger():
