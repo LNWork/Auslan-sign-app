@@ -59,7 +59,7 @@ class Model:
     async def __get_model_result(self, keypoints):
         print("CALLINGTHE MODEEL")
         # just query the model
-        result = await asyncio.to_thread(self.model.predict, keypoints)
+        result = await asyncio.to_thread(self.model.predict, keypoints, verbose=2)
         return result[0]
     
     def __format_model_results(self, result):
