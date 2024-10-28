@@ -81,10 +81,13 @@ class Connectinator:
         processed_t2s_phrase = self.text_animation_translation.parse_text_to_sign(
             input)
 
+        # Create video from the processed sentence
+        process_sentence(processed_t2s_phrase)
+
         # Update log file
         self.logger.info(
             'Text To Sign Processed Successfully! Message: %s', processed_t2s_phrase)
-
+        
         return processed_t2s_phrase
 
     def get_trnasltio(self):

@@ -55,7 +55,7 @@ const TranslateApp = () => {
 
         // 1. API call to parse sentence to Auslan grammar
         try {
-            const response = await fetch("http://3.106.229.4:5000/t2s", {
+            const response = await fetch("http://127.0.0.1:8001/t2s", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
