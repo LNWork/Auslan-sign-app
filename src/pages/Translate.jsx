@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import VideoInput from "../components/VideoInput";
 import { storage, ref, getDownloadURL } from "../firebase";
 import { data } from "autoprefixer";
@@ -47,7 +47,21 @@ const TranslateApp = () => {
         }
     };
 
-    setInterval(get_sign_trans, 1000);
+
+    // old code - trigger every second
+    // setInterval(get_sign_trans, 1000);
+
+    // new code - only trigger when mode is videoToText
+    useEffect(() => {
+        let interval;
+        if (mode === "videoToText") {
+            interval = setInterval(get_sign_trans, 1000);
+        }
+        
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [mode]);
 
     // Function to convert text to video
 
