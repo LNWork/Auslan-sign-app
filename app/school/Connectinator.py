@@ -39,6 +39,7 @@ class Connectinator:
         self.full_phrase = AsyncResultsList(self)
         self.end_phrase_flag = False
         self.front_end_translation_variable = ''
+        self.geminiFlag = False
 
         # Creating logger
         self.logger = create_logger()
@@ -78,22 +79,26 @@ class Connectinator:
 
     # Return auslan grammer sentence
     def format_sign_text(self, input):
-        processed_t2s_phrase_one, processed_t2s_phrase_two  = self.text_animation_translation.parse_text_to_sign(input)
+        processed_t2s_phrase_one, processed_t2s_phrase_two = self.text_animation_translation.parse_text_to_sign(
+            input)
 
         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         print(processed_t2s_phrase_one, processed_t2s_phrase_two)
-        
+
         # Create video from the processed sentence
         process_sentence(processed_t2s_phrase_one)
 
         # Update log file
         self.logger.info(
             'Text To Sign Processed Successfully! Message: %s', processed_t2s_phrase_one)
-        
+
         return processed_t2s_phrase_one
 
     def get_trnasltio(self):
         return self.front_end_translation_variable
+
+    def get_gem_flag(self):
+        return self.geminiFlag
 
     # Process frame
     async def process_frame(self, keypoints):

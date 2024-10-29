@@ -15,9 +15,9 @@ const TranslateApp = () => {
         setTranslatedText(""); // Clear the translated text on swap
 
         if (mode === "videoToText" && videoInputRef.current) {
-          videoInputRef.current.stopCamera(); // Stop the camera when switching to textToVideo
+            videoInputRef.current.stopCamera(); // Stop the camera when switching to textToVideo
         }
-        
+
         setMode((prevMode) =>
             prevMode === "videoToText" ? "textToVideo" : "videoToText"
         );
@@ -46,7 +46,29 @@ const TranslateApp = () => {
             );
         }
     };
+    const getGemFlag = async () => {
+        try {
+            const response = await fetch("http://127.0.0.1:8001/getGemFlag", {
+                method: "GET",
+            });
 
+            const data = await response.json();
+
+            // Output parsed sentence to console
+            console.log("GeminiFlag:", data);
+
+            // Set translated text or handle fallback
+            const isInGemini = data.flag;
+            // =======================================
+            // PUT CODE HERE FOR GEMINI FLAG HANDLING
+            // =======================================
+        } catch (error) {
+            console.error("Error:", error);
+            setTranslatedText(
+                `Error: ${error.message}. Please check the API and input.`
+            );
+        }
+    };
 
     // old code - trigger every second
     // setInterval(get_sign_trans, 1000);
@@ -55,7 +77,10 @@ const TranslateApp = () => {
     useEffect(() => {
         let interval;
         if (mode === "videoToText") {
-            interval = setInterval(get_sign_trans, 1000);
+            interval = setInterval(function () {
+        get_sign_trans();
+        getGemFlag();
+    }, 1000);
         }
         
         return () => {
@@ -68,7 +93,7 @@ const TranslateApp = () => {
     const handleTextToVideo = async () => {
         const fixedSourceText = sourceText.trim();
         console.log("Sending Source Text:", fixedSourceText);
-    
+
         // Step 1: API call to parse sentence to Auslan grammar
         try {
             const response = await fetch("http://127.0.0.1:8001/t2s", {
@@ -76,34 +101,35 @@ const TranslateApp = () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ t2s_input: fixedSourceText }),
             });
-    
+
             if (!response.ok)
                 throw new Error(`HTTP error! status: ${response.status}`);
-    
+
             const data = await response.json();
             console.log("Full response:", data);
-    
+
             // Set translated text
             const translatedText = data.message || "No translation available.";
             setTranslatedText(translatedText);
-    
+
             // Step 2: Generate the Firebase video path using the translated text
             const firebaseURL = "gs://auslan-194e5.appspot.com/output_videos/";
             const fileType = ".mp4";
             const parsedVideoName = translatedText || fixedSourceText;
             const videoPath = firebaseURL + parsedVideoName + fileType;
-    
+
             // Step 3: Fetch the video URL from Firebase
             const videoRef = ref(storage, videoPath);
             const videoUrl = await getDownloadURL(videoRef);
             setAnimatedSignVideo(videoUrl);
-            
         } catch (error) {
             console.error("Error:", error);
-            setTranslatedText(`Error: ${error.message}. Please check the API and input.`);
+            setTranslatedText(
+                `Error: ${error.message}. Please check the API and input.`
+            );
         }
     };
-    
+
     // React code for UI rendering
 
     return (
@@ -204,17 +230,17 @@ const styles = {
         padding: "20px",
     },
     textarea: {
-      width: "530px",
-      height: "540px",
-      padding: "10px",
-      fontSize: "20px",
-      resize: "none",
-      boxSizing: "border-box",
-      backgroundColor: "#333333", 
-      color: "#ffffff", 
-      border: "1px solid #555555", 
-      borderRadius: "8px",
-  },
+        width: "530px",
+        height: "540px",
+        padding: "10px",
+        fontSize: "20px",
+        resize: "none",
+        boxSizing: "border-box",
+        backgroundColor: "#333333",
+        color: "#ffffff",
+        border: "1px solid #555555",
+        borderRadius: "8px",
+    },
     buttons: {
         display: "flex",
         flexDirection: "column",
@@ -224,30 +250,30 @@ const styles = {
         gap: "10px",
     },
     button: {
-      padding: "10px 20px",
-      fontSize: "20px",
-      backgroundColor: "#007bff", // Existing button background color
-      color: "#ffffff", // White text color
-      cursor: "pointer",
-      border: "none", // Optional: removes default border for a cleaner look
-      borderRadius: "5px", // Optional: adds rounded corners
-  },
+        padding: "10px 20px",
+        fontSize: "20px",
+        backgroundColor: "#007bff", // Existing button background color
+        color: "#ffffff", // White text color
+        cursor: "pointer",
+        border: "none", // Optional: removes default border for a cleaner look
+        borderRadius: "5px", // Optional: adds rounded corners
+    },
     videoContainer: {
-        width: "100%", 
-        maxWidth: "800px", 
-        height: "auto", 
+        width: "100%",
+        maxWidth: "800px",
+        height: "auto",
         display: "flex",
         justifyContent: "center",
-        alignItems: "center", 
-        overflow: "hidden", 
-        borderRadius: "8px", 
-        color: "#ffffff", 
-        backgroundColor: "#333333", 
+        alignItems: "center",
+        overflow: "hidden",
+        borderRadius: "8px",
+        color: "#ffffff",
+        backgroundColor: "#333333",
     },
     video: {
-        width: "100%", 
-        height: "100%", 
-        objectFit: "contain", 
+        width: "100%",
+        height: "100%",
+        objectFit: "contain",
     },
     videoPlaceholder: {
         width: "530px", // Full width placeholder
@@ -257,7 +283,7 @@ const styles = {
         alignItems: "center",
         backgroundColor: "#333333", // A background color for the placeholder
         color: "darkgray", // White text color for contrast
-        borderRadius: "8px"
+        borderRadius: "8px",
     },
 };
 
