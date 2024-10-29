@@ -78,11 +78,11 @@ const TranslateApp = () => {
         let interval;
         if (mode === "videoToText") {
             interval = setInterval(function () {
-        get_sign_trans();
-        getGemFlag();
-    }, 1000);
+                get_sign_trans();
+                getGemFlag();
+            }, 1000);
         }
-        
+
         return () => {
             if (interval) clearInterval(interval);
         };
