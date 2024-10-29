@@ -7,6 +7,8 @@ import tensorflow as tf
 import asyncio
 
 # Define a custom layer so that the model can load
+
+
 @tf.keras.utils.register_keras_serializable()
 class ExpandAxisLayer(tf.keras.layers.Layer):
     def __init__(self, axis=1, **kwargs):
@@ -20,6 +22,7 @@ class ExpandAxisLayer(tf.keras.layers.Layer):
         config = super(ExpandAxisLayer, self).get_config()
         config.update({"axis": self.axis})
         return config
+
 
 class Model:
     def __init__(self, model_path):
@@ -35,7 +38,7 @@ class Model:
         self.model = load_model(filepath=model_path)
 
     async def query_model(self, keypoints):
-        print("IN QUERY")
+        # print("IN QUERY")
         # Format keypoints so it fits the model
         formatted_keypoints = self.__format_input_keypoints(keypoints)
 
@@ -44,9 +47,9 @@ class Model:
 
         # Parse results so it fits the formate needed
         final_result = self.__format_model_results(result)
-        print("FORMATTE RESSULTS")
+        # print("FORMATTE RESSULTS")
         return final_result
-    
+
     ############################# Private helper functions needed for query model #############################
     def __format_input_keypoints(self, keypoints):
         #! PLEASE GIVE SHAPE WITH (number_of_frames, number_of_keypoints, 1, features)
@@ -57,21 +60,23 @@ class Model:
         return keypoints
 
     async def __get_model_result(self, keypoints):
-        print("CALLINGTHE MODEEL")
+        # print("CALLINGTHE MODEEL")
         # just query the model
         result = await asyncio.to_thread(self.model.predict, keypoints, verbose=2)
         return result[0]
-    
+
     def __format_model_results(self, result):
         # Loop through resuklts and append the correct class to the probability
-        
+
         fomated_results = {"model_output": []}
         for i in range(len(result)):
             # Adding the results
             str_index = str(i)
-            fomated_results['model_output'].append([self.outputs[str_index], result[i]])
-        
-        fomated_results['model_output'] = sorted(fomated_results['model_output'], key=lambda x: float(x[1]), reverse=True)[:10]
+            fomated_results['model_output'].append(
+                [self.outputs[str_index], result[i]])
+
+        fomated_results['model_output'] = sorted(
+            fomated_results['model_output'], key=lambda x: float(x[1]), reverse=True)[:10]
 
         return fomated_results
     ############################# Private helper functions needed for query model #############################

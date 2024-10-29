@@ -187,3 +187,17 @@ Time: 1730199997.318201, Phrase: Hello, hello, swing!
 Time: 1730200004.071434, Phrase: Swing, swing. 
 Time: 1730200004.915452, Phrase: Swing, swing. 
 Time: 1730200005.965587, Phrase: Swing, swing. 
+Time: 1730200215.418175, Phrase: Swing, swing. 
+Time: 1730200216.7266932, Phrase: Swing, swing. 
+Time: 1730200225.671762, Phrase: Hello, hello, swing the antenna. 
+Time: 1730200226.424501, Phrase: Hello, hello, swing the antenna. 
+Time: 1730200227.428315, Phrase: Hello, hello, swing the antenna. 
+Time: 1730200228.606712, Phrase: Hello, hello, swing the antenna. 
+Time: 1730200230.007804, Phrase: Hello, hello, swing the antenna. 
+Time: 1730200231.330313, Phrase: Hello, hello, swing the antenna. 
+Time: 1730200241.6854699, Phrase: Hello, hello, sprinkle. 
+Time: 1730200242.6271539, Phrase: Hello, hello, sprinkle. 
+Time: 1730200243.925941, Phrase: Hello, hello, sprinkle. 
+Time: 1730200315.2441878, Phrase: Hello, hello, cubbyhouse, cubbyhouse.  This is a grammatically correct sentence, but it doesn't convey much meaning.  It's possible that the sentence is intended to be playful or repetitive, but without context, it's hard to know for sure. 
+Time: 1730200315.8766289, Phrase: Hello, hello, cubbyhouse, cubbyhouse.  This is a grammatically correct sentence, but it doesn't convey much meaning.  It's possible that the sentence is intended to be playful or repetitive, but without context, it's hard to know for sure. 
+Time: 1730200317.159581, Phrase: Hello, hello, cubbyhouse, cubbyhouse.  This is a grammatically correct sentence, but it doesn't convey much meaning.  It's possible that the sentence is intended to be playful or repetitive, but without context, it's hard to know for sure. 

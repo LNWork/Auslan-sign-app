@@ -71,7 +71,7 @@ class Connectinator:
         if processed_output is not None:
             self.front_end_translation_variable = processed_output
 
-        print("DONEEE")
+        # print("DONEEE")
 
         with open('model_output.txt', 'a+') as f:
             f.write(
@@ -109,16 +109,16 @@ class Connectinator:
         # full_chunk, self.end_phrase_flag = self.inputProc.process_frame(
         #     keypoints)
         if self.end_phrase_flag == True and self.prevFlag == False:
-            print("meow meow meow meow")
+            # print("meow meow meow meow")
             self.prevFlag = True
-            print(self.end_phrase_flag, self.prevFlag)
+            # print(self.end_phrase_flag, self.prevFlag)
             self.full_phrase.parse_results()
             self.prevFlag = False
 
-            print(f"End Phrase: {self.end_phrase_flag}")
+            # print(f"End Phrase: {self.end_phrase_flag}")
 
         if full_chunk is not None:
-            print("AAAAAAAAa SENT TO THE MODEL")
+            # print("AAAAAAAAa SENT TO THE MODEL")
             self.prevFlag = False
 
             # async predict the work and then add it to the self.full_phrase
@@ -129,19 +129,19 @@ class Connectinator:
                 f.write(f"time: {str(time())}, predict:")
                 f.write(json.dumps(str(predicted_result)))
                 f.write("\n\n")
-            print(self.end_phrase_flag, self.prevFlag)
-            print('EBFORE THE APPEND')
-            print(predicted_result)
-            print(predicted_result['model_output'])
-            self.full_phrase.append(predicted_result['model_output'])
-            print("ADGERT APPEND")
+            # print(self.end_phrase_flag, self.prevFlag)
+            # print('EBFORE THE APPEND')
+            # print(predicted_result)
+            # print(predicted_result['model_output'])
+            # self.full_phrase.append(predicted_result['model_output'])
+            # print("ADGERT APPEND")
 
     # TODO: LISTENER FOR RECEIVE FROM SAVE CHUNK, SEND TO MODEL
 
     # Get model prediction
 
     async def predict_model(self, keypoints):
-        print("SENT TO PREDICT")
+        # print("SENT TO PREDICT")
         return await self.model.query_model(keypoints)
 
     # TODO: LISTENER FOR RECEIVE OUTPUT FROM MODEL, ADD TO LIST, SEND TO RESULTS PARSER
@@ -156,7 +156,7 @@ class AsyncResultsList(list):
         self.connectinator = connectinator_instance
 
     def append(self, item):
-        print("adding worekds")
+        # print("adding worekds")
         self.connectinator.logger.info(
             f"Word added with shape {item}")
         super().append(item)
@@ -170,9 +170,9 @@ class AsyncResultsList(list):
 
         # Reset the flag
         self.connectinator.logger.info("Parsing results asynchronously...")
-        print("FORMATTING RESULTS")
-        print(self.saved_results)
-        print(self)
-        print(len(self.saved_results))
+        # print("FORMATTING RESULTS")
+        # print(self.saved_results)
+        # print(self)
+        # print(len(self.saved_results))
         # change to pass saves results
         self.connectinator.format_model_output(self.saved_results)

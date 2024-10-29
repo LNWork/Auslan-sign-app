@@ -107,9 +107,9 @@ class InputParser:
             keypoints_current[33:53], keypoints_current[54:74])
         if handsDown:
             self.handsDownCounter += 1
-            print("HANDS DOWN for ", self.handsDownCounter)
+            # print("HANDS DOWN for ", self.handsDownCounter)
             if self.handsDownCounter >= HANDS_DOWN_TIME:
-                print("HANDS DOWN FOR TOO LONG - END OF PHRASE")
+                # print("HANDS DOWN FOR TOO LONG - END OF PHRASE")
                 chunk_result, locEOP = self.endPhrase()
                 return chunk_result, locEOP  # Return immediately if hands are down
             return None, False  # Return None if hands are detected down but not long enough
@@ -123,21 +123,17 @@ class InputParser:
             # Calculate velocity between consecutive frames
             velocity = self.calculate_velocity(
                 keypoints_current, self.previous_keypoints)
-            print(f"Calculated velocity: {velocity}")
+            # print(f"Calculated velocity: {velocity}")
 
             # Detect if movement is under the threshold
             if velocity < self.threshold:
-                print("velocity < threshold, velocity: ", velocity)
+                # print("velocity < threshold, velocity: ", velocity)
                 self.pause_count += 1
             else:
                 self.pause_count = 0  # Reset pause count when movement occurs
 
             # Check if we detect a potential boundary or chunk size exceeds limit
             if self.pause_count >= self.window_size or len(self.current_chunk) >= MAX_CHUNK_LENGTH:
-                if self.pause_count >= self.window_size:
-                    print("Pause count >= window size, saving chunk")
-                else:
-                    print("Chunk length exceeded, saving chunk")
                 chunk_result, locEOP = self.save_chunk(self.current_chunk)
                 self.current_chunk = []  # Start a new chunk after saving the current one
                 self.pause_count = 0  # Reset pause counter
@@ -167,7 +163,7 @@ class InputParser:
 
         final_chunk = padded_np_arr.reshape(145, 75, 4)
         # TODO: SEND TO CONNECTINATOR
-        print("finsih save")
+        # print("finsih save")
 
         return final_chunk, False
         # Save to the JSON file
@@ -187,7 +183,7 @@ class InputParser:
 
     def endPhrase(self):
         """End the current phrase and save the chunks to a file."""
-        print("END OF PHRASE")
+        # print("END OF PHRASE")
         self.callFunc()
         return None, True
 
@@ -202,7 +198,7 @@ class InputParser:
         return leftHandY < HANDS_DOWN_THRESHOLD and rightHandY < HANDS_DOWN_THRESHOLD
 
     def callFunc(self):
-        print("CALLING FUNCTION")
+        # print("CALLING FUNCTION")
         # self.connectinator.phraseFlag = True
         self.reset()
 

@@ -39,7 +39,7 @@ class ResultsParser:
                 model_output_single, key=lambda item: item[1])
             best_model_phrase = ", ".join([best_model_phrase, best_phrase])
 
-        print(best_model_phrase)
+        # print(best_model_phrase)
 
         def fetch_and_write_content():
             response = self.model.generate_content(
@@ -49,14 +49,14 @@ class ResultsParser:
             return response
 
         if len(best_model_phrase.split()) > 2:
-            print("contacting gemini")
+            # print("contacting gemini")
             self.connectinator.geminiFlag = True
-            print(self.connectinator.geminiFlag)
+            # print(self.connectinator.geminiFlag)
 
             # Create model if it does not exist
             self._initialize_model()
 
-            print("GETTING RESULT")
+            # print("GETTING RESULT")
             response = self.model.generate_content(
                 "Convert these words into a correct English sentence: Each of the words are separated by a comma" + best_model_phrase)
 
@@ -72,19 +72,19 @@ class ResultsParser:
             else:
                 result = full_result  # Fallback if no ** found
 
-            print(result)
+            # print(result)
 
         else:
             result = best_model_phrase
-        print("DONE")
+        # print("DONE")
         self.connectinator.geminiFlag = False
-        print(self.connectinator.geminiFlag)
+        # print(self.connectinator.geminiFlag)
         return result
 
     def save_as_json(self, parsed_result, output_filename="parsed_result.json"):
         with open(output_filename, 'w') as outfile:
             json.dump(parsed_result, outfile, indent=4)
-            print(f"Saved parsed result to {output_filename}")
+            # print(f"Saved parsed result to {output_filename}")
 
             # Define a function to perform the API call and file write operation
 
@@ -96,7 +96,7 @@ class textAnimationTranslation:
             return {"error": "Invalid input from user"}
 
         if len(t2s_input.split()) > 2:
-            print("Contacting Gemini")
+            # print("Contacting Gemini")
 
             model = genai.GenerativeModel("gemini-1.5-flash")
 
@@ -136,4 +136,4 @@ class textAnimationTranslation:
     def save_as_json(self, parsed_result, output_filename="parsed_input.json"):
         with open(output_filename, 'w') as outfile:
             json.dump(parsed_result, outfile, indent=4)
-            print(f"Saved parsed result to {output_filename}")
+            # print(f"Saved parsed result to {output_filename}")
