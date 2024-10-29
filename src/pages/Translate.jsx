@@ -298,12 +298,13 @@ const styles = {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        width: "100%",
-        height: "100%",
+        width: "530px",
+        height: "540px",
         fontSize: "20px",
         color: "white",
         backgroundColor: "#333333",
         borderRadius: "8px",
+        border: "1px solid #555555",
     },
 };
 

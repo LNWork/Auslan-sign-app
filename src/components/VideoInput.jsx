@@ -223,6 +223,7 @@ const styles = {
     objectFit: 'cover',
     borderRadius: '10px',
     boxSizing: 'border-box',
+    transform: 'scaleX(-1)',
   },
   button: {
     position: 'absolute',
