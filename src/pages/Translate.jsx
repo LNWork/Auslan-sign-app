@@ -2,6 +2,12 @@ import React, { useState, useRef, useEffect } from "react";
 import VideoInput from "../components/VideoInput";
 import { storage, ref, getDownloadURL } from "../firebase";
 import { data } from "autoprefixer";
+import namesData from '../namesdatapose.json';
+import 'react-toastify/dist/ReactToastify.css';
+import { Toaster, toast } from 'react-hot-toast';
+
+
+
 
 const TranslateApp = () => {
     const [mode, setMode] = useState("videoToText");
@@ -92,11 +98,30 @@ const TranslateApp = () => {
         };
     }, [mode]);
 
+
+    
+    const checkTextAgainstJson = (text) => {
+        // Split the text into words, encode, and convert to lowercase
+        const words = text.split(/\s+/).map(word => encodeURIComponent(word.toLowerCase()));
+        
+        // Convert namesData entries to lowercase for case-insensitive comparison
+        const existingWords = new Set(namesData.map(item => item.toLowerCase()));
+        
+        // Filter out words that do not exist in the existing words set
+        const missingWords = words.filter(word => !existingWords.has(word));
+    
+        if (missingWords.length > 0) {
+            console.log(`The following words do not exist: ${missingWords}`);
+            toast.error(`The following words do not exist: ${missingWords.join(', ')}`);
+        }
+    };
+
     // Function to convert text to video
 
     const handleTextToVideo = async () => {
         const fixedSourceText = sourceText.trim();
         console.log("Sending Source Text:", fixedSourceText);
+        checkTextAgainstJson(fixedSourceText);
         setLoading(true); // Set loading to true while fetching video
 
         // Step 1: API call to parse sentence to Auslan grammar
@@ -141,6 +166,7 @@ const TranslateApp = () => {
 
     return (
         <div style={styles.container}>
+            <Toaster position="top-right" />
             {mode === "videoToText" ? (
                 <>
                     <div style={styles.panel}>
