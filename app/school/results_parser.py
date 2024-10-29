@@ -27,7 +27,6 @@ class ResultsParser:
 
     def parse_model_output(self, model_output):
         executor = ThreadPoolExecutor()
-        print("IN RESULTS")
         print(model_output)
         if len(model_output) == 0:
             # return {"error": "No output from model"}
@@ -40,14 +39,6 @@ class ResultsParser:
             best_model_phrase = ", ".join([best_model_phrase, best_phrase])
 
         # print(best_model_phrase)
-
-        def fetch_and_write_content():
-            response = self.model.generate_content(
-                "Convert these words into a correct English sentence: Each of the words are separated by a comma" + best_model_phrase)
-            with open("output.txt", "w") as file:
-                file.write(response)
-            return response
-
         if len(best_model_phrase.split()) > 2:
             # print("contacting gemini")
             self.connectinator.geminiFlag = True
@@ -58,7 +49,7 @@ class ResultsParser:
 
             # print("GETTING RESULT")
             response = self.model.generate_content(
-                "Convert these words into a correct English sentence: Each of the words are separated by a comma" + best_model_phrase)
+                "Convert these words into a correct English sentence, each of the words are separated by a comma and wrap the phrase in **: " + best_model_phrase)
 
             # Parse the response
             response_dict = response.to_dict()
@@ -103,12 +94,8 @@ class textAnimationTranslation:
             response = model.generate_content(
                 "Convert this phrase into an Auslan English sentence (as text) Provide only the text no other explanation: " + t2s_input
             )
-            response2 = model.generate_content(
-                "Convert this phrase into a sign-language English sentence (as text) Provide only the text no other explanation: " + t2s_input
-            )
 
             response_dict = response.to_dict()
-            response2_dict = response2.to_dict()
 
             result = (
                 response_dict["candidates"][0]["content"]["parts"][0]["text"].strip().replace(
@@ -117,21 +104,13 @@ class textAnimationTranslation:
                 else "No valid response"
             )
 
-            result2 = (
-                response2_dict["candidates"][0]["content"]["parts"][0]["text"].strip().replace(
-                    "\n", "").replace("\"", "")
-                if response2_dict["candidates"]
-                else "No valid response"
-            )
-
             # print(result)
             # print(result2)
 
         else:
             result = t2s_input
-            result2 = 'N/A'
 
-        return result, result2
+        return result
 
     def save_as_json(self, parsed_result, output_filename="parsed_input.json"):
         with open(output_filename, 'w') as outfile:

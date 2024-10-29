@@ -26,3 +26,8 @@ dist-ssr
 #Flask app cache
 results_parser.cpython-312.pyc
 *.pyc
+*.env
+
+# Model spam
+app/model_output.txt
+app/ball.txt
