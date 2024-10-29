@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import VideoInput from "../components/VideoInput";
 import { storage, ref, getDownloadURL } from "../firebase";
+import { data } from "autoprefixer";
 
 const TranslateApp = () => {
     const [mode, setMode] = useState("videoToText");
@@ -49,65 +50,46 @@ const TranslateApp = () => {
     setInterval(get_sign_trans, 1000);
 
     // Function to convert text to video
+
     const handleTextToVideo = async () => {
         const fixedSourceText = sourceText.trim();
         console.log("Sending Source Text:", fixedSourceText);
-
-        // 1. API call to parse sentence to Auslan grammar
+    
+        // Step 1: API call to parse sentence to Auslan grammar
         try {
-            const response = await fetch("http://3.106.229.4:5000/t2s", {
+            const response = await fetch("http://127.0.0.1:8001/t2s", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ t2s_input: fixedSourceText }),
             });
-
+    
             if (!response.ok)
                 throw new Error(`HTTP error! status: ${response.status}`);
-
+    
             const data = await response.json();
-
-            // Output parsed sentence to console
             console.log("Full response:", data);
-
-            // Set translated text or handle fallback
-            const translatedText =
-                data.Translated_text ||
-                data.translatedText ||
-                (Array.isArray(data.queries)
-                    ? data.queries.join(", ")
-                    : "No translation available.");
+    
+            // Set translated text
+            const translatedText = data.message || "No translation available.";
             setTranslatedText(translatedText);
-        } catch (error) {
-            console.error("Error:", error);
-            setTranslatedText(
-                `Error: ${error.message}. Please check the API and input.`
-            );
-        }
-
-        // 2. Firebase - fetch the sign language video based on the translated text
-        try {
-            const videoPath = getVideoPathForText(fixedSourceText);
+    
+            // Step 2: Generate the Firebase video path using the translated text
+            const firebaseURL = "gs://auslan-194e5.appspot.com/output_videos/";
+            const fileType = ".mp4";
+            const parsedVideoName = translatedText || fixedSourceText;
+            const videoPath = firebaseURL + parsedVideoName + fileType;
+    
+            // Step 3: Fetch the video URL from Firebase
             const videoRef = ref(storage, videoPath);
             const videoUrl = await getDownloadURL(videoRef);
             setAnimatedSignVideo(videoUrl);
+            
         } catch (error) {
-            console.error("Error fetching video:", error);
+            console.error("Error:", error);
+            setTranslatedText(`Error: ${error.message}. Please check the API and input.`);
         }
     };
-
-
-    // Mock function to map user input to a specific video path in Firebase
-    const getVideoPathForText = (inputText) => {
-        // Example mapping logic
-        const firebaseURL = "gs://auslan-194e5.appspot.com/output_videos/";
-        const fileType = ".mp4";
-
-        return firebaseURL + inputText + fileType;
-        // return "gs://auslan-194e5.appspot.com/output_videos/I do himself make first new greatest little hers last day their.mp4"; // Default video path
-    };
-
+    
     // React code for UI rendering
 
     return (

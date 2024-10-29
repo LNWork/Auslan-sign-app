@@ -8,7 +8,7 @@ from school.text_to_animation.pose_format.pose_visualizer import PoseVisualizer
 import io
 import cv2
 from concurrent.futures import ProcessPoolExecutor
-from spoken_to_signed.gloss_to_pose import concatenate_poses
+from school.text_to_animation.spoken_to_signed.gloss_to_pose import concatenate_poses
 from dotenv import load_dotenv
 
 # Required for subprocess.run
