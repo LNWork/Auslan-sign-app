@@ -124,8 +124,8 @@ class textAnimationTranslation:
                 else "No valid response"
             )
 
-            print(result)
-            print(result2)
+            # print(result)
+            # print(result2)
 
         else:
             result = t2s_input

@@ -31,3 +31,100 @@ Time: 1730119503.6326377, Phrase: Hello! Hello! Hello! It's me!
 Time: 1730167610.32958, Phrase: Swing, swing, swing, swing, swing, bright!
 Time: 1730167611.121624, Phrase: Swing, swing, swing, swing, swing, bright!
 Time: 1730167612.4177809, Phrase: Swing, swing, swing, swing, swing, bright!
+Time: 1730176453.8606098, Phrase: There are thirty-five swings. 
+Time: 1730176454.5597148, Phrase: There are thirty-five swings. 
+Time: 1730176455.5414965, Phrase: There are thirty-five swings. 
+Time: 1730176456.5578568, Phrase: There are thirty-five swings. 
+Time: 1730181623.4524555, Phrase: 
+Time: 1730181631.895321, Phrase: , cubbyhouse
+Time: 1730181632.8994071, Phrase: , cubbyhouse
+Time: 1730181633.929967, Phrase: , cubbyhouse
+Time: 1730181634.9589791, Phrase: , cubbyhouse
+Time: 1730181635.9705112, Phrase: , cubbyhouse
+Time: 1730181637.048693, Phrase: , cubbyhouse
+Time: 1730181638.1188965, Phrase: , cubbyhouse
+Time: 1730181639.1508327, Phrase: , cubbyhouse
+Time: 1730181649.2472298, Phrase: There are 35 cubbyhouses. 
+Time: 1730181649.8942134, Phrase: There are 35 cubbyhouses. 
+Time: 1730181650.9171963, Phrase: There are 35 cubbyhouses. 
+Time: 1730181651.9549377, Phrase: There are 35 cubbyhouses. 
+Time: 1730181652.9906697, Phrase: There are 35 cubbyhouses. 
+Time: 1730181654.0003996, Phrase: There are 35 cubbyhouses. 
+Time: 1730181655.0221415, Phrase: There are 35 cubbyhouses. 
+Time: 1730181671.5097623, Phrase: Press, swing, hello, hello, hello
+Time: 1730181672.7387114, Phrase: Press, swing, hello, hello, hello
+Time: 1730181674.0551205, Phrase: Press, swing, hello, hello, hello
+Time: 1730181675.075575, Phrase: Press, swing, hello, hello, hello
+Time: 1730181676.067391, Phrase: Press, swing, hello, hello, hello
+Time: 1730181677.07168, Phrase: Press, swing, hello, hello, hello
+Time: 1730181678.073513, Phrase: Press, swing, hello, hello, hello
+Time: 1730181679.0780404, Phrase: Press, swing, hello, hello, hello
+Time: 1730181680.0721433, Phrase: Press, swing, hello, hello, hello
+Time: 1730181681.0762148, Phrase: Press, swing, hello, hello, hello
+Time: 1730181682.0712779, Phrase: Press, swing, hello, hello, hello
+Time: 1730181683.0772822, Phrase: Press, swing, hello, hello, hello
+Time: 1730181684.069061, Phrase: Press, swing, hello, hello, hello
+Time: 1730181685.1077762, Phrase: Press, swing, hello, hello, hello
+Time: 1730181687.7655234, Phrase: Press, swing, hello, hello, hello
+Time: 1730181688.774837, Phrase: Press, swing, hello, hello, hello
+Time: 1730181919.7527854, Phrase: Press, swing, hello, hello, hello
+Time: 1730181920.8100264, Phrase: Press, swing, hello, hello, hello
+Time: 1730181921.975896, Phrase: Press, swing, hello, hello, hello
+Time: 1730181923.3095195, Phrase: Press, swing, hello, hello, hello
+Time: 1730181924.4124615, Phrase: Press, swing, hello, hello, hello
+Time: 1730181925.4292583, Phrase: Press, swing, hello, hello, hello
+Time: 1730181926.4979517, Phrase: Press, swing, hello, hello, hello
+Time: 1730181927.5534244, Phrase: Press, swing, hello, hello, hello
+Time: 1730181940.341749, Phrase: Thirty-five swings. 
+Time: 1730181941.0287092, Phrase: Thirty-five swings. 
+Time: 1730181942.0650253, Phrase: Thirty-five swings. 
+Time: 1730181943.0937474, Phrase: Thirty-five swings. 
+Time: 1730181953.8317218, Phrase: Thirty-five, thirty-five, thirty-five, thirty-five, thirty-five. 
+Time: 1730181954.4322758, Phrase: Thirty-five, thirty-five, thirty-five, thirty-five, thirty-five. 
+Time: 1730181955.4556406, Phrase: Thirty-five, thirty-five, thirty-five, thirty-five, thirty-five. 
+Time: 1730181956.475172, Phrase: Thirty-five, thirty-five, thirty-five, thirty-five, thirty-five. 
+Time: 1730181957.4709241, Phrase: Thirty-five, thirty-five, thirty-five, thirty-five, thirty-five. 
+Time: 1730181969.5476556, Phrase: The sentence could be: Hello, hello, from my cubbyhouse! 
+Time: 1730181970.0645118, Phrase: The sentence could be: Hello, hello, from my cubbyhouse! 
+Time: 1730181971.0643177, Phrase: The sentence could be: Hello, hello, from my cubbyhouse! 
+Time: 1730181972.0985768, Phrase: The sentence could be: Hello, hello, from my cubbyhouse! 
+Time: 1730181973.1317787, Phrase: The sentence could be: Hello, hello, from my cubbyhouse! 
+Time: 1730181974.1392493, Phrase: The sentence could be: Hello, hello, from my cubbyhouse! 
+Time: 1730181975.1320739, Phrase: The sentence could be: Hello, hello, from my cubbyhouse! 
+Time: 1730181987.6702678, Phrase: 1. Thirty-five as a word:
+Time: 1730181988.0287597, Phrase: 1. Thirty-five as a word:
+Time: 1730181989.091982, Phrase: 1. Thirty-five as a word:
+Time: 1730181990.1601684, Phrase: 1. Thirty-five as a word:
+Time: 1730181991.20289, Phrase: 1. Thirty-five as a word:
+Time: 1730182422.892946, Phrase: Hello. 
+Time: 1730182423.5918653, Phrase: Hello. 
+Time: 1730182424.5897264, Phrase: Hello. 
+Time: 1730182425.5871513, Phrase: Hello. 
+Time: 1730182426.595778, Phrase: Hello. 
+Time: 1730182438.752897, Phrase: Hello. 
+Time: 1730182439.3543556, Phrase: Hello. 
+Time: 1730182440.448277, Phrase: Hello. 
+Time: 1730182441.4546485, Phrase: Hello. 
+Time: 1730182442.4377537, Phrase: Hello. 
+Time: 1730182443.449799, Phrase: Hello. 
+Time: 1730182444.4621558, Phrase: Hello. 
+Time: 1730182445.7468138, Phrase: Hello. 
+Time: 1730182447.030886, Phrase: Hello. 
+Time: 1730182448.2282355, Phrase: Hello. 
+Time: 1730182449.456164, Phrase: Hello. 
+Time: 1730182450.6600683, Phrase: Hello. 
+Time: 1730182451.72817, Phrase: Hello. 
+Time: 1730182452.724995, Phrase: Hello. 
+Time: 1730182453.7319105, Phrase: Hello. 
+Time: 1730182454.8402746, Phrase: Hello. 
+Time: 1730182455.8720622, Phrase: Hello. 
+Time: 1730182456.9444616, Phrase: Hello. 
+Time: 1730182458.1241233, Phrase: Hello. 
+Time: 1730182459.1954315, Phrase: Hello. 
+Time: 1730182460.1947982, Phrase: Hello. 
+Time: 1730182461.2497294, Phrase: Hello. 
+Time: 1730182472.5651863, Phrase: Thirty-five, thirty-five, and 35. 
+Time: 1730182473.1496296, Phrase: Thirty-five, thirty-five, and 35. 
+Time: 1730182474.1369576, Phrase: Thirty-five, thirty-five, and 35. 
+Time: 1730182475.1736484, Phrase: Thirty-five, thirty-five, and 35. 
+Time: 1730182476.23213, Phrase: Thirty-five, thirty-five, and 35. 

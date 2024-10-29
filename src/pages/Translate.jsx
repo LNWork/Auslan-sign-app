@@ -60,9 +60,11 @@ const TranslateApp = () => {
 
             // Set translated text or handle fallback
             const isInGemini = data.flag;
+            
             // =======================================
             // PUT CODE HERE FOR GEMINI FLAG HANDLING
             // =======================================
+            setLoading(isInGemini)
         } catch (error) {
             console.error("Error:", error);
             setTranslatedText(

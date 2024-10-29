@@ -98,6 +98,8 @@ def concatenate_poses_and_upload(blob_names, sentence):
         output_path = temp_video_path.replace('.mp4', '_converted.mp4')
         try:
             # Capture output to check for errors
+
+            #! FFMPEG will need to be install on all computers
             result = subprocess.run(['ffmpeg', '-i', temp_video_path, '-vcodec', 'libx264', '-acodec', 'aac', output_path], 
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 

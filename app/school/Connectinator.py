@@ -82,8 +82,8 @@ class Connectinator:
         processed_t2s_phrase_one, processed_t2s_phrase_two = self.text_animation_translation.parse_text_to_sign(
             input)
 
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-        print(processed_t2s_phrase_one, processed_t2s_phrase_two)
+        # print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        # print(processed_t2s_phrase_one, processed_t2s_phrase_two)
 
         # Create video from the processed sentence
         process_sentence(processed_t2s_phrase_one)
