@@ -207,7 +207,7 @@ const TranslateApp = () => {
                             </div>
                         ) : (
                             <div style={styles.videoPlaceholder}>
-                                Please type in a sentence and click convert!
+                                Please type in a sentence and click translate!
                             </div>
                         )}
                     </div>
