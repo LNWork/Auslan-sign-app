@@ -60,11 +60,12 @@ const TranslateApp = () => {
 
             // Set translated text or handle fallback
             const isInGemini = data.flag;
-            
+
             // =======================================
             // PUT CODE HERE FOR GEMINI FLAG HANDLING
             // =======================================
-            setLoading(isInGemini)
+            console.log("GeminiFlag:", isInGemini);
+            setLoading(isInGemini);
         } catch (error) {
             console.error("Error:", error);
             setTranslatedText(
@@ -97,7 +98,7 @@ const TranslateApp = () => {
         const fixedSourceText = sourceText.trim();
         console.log("Sending Source Text:", fixedSourceText);
         setLoading(true); // Set loading to true while fetching video
-    
+
         // Step 1: API call to parse sentence to Auslan grammar
         try {
             const response = await fetch("http://127.0.0.1:8001/t2s", {
@@ -155,12 +156,19 @@ const TranslateApp = () => {
 
                     <div style={styles.panel}>
                         <h2>Text</h2>
-                        <textarea
-                            placeholder='Translation will appear here'
-                            value={translatedText}
-                            readOnly
-                            style={styles.textarea}
-                        />
+                        {loading ? ( // Display loading animation if loading is true
+                            <div style={styles.loadingPlaceholder}>
+                                {/* Loading... */}
+                                <div className='spinner'></div>
+                            </div>
+                        ) : (
+                            <textarea
+                                placeholder='Translation will appear here'
+                                value={translatedText}
+                                readOnly
+                                style={styles.textarea}
+                            />
+                        )}
                     </div>
                 </>
             ) : (
@@ -192,7 +200,7 @@ const TranslateApp = () => {
                         {loading ? ( // Display loading animation if loading is true
                             <div style={styles.loadingPlaceholder}>
                                 {/* Loading... */}
-                                <div className="spinner"></div>
+                                <div className='spinner'></div>
                             </div>
                         ) : animatedSignVideo ? (
                             <div style={styles.videoContainer}>
@@ -202,7 +210,9 @@ const TranslateApp = () => {
                                     autoPlay
                                     loop
                                     style={styles.video}
-                                    onLoadedMetadata={(e) => (e.target.playbackRate = 1.0)}
+                                    onLoadedMetadata={(e) =>
+                                        (e.target.playbackRate = 1.0)
+                                    }
                                 />
                             </div>
                         ) : (
@@ -292,9 +302,10 @@ const styles = {
         alignItems: "center",
         backgroundColor: "#333333", // A background color for the placeholder
         color: "darkgray",
-        borderRadius: "8px"
+        borderRadius: "8px",
     },
-    loadingPlaceholder: { // New loading animation style
+    loadingPlaceholder: {
+        // New loading animation style
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

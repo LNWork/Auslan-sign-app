@@ -128,3 +128,62 @@ Time: 1730182473.1496296, Phrase: Thirty-five, thirty-five, and 35.
 Time: 1730182474.1369576, Phrase: Thirty-five, thirty-five, and 35. 
 Time: 1730182475.1736484, Phrase: Thirty-five, thirty-five, and 35. 
 Time: 1730182476.23213, Phrase: Thirty-five, thirty-five, and 35. 
+Time: 1730198722.095382, Phrase: 
+Time: 1730198730.34198, Phrase: , cubbyhouse
+Time: 1730198731.971528, Phrase: , cubbyhouse
+Time: 1730198957.3351, Phrase: , cubbyhouse
+Time: 1730198958.4682932, Phrase: , cubbyhouse
+Time: 1730199071.5914629, Phrase: , cubbyhouse
+Time: 1730199072.9145422, Phrase: , cubbyhouse
+Time: 1730199074.173533, Phrase: , cubbyhouse
+Time: 1730199082.626647, Phrase: , swing
+Time: 1730199083.906497, Phrase: , swing
+Time: 1730199085.2051451, Phrase: , swing
+Time: 1730199095.3592389, Phrase: Hello. 
+Time: 1730199095.371758, Phrase: Hello. 
+Time: 1730199096.6778, Phrase: Hello. 
+Time: 1730199098.02404, Phrase: Hello. 
+Time: 1730199109.534977, Phrase: Option 1 (Simple):
+Time: 1730199109.827656, Phrase: Option 1 (Simple):
+Time: 1730199111.108581, Phrase: Option 1 (Simple):
+Time: 1730199112.405417, Phrase: Option 1 (Simple):
+Time: 1730199166.310272, Phrase: Hello, hello, hello. 
+Time: 1730199167.2124312, Phrase: Hello, hello, hello. 
+Time: 1730199168.4910378, Phrase: Hello, hello, hello. 
+Time: 1730199182.9377122, Phrase: Hello, hello, hello. 
+Time: 1730199184.224892, Phrase: Hello, hello, hello. 
+Time: 1730199200.541655, Phrase: Hello, hello, swung the cubbyhouse. 
+Time: 1730199201.394688, Phrase: Hello, hello, swung the cubbyhouse. 
+Time: 1730199202.7136772, Phrase: Hello, hello, swung the cubbyhouse. 
+Time: 1730199214.599778, Phrase: There is no sentence to be formed as hello, cubbyhouse does not form a complete thought.  However, you could use these words to create a sentence like:I built a cubbyhouse, and said hello to my friends. 
+Time: 1730199215.1633332, Phrase: There is no sentence to be formed as hello, cubbyhouse does not form a complete thought.  However, you could use these words to create a sentence like:I built a cubbyhouse, and said hello to my friends. 
+Time: 1730199216.440821, Phrase: There is no sentence to be formed as hello, cubbyhouse does not form a complete thought.  However, you could use these words to create a sentence like:I built a cubbyhouse, and said hello to my friends. 
+Time: 1730199405.761102, Phrase: 
+Time: 1730199410.7322502, Phrase: , hello
+Time: 1730199411.807523, Phrase: , hello
+Time: 1730199412.899849, Phrase: , hello
+Time: 1730199421.697037, Phrase: , hello
+Time: 1730199422.959088, Phrase: , hello
+Time: 1730199424.339481, Phrase: , hello
+Time: 1730199425.676362, Phrase: , hello
+Time: 1730199438.9680681, Phrase: Hello, cubbyhouse!
+Time: 1730199440.138913, Phrase: Hello, cubbyhouse!
+Time: 1730199441.448318, Phrase: Hello, cubbyhouse!
+Time: 1730199581.509325, Phrase: Hello, cubbyhouse!
+Time: 1730199582.870274, Phrase: Hello, cubbyhouse!
+Time: 1730199592.739763, Phrase: Swing, hello, swing, she shouted, enjoying the rhythm of the playground.
+Time: 1730199593.6560361, Phrase: Swing, hello, swing, she shouted, enjoying the rhythm of the playground.
+Time: 1730199594.720448, Phrase: Swing, hello, swing, she shouted, enjoying the rhythm of the playground.
+Time: 1730199595.7444859, Phrase: Swing, hello, swing, she shouted, enjoying the rhythm of the playground.
+Time: 1730199646.0075362, Phrase: Swing, hello, swing, she shouted, enjoying the rhythm of the playground.
+Time: 1730199656.1761081, Phrase: , hello
+Time: 1730199657.474784, Phrase: , hello
+Time: 1730199658.7814589, Phrase: , hello
+Time: 1730199660.858697, Phrase: , hello
+Time: 1730199670.899193, Phrase: Hello, hello, swing! 
+Time: 1730199671.8076842, Phrase: Hello, hello, swing! 
+Time: 1730199673.090454, Phrase: Hello, hello, swing! 
+Time: 1730199997.318201, Phrase: Hello, hello, swing! 
+Time: 1730200004.071434, Phrase: Swing, swing. 
+Time: 1730200004.915452, Phrase: Swing, swing. 
+Time: 1730200005.965587, Phrase: Swing, swing. 
