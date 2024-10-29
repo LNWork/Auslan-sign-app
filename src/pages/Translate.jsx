@@ -188,7 +188,10 @@ const TranslateApp = () => {
                     <div style={styles.panel}>
                         <h2>Sign Video</h2>
                         {loading ? ( // Display loading animation if loading is true
-                            <div style={styles.loadingPlaceholder}>Loading...</div>
+                            <div style={styles.loadingPlaceholder}>
+                                {/* Loading... */}
+                                <div className="spinner"></div>
+                            </div>
                         ) : animatedSignVideo ? (
                             <div style={styles.videoContainer}>
                                 <video
@@ -296,7 +299,7 @@ const styles = {
         width: "100%",
         height: "100%",
         fontSize: "20px",
-        color: "gray",
+        color: "white",
         backgroundColor: "#333333",
         borderRadius: "8px",
     },
