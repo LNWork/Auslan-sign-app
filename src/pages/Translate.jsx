@@ -129,6 +129,8 @@ const TranslateApp = () => {
             setTranslatedText(
                 `Error: ${error.message}. Please check the API and input.`
             );
+        } finally {
+            setLoading(false); // Set loading to false after fetching video
         }
     };
 
