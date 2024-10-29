@@ -28,3 +28,6 @@ Time: 1730119499.1080947, Phrase: Hello! Hello! Hello! It's me!
 Time: 1730119500.6169796, Phrase: Hello! Hello! Hello! It's me!
 Time: 1730119502.1158943, Phrase: Hello! Hello! Hello! It's me!
 Time: 1730119503.6326377, Phrase: Hello! Hello! Hello! It's me!
+Time: 1730167610.32958, Phrase: Swing, swing, swing, swing, swing, bright!
+Time: 1730167611.121624, Phrase: Swing, swing, swing, swing, swing, bright!
+Time: 1730167612.4177809, Phrase: Swing, swing, swing, swing, swing, bright!

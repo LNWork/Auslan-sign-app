@@ -51,7 +51,7 @@ class Connectinator:
         self.inputProc = InputParser()
 
         # Create result parser
-        self.results_parser = ResultsParser()
+        self.results_parser = ResultsParser(self)
 
         # Create text ani transltior
         self.text_animation_translation = textAnimationTranslation()

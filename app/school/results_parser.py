@@ -7,7 +7,6 @@ from flask import Flask, jsonify, request
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import re
-import Connectinator
 
 load_dotenv(override=True)
 
@@ -17,9 +16,9 @@ genai.configure()
 
 class ResultsParser:
     # Only create model once
-    def __init__(self):
+    def __init__(self, connectinator):
         self.model = None
-        self.connectinator = Connectinator.Connectinator()
+        self.connectinator = connectinator
 
     # Function for lazy loading for efficiency
     def _initialize_model(self):
@@ -52,6 +51,7 @@ class ResultsParser:
         if len(best_model_phrase.split()) > 2:
             print("contacting gemini")
             self.connectinator.geminiFlag = True
+            print(self.connectinator.geminiFlag)
 
             # Create model if it does not exist
             self._initialize_model()
@@ -78,6 +78,7 @@ class ResultsParser:
             result = best_model_phrase
         print("DONE")
         self.connectinator.geminiFlag = False
+        print(self.connectinator.geminiFlag)
         return result
 
     def save_as_json(self, parsed_result, output_filename="parsed_result.json"):
