@@ -8,7 +8,8 @@ const TranslateApp = () => {
     const [sourceText, setSourceText] = useState("");
     const [translatedText, setTranslatedText] = useState("");
     const [animatedSignVideo, setAnimatedSignVideo] = useState(null);
-    const videoInputRef = useRef(null); // Define videoInputRef here
+    const videoInputRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
     // Function to swap between modes
     const handleSwap = () => {
@@ -68,6 +69,7 @@ const TranslateApp = () => {
     const handleTextToVideo = async () => {
         const fixedSourceText = sourceText.trim();
         console.log("Sending Source Text:", fixedSourceText);
+        setLoading(true); // Set loading to true while fetching video
     
         // Step 1: API call to parse sentence to Auslan grammar
         try {
@@ -101,6 +103,8 @@ const TranslateApp = () => {
         } catch (error) {
             console.error("Error:", error);
             setTranslatedText(`Error: ${error.message}. Please check the API and input.`);
+        } finally {
+            setLoading(false); // Set loading to false after fetching video
         }
     };
     
@@ -157,7 +161,9 @@ const TranslateApp = () => {
 
                     <div style={styles.panel}>
                         <h2>Sign Video</h2>
-                        {animatedSignVideo ? (
+                        {loading ? ( // Display loading animation if loading is true
+                            <div style={styles.loadingPlaceholder}>Loading...</div>
+                        ) : animatedSignVideo ? (
                             <div style={styles.videoContainer}>
                                 <video
                                     src={animatedSignVideo}
@@ -165,9 +171,7 @@ const TranslateApp = () => {
                                     autoPlay
                                     loop
                                     style={styles.video}
-                                    onLoadedMetadata={(e) =>
-                                        (e.target.playbackRate = 1.0)
-                                    }
+                                    onLoadedMetadata={(e) => (e.target.playbackRate = 1.0)}
                                 />
                             </div>
                         ) : (
@@ -256,8 +260,19 @@ const styles = {
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "#333333", // A background color for the placeholder
-        color: "darkgray", // White text color for contrast
+        color: "darkgray",
         borderRadius: "8px"
+    },
+    loadingPlaceholder: { // New loading animation style
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+        height: "100%",
+        fontSize: "20px",
+        color: "gray",
+        backgroundColor: "#333333",
+        borderRadius: "8px",
     },
 };
 
