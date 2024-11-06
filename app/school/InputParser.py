@@ -1,10 +1,4 @@
 import numpy as np
-import json
-import os
-import pandas as pd
-
-# Class used to store the frame data
-
 # Parameters (adjust for real-time speed and accuracy)
 THRESHOLD = 0.05
 VISIBILITY_THRESHOLD = 0.7
@@ -30,27 +24,30 @@ class InputParser:
         self.handsDownCounter = 0
         self.endOfPhrase = False
 
-    def normalize_keypoints(self, data):
-        """Normalize the keypoints data."""
+    @staticmethod
+    def normalise_keypoints(data):
+        """Normalise the keypoints data."""
         data = np.array(data)  # Convert to NumPy array
         coords = data[..., :3]  # Extract x, y, z coordinates
         min_vals = np.min(coords, axis=0, keepdims=True)
         max_vals = np.max(coords, axis=0, keepdims=True)
 
-        # Normalize the coordinates
-        normalized_coords = (coords - min_vals) / (max_vals - min_vals + 1e-8)
+        # Normalise the coordinates
+        normalised_coords = (coords - min_vals) / (max_vals - min_vals + 1e-8)
 
-        normalized_data = data.copy()
-        # Replace with normalized x, y, z
-        normalized_data[..., :3] = normalized_coords
+        normalised_data = data.copy()
+        # Replace with normalised x, y, z
+        normalised_data[..., :3] = normalised_coords
 
-        return normalized_data
+        return normalised_data
 
-    def extract_keypoints(self, landmarks):
+    @staticmethod
+    def extract_keypoints(landmarks):
         """Extract the keypoints (x, y, z, visibility) from the landmarks."""
         return np.array([[landmark['x'], landmark['y'], landmark['z'], landmark['visibility']] for landmark in landmarks])
 
-    def pad_chunk(self, chunk, max_length=MAX_CHUNK_LENGTH):
+    @staticmethod
+    def pad_chunk(chunk, max_length=MAX_CHUNK_LENGTH):
         """Pads the chunk with the last frame to reach the max length of frames."""
         chunk_length = len(chunk)  # Get the length of the chunk (a list)
         if chunk_length < max_length:
@@ -59,42 +56,42 @@ class InputParser:
             chunk.extend([last_frame] * padding_needed)  # Add padding
         return chunk
 
+    @staticmethod
+    def calculate_velocity(keypoints_current, keypoints_previous):
+        """Calculate the velocity of keypoints between two frames."""
+        velocities = np.linalg.norm(
+            keypoints_current[:, :3] - keypoints_previous[:, :3], axis=1)
+        return np.mean(velocities)
+
+    @staticmethod
+    def visibility_check(keypoints):
+        """Check if the visibility of keypoints is above a threshold."""
+        visible_keypoints_count = (
+            keypoints[..., 3] >= VISIBILITY_THRESHOLD).sum()
+        total_keypoints = len(keypoints[..., 3])
+        return visible_keypoints_count >= total_keypoints * VISIBILITY_COUNT
+
+    @staticmethod
+    def hands_down(left_hand, right_hand):
+        """Check if both hands are below a certain threshold."""
+        left_hand_y = np.mean(left_hand[:, 1])
+        right_hand_y = np.mean(right_hand[:, 1])
+        return left_hand_y < HANDS_DOWN_THRESHOLD and right_hand_y < HANDS_DOWN_THRESHOLD
+
     def combine_keypoints(self, frame):
         """Combine pose, left hand, and right hand keypoints into a single array."""
-        # combined = np.concatenate((frame['keypoints']), axis=0)
-        # Checker for missing keypoint data
         full_data = []
         for index, keypoints in enumerate(frame):
-            if keypoints != None:
+            if keypoints is not None:
                 full_data += keypoints
                 continue
 
             pose_number = 33 if index == 0 else 21
-
-            match index:
-                case 0:
-                    full_data += [{'x': 0, 'y': 0, 'z': 0, 'visibility': 0}
-                                  for _ in range(pose_number)]
-                case 1 | 2:
-                    full_data += [{'x': 0, 'y': 0, 'z': 0, 'visibility': 0}
-                                  for _ in range(pose_number)]
-                case _:
-                    print("if goes here u have stuffed up")
-
-        # combined = self.extract_keypoints(full_data)
-        # print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-        # print(full_data)
+            full_data += [{'x': 0, 'y': 0, 'z': 0, 'visibility': 0}
+                          for _ in range(pose_number)]
 
         extracted_data = self.extract_keypoints(full_data)
-        # Normalize combined keypoints
-        return self.normalize_keypoints(extracted_data)
-
-    def calculate_velocity(self, keypoints_current, keypoints_previous):
-        """Calculate the velocity of keypoints between two frames."""
-        velocities = np.linalg.norm(
-            keypoints_current[:, :3] - keypoints_previous[:, :3], axis=1)
-        # Return average velocity of all keypoints
-        return np.mean(velocities)
+        return self.normalise_keypoints(extracted_data)
 
     def process_frame(self, frame):
         """Process a single frame of keypoint data in real-time."""
@@ -102,104 +99,52 @@ class InputParser:
         chunk_result = None
         locEOP = False
 
-        # Check if hands are down, and return None if detected
-        handsDown = self.handsDown(
-            keypoints_current[33:53], keypoints_current[54:74])
-        if handsDown:
+        if self.hands_down(keypoints_current[33:53], keypoints_current[54:74]):
             self.handsDownCounter += 1
-            # print("HANDS DOWN for ", self.handsDownCounter)
             if self.handsDownCounter >= HANDS_DOWN_TIME:
-                # print("HANDS DOWN FOR TOO LONG - END OF PHRASE")
-                chunk_result, locEOP = self.endPhrase()
-                return chunk_result, locEOP  # Return immediately if hands are down
-            return None, False  # Return None if hands are detected down but not long enough
+                chunk_result, locEOP = self.end_phrase()
+                return chunk_result, locEOP
+            return None, False
         else:
-            self.handsDownCounter = 0  # Reset if hands are detected
+            self.handsDownCounter = 0
 
-        # Store combined and normalized keypoints in 'data'
         frame['data'] = keypoints_current.tolist()
 
         if self.previous_keypoints is not None:
-            # Calculate velocity between consecutive frames
             velocity = self.calculate_velocity(
                 keypoints_current, self.previous_keypoints)
-            # print(f"Calculated velocity: {velocity}")
 
-            # Detect if movement is under the threshold
             if velocity < self.threshold:
-                # print("velocity < threshold, velocity: ", velocity)
                 self.pause_count += 1
             else:
-                self.pause_count = 0  # Reset pause count when movement occurs
+                self.pause_count = 0
 
-            # Check if we detect a potential boundary or chunk size exceeds limit
             if self.pause_count >= self.window_size or len(self.current_chunk) >= MAX_CHUNK_LENGTH:
                 chunk_result, locEOP = self.save_chunk(self.current_chunk)
-                self.current_chunk = []  # Start a new chunk after saving the current one
-                self.pause_count = 0  # Reset pause counter
+                self.current_chunk = []
+                self.pause_count = 0
             else:
-                self.buffer = []  # Clear buffer if no boundary detected
+                self.buffer = []
 
-        # Add the current frame to the chunk
         self.current_chunk.append(frame)
-        self.previous_keypoints = keypoints_current  # Update for the next frame
+        self.previous_keypoints = keypoints_current
 
         return chunk_result, locEOP
 
     def save_chunk(self, chunk):
         """Save the current chunk to a JSON file in the specified format, padding it to 145 frames."""
-        # os.makedirs('outputChunks',
-        #             exist_ok=True)  # Ensure the output directory exists
-        # filename = f"outputChunks/chunk_{self.chunk_counter}.json"
-
-        # Pad the chunk to 145 frames if necessary
         padded_chunk = self.pad_chunk(chunk)
-
-        # Prepare the formatted data
-        chunk_data = []
-        for i, frame in enumerate(padded_chunk):
-            chunk_data.append(frame['data'])
+        chunk_data = [frame['data'] for frame in padded_chunk]
         padded_np_arr = np.array(chunk_data)
-
         final_chunk = padded_np_arr.reshape(145, 75, 4)
-        # TODO: SEND TO CONNECTINATOR
-        # print("finsih save")
-
         return final_chunk, False
-        # Save to the JSON file
-        # with open(filename, 'w') as f:
-        #     json.dump(chunk_data, f, indent=4)
 
-        # print(
-        #     f"Chunk saved to {filename} with {len(chunk_data)} frames (padded if needed).")
-        # self.chunk_counter += 1
-
-    def visibility_check(self, keypoints):
-        """Check if the visibility of keypoints is above a threshold."""
-        visible_keypoints_count = (
-            keypoints[..., 3] >= VISIBILITY_THRESHOLD).sum()
-        total_keypoints = len(keypoints[..., 3])
-        return visible_keypoints_count >= total_keypoints * VISIBILITY_COUNT
-
-    def endPhrase(self):
+    def end_phrase(self):
         """End the current phrase and save the chunks to a file."""
-        # print("END OF PHRASE")
-        self.callFunc()
+        self.call_func()
         return None, True
 
-    def handsDown(self, leftHand, rightHand):
-        """Check if both hands are below a certain threshold."""
-
-        # Y is the second column in the keypoints (x, y, z, visibility)
-        leftHandY = np.mean(leftHand[:, 1])
-        rightHandY = np.mean(rightHand[:, 1])
-        # print("LEFT HAND Y: ", leftHandY)
-        # print("RIGHT HAND Y: ", rightHandY)
-        return leftHandY < HANDS_DOWN_THRESHOLD and rightHandY < HANDS_DOWN_THRESHOLD
-
-    def callFunc(self):
-        # print("CALLING FUNCTION")
-        # self.connectinator.phraseFlag = True
+    def call_func(self):
         self.reset()
 
     def reset(self):
